@@ -79,26 +79,37 @@ void exit_screen(char **envp) {
     }
 }
 
+// void execute_command(char *command, char **envp) {
+//     pid_t pid = fork();
+//     if (pid == 0) {
+//         char *argv[] = {/usr/bin/env, NULL};
+//         execve(command, argv, envp);
+//         perror("execve");
+//         exit(EXIT_FAILURE);
+//     } else if (pid > 0) {
+//         wait(NULL);
+//     } else {
+//         perror("fork");
+//         exit(EXIT_FAILURE);
+//     }
+// }
+
 int main(int argc, char **argv, char **envp) {
-    clear_screen(envp);
+    //clear_screen(envp);
     char *line;
     char *pro;
     argc = 0;
     argv = NULL;
-    char **str;
+    //char **str;
     int i = 0;
     while (1) {
 
         pro = prompt();
         line = readline(pro);
-        str = split_string(line);
+        if(line == NULL)
+            return 0;
+        print_type(line);
         i = 0;
-        while(str[i])
-        {
-            printf("%s\n", str[i]);
-            i++;
-
-        }
         if (line == NULL) {
             break;
         }
@@ -114,6 +125,8 @@ int main(int argc, char **argv, char **envp) {
             free(line);
             break;
         }
+        // else if(strcmp(line, "env") == 0)
+        //     execute_command(line, envp);
         free(line);
     }
 

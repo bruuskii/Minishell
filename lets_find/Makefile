@@ -1,4 +1,4 @@
-SRCS = ft_split.c main.c
+SRCS = ft_split.c parsing.c main.c
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc
