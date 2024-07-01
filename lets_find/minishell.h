@@ -29,6 +29,7 @@ char **split_string(const char *str);
 int	is_operator(const char *str);
 int  print_type(char *str);
 int parse_every_word(char **tokens);
+char  **double_quotes(char **tokens);
 
 
 

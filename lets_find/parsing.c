@@ -1,7 +1,8 @@
 #include "minishell.h"
 
 int print_type(char *str) {
-    char **tokens = split_string(str);
+    char **real_tokens = split_string(str);
+    char **tokens = double_quotes(real_tokens);
     int index = 0;
     int last_operator = 0;
 
@@ -10,14 +11,14 @@ int print_type(char *str) {
         token.token = tokens[index];
         if (index == 0) {
             token.type = "command";
-        }else if(last_operator)
-        {
+        } else if (last_operator) {
             token.type = "command";
             last_operator = 0;
-        }
-        else if (is_operator(tokens[index])) {
+        } else if (strcmp(tokens[index], "|") == 0) {
             token.type = "operator";
             last_operator = 1;
+        } else if (is_operator(tokens[index])) {
+            token.type = "operator";
         } else {
             token.type = "argument";
         }
@@ -25,14 +26,58 @@ int print_type(char *str) {
         index++;
     }
     parse_every_word(tokens);
-    // index = 0;
-    // while (tokens[index] != NULL) {
-    //     free(tokens[index]);
-    //     index++;
-    // }
-    free(tokens);
+    index = 0;
+    while (tokens[index] != NULL) {
+        free(tokens[index]);
+        index++;
+    }
+    //free(tokens);
+    index = 0;
+    while (real_tokens[index] != NULL) {
+        free(real_tokens[index]);
+        index++;
+    }
+    free(real_tokens);
     return 1;
 }
+
+char **double_quotes(char **tokens) {
+    int i = 0;
+    while (tokens[i]) {
+        i++;
+    }
+    char **real_tokens = (char **)malloc((i + 1) * sizeof(char *));
+    i = 0;
+    int k = 0;
+    int index = 0;
+    int pos = 0;
+    while (tokens[i]) {
+        int len = strlen(tokens[i]);
+        k = 0;
+        pos = 0;
+        real_tokens[index] = (char *)malloc((len + 1) * sizeof(char));
+        if ((tokens[i][0] == '"' && tokens[i][len - 1] == '"') || (tokens[i][0] == '\'' && tokens[i][len - 1] == '\'')) {
+            k++;
+            while (k < len - 1) {
+                real_tokens[index][pos] = tokens[i][k];
+                pos++;
+                k++;
+            }
+        } else {
+            while (tokens[i][k]) {
+                real_tokens[index][pos] = tokens[i][k];
+                k++;
+                pos++;
+            }
+        }
+        real_tokens[index][pos] = '\0';
+        i++;
+        index++;
+    }
+    real_tokens[index] = NULL;
+    return real_tokens;
+}
+
 
 int parse_every_word(char **tokens)
 {
@@ -45,6 +90,7 @@ int parse_every_word(char **tokens)
     while(tokens[index] != NULL)
     {
         i = 0;
+        //int len = strlen(tokens[index]);
         while(tokens[index][i] != '\0')
         {
             if(tokens[index][i] == '\'')
@@ -56,7 +102,7 @@ int parse_every_word(char **tokens)
         index++;
     }
 
-    if(count_single % 2 != 0 || count_double != 0)
+    if(count_single % 2 != 0 || count_double % 2 != 0)
     {
         write(2, "what the fuck!!\n", 16);
         return 0;

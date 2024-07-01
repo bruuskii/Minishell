@@ -95,7 +95,7 @@ void exit_screen(char **envp) {
 // }
 
 int main(int argc, char **argv, char **envp) {
-    //clear_screen(envp);
+    clear_screen(envp);
     char *line;
     char *pro;
     argc = 0;
