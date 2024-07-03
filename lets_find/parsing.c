@@ -2,6 +2,7 @@
 
 int print_type(char *str) {
     char **real_tokens = split_string(str);
+    parse_every_word(real_tokens);
     char **tokens = double_quotes(real_tokens);
     int index = 0;
     int last_operator = 0;
@@ -25,7 +26,6 @@ int print_type(char *str) {
         printf("Token: %s, Type: %s\n", token.token, token.type);
         index++;
     }
-    parse_every_word(tokens);
     index = 0;
     while (tokens[index] != NULL) {
         free(tokens[index]);
@@ -56,7 +56,7 @@ char **double_quotes(char **tokens) {
         k = 0;
         pos = 0;
         real_tokens[index] = (char *)malloc((len + 1) * sizeof(char));
-        if ((tokens[i][0] == '"' && tokens[i][len - 1] == '"') || (tokens[i][0] == '\'' && tokens[i][len - 1] == '\'')) {
+        if ((tokens[i][0] == '"' && tokens[i][len - 1] == '"' && len > 1) || (tokens[i][0] == '\'' && tokens[i][len - 1] == '\'' && len > 1)) {
             k++;
             while (k < len - 1) {
                 real_tokens[index][pos] = tokens[i][k];
