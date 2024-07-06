@@ -94,7 +94,19 @@ void exit_screen(char **envp) {
 //     }
 // }
 
+void handle_sigint() {
+    printf("\n");
+    char *str = prompt();
+    printf("%s", str);
+    fflush(stdout);
+}
+
 int main(int argc, char **argv, char **envp) {
+
+    struct sigaction sa;
+    sa.sa_handler = &handle_sigint;
+    sa.sa_flags = SA_RESTART; // Restart interrupted system calls
+    sigaction(SIGINT, &sa, NULL);
     clear_screen(envp);
     char *line;
     char *pro;

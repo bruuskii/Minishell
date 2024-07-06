@@ -46,35 +46,42 @@ char **double_quotes(char **tokens) {
     while (tokens[i]) {
         i++;
     }
+    
     char **real_tokens = (char **)malloc((i + 1) * sizeof(char *));
     i = 0;
-    int k = 0;
     int index = 0;
-    int pos = 0;
+
     while (tokens[i]) {
         int len = strlen(tokens[i]);
-        k = 0;
-        pos = 0;
+        int k = 0, pos = 0;
+        int in_quote = 0;
+        char current_quote = '\0';
+
         real_tokens[index] = (char *)malloc((len + 1) * sizeof(char));
-        if ((tokens[i][0] == '"' && tokens[i][len - 1] == '"' && len > 1) || (tokens[i][0] == '\'' && tokens[i][len - 1] == '\'' && len > 1)) {
+
+        while (k < len) {
+            if ((tokens[i][k] == '"' || tokens[i][k] == '\'') && !in_quote) {
+                // Start of a quote
+                in_quote = 1;
+                current_quote = tokens[i][k];
+            } else if (tokens[i][k] == current_quote && in_quote) {
+                // End of a quote
+                in_quote = 0;
+                current_quote = '\0';
+            } else {
+                // Copy character if not within quotes
+                real_tokens[index][pos] = tokens[i][k];
+                pos++;
+            }
             k++;
-            while (k < len - 1) {
-                real_tokens[index][pos] = tokens[i][k];
-                pos++;
-                k++;
-            }
-        } else {
-            while (tokens[i][k]) {
-                real_tokens[index][pos] = tokens[i][k];
-                k++;
-                pos++;
-            }
         }
+
         real_tokens[index][pos] = '\0';
         i++;
         index++;
     }
     real_tokens[index] = NULL;
+
     return real_tokens;
 }
 
@@ -87,6 +94,7 @@ int parse_every_word(char **tokens)
     int count_double = 0;
     index = 0;
     i = 0;
+
     while(tokens[index] != NULL)
     {
         i = 0;
