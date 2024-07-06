@@ -2,7 +2,8 @@
 
 int print_type(char *str) {
     char **real_tokens = split_string(str);
-    parse_every_word(real_tokens);
+    if(!parse_every_word(real_tokens))
+        return (0);
     char **tokens = double_quotes(real_tokens);
     int index = 0;
     int last_operator = 0;

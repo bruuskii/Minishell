@@ -67,8 +67,7 @@ void ls_screen(char **envp) {
 void exit_screen(char **envp) {
     pid_t pid = fork();
     if (pid == 0) {
-        char *clear[] = {"/usr/bin/ls", NULL};
-        execve("/usr/bin/exit", clear, envp);
+        execvp("exit", envp);
         perror("execve");
         exit(EXIT_FAILURE);
     } else if (pid > 0) {
@@ -101,6 +100,36 @@ void handle_sigint() {
     fflush(stdout);
 }
 
+void    *_malloc(size_t size)
+{
+    void *ptr;
+    ptr = malloc(size);
+    if (!ptr)
+        return NULL;
+    return ptr;
+}
+
+char **init_env(char **str)
+{
+    int i = 0;
+    while(str[i])
+        i++;
+    char **result = (char **)_malloc((i + 1) * sizeof(char *));
+    i = -1;
+    while (str[++i])
+        result[i] = str[i];
+    result[i] = NULL;
+    return result;
+    
+}
+
+void    print_env(char **env)
+{
+    int i = -1;
+    while (env[++i])
+        printf("%s\n", env[i]);
+}
+
 int main(int argc, char **argv, char **envp) {
 
     struct sigaction sa;
@@ -110,6 +139,7 @@ int main(int argc, char **argv, char **envp) {
     clear_screen(envp);
     char *line;
     char *pro;
+    char **env = init_env(envp);
     argc = 0;
     argv = NULL;
     //char **str;
@@ -122,16 +152,14 @@ int main(int argc, char **argv, char **envp) {
             return 0;
         print_type(line);
         i = 0;
-        if (line == NULL) {
+        if (line == NULL)
             break;
-        }
-        if (strcmp(line, "clear") == 0) {
+        if (strcmp(line, "clear") == 0)
             clear_screen(envp);
-        }
         if(strcmp(line, "ls") == 0)
-        {
             ls_screen(envp);
-        }
+        if (strcmp(line, "env") == 0)
+            print_env(env);
         if(strcmp(line, "exit") == 0)
         {
             free(line);
@@ -141,6 +169,10 @@ int main(int argc, char **argv, char **envp) {
         //     execute_command(line, envp);
         free(line);
     }
+    i = -1;
+    while (env[++i])
+        free(env[i]);
+    free(env);
 
     return 0;
 }
