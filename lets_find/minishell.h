@@ -10,6 +10,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <readline/history.h>
 
 #define RESET "\033[0m"
 #define RED "\033[0;31m"
@@ -25,15 +26,23 @@ typedef struct s_token
     char *type;
 }               t_token;
 
+typedef struct s_env
+{
+    char *line;
+    struct s_env *next;
+    struct s_env *prev;
+}               t_env;
+
+
 char **split_string(const char *str);
 int	is_operator(const char *str);
 int  print_type(char *str);
 int parse_every_word(char **tokens);
 char  **double_quotes(char **tokens);
-
-
-
-
+int cd_builtin(const char *path);
+void pwd(char **envp);
+void    print_env(t_env *env);
+t_env *init_env(char **str);
 
 
 

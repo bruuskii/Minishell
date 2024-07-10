@@ -1,9 +1,9 @@
-SRCS = ft_split.c parsing.c main.c
+SRCS = ft_split.c parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c main.c
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror -g
+CFLAGS = -Wall -Wextra -Werror 
 LDFLAGS = -lreadline
 
 all: ${NAME}

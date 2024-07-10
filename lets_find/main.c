@@ -78,20 +78,6 @@ void exit_screen(char **envp) {
     }
 }
 
-// void execute_command(char *command, char **envp) {
-//     pid_t pid = fork();
-//     if (pid == 0) {
-//         char *argv[] = {/usr/bin/env, NULL};
-//         execve(command, argv, envp);
-//         perror("execve");
-//         exit(EXIT_FAILURE);
-//     } else if (pid > 0) {
-//         wait(NULL);
-//     } else {
-//         perror("fork");
-//         exit(EXIT_FAILURE);
-//     }
-// }
 
 void handle_sigint() {
     printf("\n");
@@ -109,70 +95,48 @@ void    *_malloc(size_t size)
     return ptr;
 }
 
-char **init_env(char **str)
-{
-    int i = 0;
-    while(str[i])
-        i++;
-    char **result = (char **)_malloc((i + 1) * sizeof(char *));
-    i = -1;
-    while (str[++i])
-        result[i] = str[i];
-    result[i] = NULL;
-    return result;
-    
-}
-
-void    print_env(char **env)
-{
-    int i = -1;
-    while (env[++i])
-        printf("%s\n", env[i]);
-}
 
 int main(int argc, char **argv, char **envp) {
 
     struct sigaction sa;
     sa.sa_handler = &handle_sigint;
-    sa.sa_flags = SA_RESTART; // Restart interrupted system calls
+    sa.sa_flags = SA_RESTART; // For Ctr C
     sigaction(SIGINT, &sa, NULL);
     clear_screen(envp);
     char *line;
     char *pro;
-    char **env = init_env(envp);
+    t_env *env = init_env(envp);
     argc = 0;
     argv = NULL;
-    //char **str;
     int i = 0;
-    while (1) {
+    while (1) 
+    {
 
         pro = prompt();
         line = readline(pro);
-        if(line == NULL)
-            return 0;
-        print_type(line);
+        if(line)
+        {
+             add_history(line);
+            print_type(line);
+        }
+        else
+            continue ;
         i = 0;
-        if (line == NULL)
-            break;
         if (strcmp(line, "clear") == 0)
             clear_screen(envp);
         if(strcmp(line, "ls") == 0)
             ls_screen(envp);
         if (strcmp(line, "env") == 0)
             print_env(env);
+        if(strcmp(line, "pwd") == 0)
+            pwd(envp);
         if(strcmp(line, "exit") == 0)
         {
-            free(line);
+            //free(line);
             break;
         }
-        // else if(strcmp(line, "env") == 0)
-        //     execute_command(line, envp);
-        free(line);
+        //free(line);
     }
-    i = -1;
-    while (env[++i])
-        free(env[i]);
-    free(env);
 
     return 0;
 }
