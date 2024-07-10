@@ -49,3 +49,40 @@ void    print_env(t_env *env)
     }
 }
 
+
+// i added the increment shlvl function, 
+// i will make sure to channge all the forbiden function (strlen...)
+void increment_shell_level(t_env *env) {
+    t_env *current = env;
+    char *shlvl_prefix = "SHLVL=";
+    size_t prefix_len = strlen(shlvl_prefix);
+    int shlvl_value;
+
+    while (current) {
+        if (strncmp(current->line, shlvl_prefix, prefix_len) == 0) {
+            shlvl_value = atoi(current->line + prefix_len);
+            shlvl_value++;
+            
+            char new_shlvl[16];
+            char *i = ft_itoa(shlvl_value);
+            strcpy(new_shlvl, shlvl_prefix);
+            strcat(new_shlvl, i);
+            free(current->line);
+            current->line = strdup(new_shlvl);
+            return;
+        }
+        current = current->next;
+    }
+
+    t_env *new_node = (t_env *)malloc(sizeof(t_env));
+    if (new_node) {
+        new_node->line = strdup("SHLVL=1");
+        new_node->next = env;
+        new_node->prev = NULL;
+        if (env) {
+            env->prev = new_node;
+        }
+        env = new_node;
+    }
+}
+

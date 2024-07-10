@@ -43,8 +43,8 @@ int cd_builtin(const char *path);
 void pwd(char **envp);
 void    print_env(t_env *env);
 t_env *init_env(char **str);
-
-
+void increment_shell_level(t_env *env);
+char	*ft_itoa(int n);
 
 
 

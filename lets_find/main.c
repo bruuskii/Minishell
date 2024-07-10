@@ -106,6 +106,7 @@ int main(int argc, char **argv, char **envp) {
     char *line;
     char *pro;
     t_env *env = init_env(envp);
+    increment_shell_level(env);
     argc = 0;
     argv = NULL;
     int i = 0;

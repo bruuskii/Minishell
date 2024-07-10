@@ -1,9 +1,10 @@
-SRCS = ft_split.c parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c main.c
+SRCS = ft_split.c parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c \
+ft_itoa.c  main.c
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror 
+CFLAGS = -Wall -Wextra -Werror #-fsanitize=address
 LDFLAGS = -lreadline
 
 all: ${NAME}
