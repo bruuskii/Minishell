@@ -114,13 +114,16 @@ int main(int argc, char **argv, char **envp) {
 
         pro = prompt();
         line = readline(pro);
-        if(line)
+        if(!line)
         {
-             add_history(line);
+            printf("exit\n");
+            break;
+        }
+        if(strlen(line) > 0)
+        {
+            add_history(line);
             print_type(line);
         }
-        else
-            continue ;
         i = 0;
         if (strcmp(line, "clear") == 0)
             clear_screen(envp);
