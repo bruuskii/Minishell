@@ -36,7 +36,7 @@ int parse_every_word(char **tokens)
     return 1;
 }
 
-int print_type(char *str) {
+int print_type(char *str, t_env *env) {
     if(!str)
     {
         printf("here");
@@ -73,12 +73,12 @@ int print_type(char *str) {
     while (tokens[index]) {
         if (strcmp(tokens[index], "cd") == 0) {
             if (tokens[index + 1]) {
-                if (cd_builtin(tokens[index + 1]) == 0) {
+                if (cd_builtin(tokens[index + 1], env) == 0) {
                     printf("cd: failed to change directory\n");
                 }
                 index++;
             } else {
-                if (cd_builtin(NULL) == 0) {
+                if (cd_builtin((NULL), env) == 0) {
                     printf("cd: failed to change directory\n");
                 }
             }

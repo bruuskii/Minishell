@@ -123,7 +123,7 @@ int main(int argc, char **argv, char **envp) {
         if(strlen(line) > 0)
         {
             add_history(line);
-            print_type(line);
+            print_type(line, env);
         }
         i = 0;
         if (strcmp(line, "clear") == 0)

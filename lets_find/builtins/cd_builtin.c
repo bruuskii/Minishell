@@ -1,6 +1,6 @@
 #include"../minishell.h"
 
-int cd_builtin(const char *path)
+int cd_builtin(const char *path, t_env *env)
 {
     if (path == NULL)
     {
@@ -12,7 +12,11 @@ int cd_builtin(const char *path)
         }
         path = home;
     }
-      if(chdir(path) != 0)
+    if(chdir(path) == 0)
+    {
+        save_old_pwd(env);
+    }
+    else
     {
             printf("unvalid path\n");
     }

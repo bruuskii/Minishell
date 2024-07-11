@@ -86,3 +86,43 @@ void increment_shell_level(t_env *env) {
     }
 }
 
+void save_old_pwd(t_env *env)
+{
+    int index = 4;
+    t_env *pwd = env;
+    char oldpwd[100];
+    int i = 0;
+    while(pwd)
+    {
+        if(strncmp(pwd->line, "PWD=", 4) == 0)
+        {
+            while(pwd->line[index] != '\0')
+            {
+                oldpwd[i] = pwd->line[index];
+                i++;
+                index++; 
+            }
+            oldpwd[i] = '\0';
+            break;
+        }
+        pwd = pwd->next;
+    }
+    while(env)
+    {
+        if(strncmp(env->line, "OLDPWD=", 7) == 0)
+        {
+            free(env->line);
+            size_t nbr_maloc = 7 + strlen(oldpwd) + 1;
+            char *line = malloc(nbr_maloc);
+            strcpy(line, "OLDPWD=");
+            strcat(line, oldpwd);
+            env->line = strdup(line);
+            free(line);
+            return ;
+        }
+        env = env->next;
+    }
+}
+
+void save_current_pwd(t_env *env)
+{}
