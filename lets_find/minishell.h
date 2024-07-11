@@ -46,7 +46,7 @@ t_env *init_env(char **str);
 void increment_shell_level(t_env *env);
 char	*ft_itoa(int n);
 void save_old_pwd(t_env *env);
-
+void save_current_pwd(t_env *env);
 
 
 

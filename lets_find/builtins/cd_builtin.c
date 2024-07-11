@@ -15,6 +15,7 @@ int cd_builtin(const char *path, t_env *env)
     if(chdir(path) == 0)
     {
         save_old_pwd(env);
+        save_current_pwd(env);
     }
     else
     {

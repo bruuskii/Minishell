@@ -125,4 +125,23 @@ void save_old_pwd(t_env *env)
 }
 
 void save_current_pwd(t_env *env)
-{}
+{
+    char pwd[1024];
+    getcwd(pwd, 1024);
+    char  *temp;
+    while(env)
+    {
+        if(strncmp(env->line, "PWD=", 4) == 0)
+        {
+            size_t nbr_malloc = 4 + strlen(pwd) + 1;
+            temp = malloc(nbr_malloc);
+            strcpy(temp, "PWD=");
+            strcat(temp, pwd);
+            free(env->line);
+            env->line = strdup(temp);
+            free(temp);
+            return ;
+        }
+        env = env->next;
+    }
+}
