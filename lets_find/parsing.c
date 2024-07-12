@@ -62,6 +62,7 @@ int print_type(char *str, t_env *env, t_token *token) {
         new_token->token = strdup(tokens[index]);
         new_token->next = NULL;
         new_token->prev = current;
+        new_token->nbr_of_args = args_nbr;
         if (current)
             current->next = new_token;
         else
@@ -142,7 +143,7 @@ void grep_type(t_token *token, int index, int is_command) {
         token->type = "operator";
     } else if (token->prev && strcmp(token->prev->token, ">") == 0) {
         token->type = "out";
-    } else if (token->prev && strcmp(token->prev->token, "<") == 0) {
+    } else if (token->prev && (strcmp(token->prev->token, "<") == 0 || strcmp(token->prev->token, ">>") == 0)) {
         token->type = "in";
     } else {
         token->type = "argument";
