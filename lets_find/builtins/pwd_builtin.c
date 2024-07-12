@@ -1,8 +1,7 @@
 #include "../minishell.h"
 
-void pwd(char **envp)
+void pwd(t_env *env)
 {
-    t_env *env = init_env(envp);
 
     char dest[100];
     int index = 4;
@@ -17,6 +16,7 @@ void pwd(char **envp)
                 d++;
                 index++;
             }
+            dest[d] = '\0';
             printf("%s\n", dest);
         }
         env = env->next;

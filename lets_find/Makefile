@@ -4,7 +4,7 @@ OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc
 RM = rm -f
-CFLAGS = -Wall -Wextra -Werror #-fsanitize=address
+CFLAGS = -Wall -Wextra -Werror  #-fsanitize=address
 LDFLAGS = -lreadline
 
 all: ${NAME}

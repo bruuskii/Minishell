@@ -20,6 +20,7 @@ int cd_builtin(const char *path, t_env *env)
     else
     {
             printf("unvalid path\n");
+            return 0;
     }
     return 1;
 }

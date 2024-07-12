@@ -36,7 +36,10 @@ int parse_every_word(char **tokens)
     return 1;
 }
 
-int print_type(char *str, t_env *env) {
+int print_type(char *str, t_env *env, t_token *token)
+{
+    (void)env;
+    (void)token;
     if(!str)
     {
         printf("here");
@@ -47,56 +50,84 @@ int print_type(char *str, t_env *env) {
         return (0);
     char **tokens = double_quotes(real_tokens);
     int index = 0;
-    int last_operator = 0;
+    int args_nbr = 0;
+    int is_command = 0;
+    t_token *head = NULL;
+    t_token *current = NULL;
+    while(tokens[index])
+    {
+        t_token *new_token = (t_token *)malloc(sizeof(t_token));
+        if(!new_token)
+            return 0;
+        new_token->token = strdup(tokens[index]);
+        new_token->nbr_of_args = 0;
+        new_token->next = NULL;
+        new_token->prev = current;
+        if(current)
+            current->next = new_token;
+        else
+            head = new_token;
+        current = new_token;
 
-    while (tokens[index] != NULL) {
-        t_token token;
-        token.token = tokens[index];
-        if (index == 0) {
-            token.type = "command";
-        } else if (last_operator) {
-            token.type = "command";
-            last_operator = 0;
-        } else if (strcmp(tokens[index], "|") == 0) {
-            token.type = "operator";
-            last_operator = 1;
-        } else if (is_operator(tokens[index])) {
-            token.type = "operator";
-        } else {
-            token.type = "argument";
+        grep_type(current, index, is_command);
+        if(strcmp(current->type, "pipe") != 0 && index != 0)
+        {
+            args_nbr++;
+            current->nbr_of_args = args_nbr;
         }
-        printf("Token: %s, Type: %s\n", token.token, token.type);
+        else
+        {
+            is_command = 1;
+            printf("the number of these argument %d\n", current->nbr_of_args);
+            args_nbr = 0;
+        }
+        printf("token: %s, and type: %s\n", current->token, current->type);
         index++;
     }
-    index = 0;
-
-    while (tokens[index]) {
-        if (strcmp(tokens[index], "cd") == 0) {
-            if (tokens[index + 1]) {
-                if (cd_builtin(tokens[index + 1], env) == 0) {
-                    printf("cd: failed to change directory\n");
-                }
-                index++;
-            } else {
-                if (cd_builtin((NULL), env) == 0) {
-                    printf("cd: failed to change directory\n");
-                }
-            }
-        }
-        index++;
-    }
+    printf("number of ac %d\n", current->nbr_of_args);
+    
     index = 0;
     while (tokens[index] != NULL) {
         free(tokens[index]);
         index++;
     }
+    free(tokens);
+
     index = 0;
     while (real_tokens[index] != NULL) {
         free(real_tokens[index]);
         index++;
     }
     free(real_tokens);
+
+    current = head;
+    while (current) {
+        t_token *next = current->next;
+        free(current->token);
+        free(current);
+        current = next;
+    }
+
     return 1;
+}
+
+void grep_type(t_token *token, int index, int command) {
+    if (index == 0 || command) {
+        token->type = "command";
+    }
+    if (strcmp(token->token, "|") == 0) {
+        token->type = "pipe";
+    } else if (strcmp(token->token, "<<") == 0 || strcmp(token->token, "<") == 0 ||
+               strcmp(token->token, ">") == 0 || strcmp(token->token, ">>") == 0 || 
+               strcmp(token->token, "$") == 0) {
+        token->type = "operator";
+    } else if (token->prev && strcmp(token->prev->token, ">") == 0) {
+        token->type = "out";
+    } else if (token->prev && strcmp(token->prev->token, "<") == 0) {
+        token->type = "in";
+     } //else {
+    //     token->type = "argument";
+    // }
 }
 
 char **double_quotes(char **tokens) {

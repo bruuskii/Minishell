@@ -24,6 +24,9 @@ typedef struct s_token
 {
     char *token;
     char *type;
+    int nbr_of_args;
+    struct s_token *next;
+    struct s_token *prev;
 }               t_token;
 
 typedef struct s_env
@@ -36,19 +39,18 @@ typedef struct s_env
 
 char **split_string(const char *str);
 int	is_operator(const char *str);
-int  print_type(char *str, t_env *env);
 int parse_every_word(char **tokens);
 char  **double_quotes(char **tokens);
 int cd_builtin(const char *path, t_env *env);
-void pwd(char **envp);
+void pwd(t_env *env);
 void    print_env(t_env *env);
 t_env *init_env(char **str);
 void increment_shell_level(t_env *env);
 char	*ft_itoa(int n);
 void save_old_pwd(t_env *env);
 void save_current_pwd(t_env *env);
-
-
+void grep_type(t_token *token, int index, int command);
+int print_type(char *str, t_env *env, t_token *token);
 
 
 

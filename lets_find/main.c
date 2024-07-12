@@ -110,6 +110,7 @@ int main(int argc, char **argv, char **envp) {
     argc = 0;
     argv = NULL;
     int i = 0;
+    t_token *token = NULL;
     while (1) 
     {
 
@@ -123,7 +124,7 @@ int main(int argc, char **argv, char **envp) {
         if(strlen(line) > 0)
         {
             add_history(line);
-            print_type(line, env);
+            print_type(line, env, token);
         }
         i = 0;
         if (strcmp(line, "clear") == 0)
@@ -133,7 +134,7 @@ int main(int argc, char **argv, char **envp) {
         if (strcmp(line, "env") == 0)
             print_env(env);
         if(strcmp(line, "pwd") == 0)
-            pwd(envp);
+            pwd(env);
         if(strcmp(line, "exit") == 0)
         {
             //free(line);
