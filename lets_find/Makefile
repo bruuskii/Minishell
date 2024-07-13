@@ -1,5 +1,5 @@
 SRCS = ft_split.c parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c \
-ft_itoa.c  main.c
+ft_itoa.c  main.c builtins/export.c
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc

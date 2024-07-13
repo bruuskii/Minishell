@@ -53,6 +53,10 @@ void grep_type(t_token *token, int index, int command);
 int print_type(char *str, t_env *env, t_token *token);
 
 
+void    InsertAtEnd(t_env **head, t_env *node_to_add);
+void export(t_env *env, t_env *export_list, char **cmd);
+
+
 
 
 #endif
