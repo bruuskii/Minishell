@@ -52,6 +52,7 @@ void save_current_pwd(t_env *env);
 void grep_type(t_token *token, int index, int command);
 int print_type(char *str, t_env *env, t_token *token);
 
+void expand(t_token *token, t_env *env, char **str, int index);
 
 
 

@@ -107,9 +107,9 @@ int main(int argc, char **argv, char **envp) {
     char *pro;
     t_env *env = init_env(envp);
     increment_shell_level(env);
-    argc = 0;
-    argv = NULL;
-    int i = 0;
+    (void)argc;
+    (void)argv;
+    //int i = 0;
     t_token *token = NULL;
     while (1) 
     {
@@ -126,7 +126,7 @@ int main(int argc, char **argv, char **envp) {
             add_history(line);
             print_type(line, env, token);
         }
-        i = 0;
+        //i = 0;
         if (strcmp(line, "clear") == 0)
             clear_screen(envp);
         if(strcmp(line, "ls") == 0)
