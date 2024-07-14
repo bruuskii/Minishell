@@ -11,7 +11,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <readline/history.h>
-#include "Libft/libft.h"
 
 #define RESET "\033[0m"
 #define RED "\033[0;31m"
@@ -38,20 +37,6 @@ typedef struct s_env
 }               t_env;
 
 
-
-typedef struct s_exec
-{
-    t_token *tokens;
-    char **cmd;
-    char **Paths;
-    t_env *env;
-    t_env *env_export;
-    int inputfile;
-    int outputfile;
-    int exit_status;
-}   t_exec;
-
-
 char **split_string(const char *str);
 int	is_operator(const char *str);
 int parse_every_word(char **tokens);
@@ -65,16 +50,11 @@ char	*ft_itoa(int n);
 void save_old_pwd(t_env *env);
 void save_current_pwd(t_env *env);
 void grep_type(t_token *token, int index, int command);
-int print_type(char *str, t_env *env, t_token **token);
+int print_type(char *str, t_env *env, t_token *token);
 
-void expand(t_token *token, t_env *env, char **str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
 void export(t_env *env, t_env *export_list, char **cmd);
-//exec;
-void execute(t_exec *exec);
-t_exec *initexec(char **env);
-char	**get_paths();
 
 
 
