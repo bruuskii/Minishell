@@ -36,9 +36,9 @@ int parse_every_word(char **tokens)
     return 1;
 }
 
-int print_type(char *str, t_env *env, t_token *token) {
+int print_type(char *str, t_env *env, t_token **token) {
     (void)env;
-    (void)token;
+    //(void)token;
     if (!str) {
         printf("here");
         return 0;
@@ -121,14 +121,23 @@ int print_type(char *str, t_env *env, t_token *token) {
     }
     free(real_tokens);
 
-    current = head;
-    while (current) {
-        t_token *next = current->next;
-        free(current->token);
-        free(current);
-        current = next;
-    }
+    // current = head;
+    // while (current) {
+    //     t_token *next = current->next;
+    //     free(current->token);
+    //     free(current);
+    //     current = next;
+    // }
 
+    // printf("je vais sortir");
+    // t_token *tmp = head;
+    // while (tmp)
+    // {
+    //     printf("token value is %s\n", tmp->token);
+    //     tmp = tmp->next;
+    // }
+    // printf("je vais sortir def");
+    (*token) = head;
     return 1;
 }
 
