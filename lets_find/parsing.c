@@ -83,7 +83,6 @@ int print_type(char *str, t_env *env, t_token **token) {
         current = new_token;
         grep_type(current, index, is_command);
 
-        // Call expand on current token
         expand(current, env, tokens, index);
 
         if (strcmp(current->type, "pipe") != 0 && index != 0 && strcmp(current->type, "argument") == 0) {
@@ -104,7 +103,9 @@ int print_type(char *str, t_env *env, t_token **token) {
     }
 
     printf("number of ac %d\n", current->nbr_of_args);
+    current = head;
 
+    parse_every_command(current);
     index = 0;
     while (tokens[index]) {
         if (strcmp(tokens[index], "cd") == 0) {
@@ -135,23 +136,7 @@ int print_type(char *str, t_env *env, t_token **token) {
         index++;
     }
     free(real_tokens);
-
-    // current = head;
-    // while (current) {
-    //     t_token *next = current->next;
-    //     free(current->token);
-    //     free(current);
-    //     current = next;
-    // }
-
-    // printf("je vais sortir");
-    // t_token *tmp = head;
-    // while (tmp)
-    // {
-    //     printf("token value is %s\n", tmp->token);
-    //     tmp = tmp->next;
-    // }
-    // printf("je vais sortir def");
+    
     (*token) = head;
     return 1;
 }

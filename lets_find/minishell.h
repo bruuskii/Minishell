@@ -39,6 +39,33 @@ typedef struct s_env
 
 
 
+
+
+typedef struct s_filedescriptiom
+{
+
+    char    *filename;
+    int     isherdoc;
+    int     iswithappend;
+    char    *delimeter;
+    struct s_filedescriptiom *next;
+}               t_filedescriptiom;
+
+
+typedef struct s_cmd
+{
+    char **cmd;
+    struct s_filedescriptiom *infile;
+    struct s_filedescriptiom *outfile;
+    struct s_cmd *next;
+}   t_cmd;
+
+
+
+
+
+
+
 typedef struct s_exec
 {
     t_token *tokens;
@@ -65,9 +92,10 @@ char	*ft_itoa(int n);
 void save_old_pwd(t_env *env);
 void save_current_pwd(t_env *env);
 void grep_type(t_token *token, int index, int command);
+t_cmd *parse_every_command(t_token *token);
 int print_type(char *str, t_env *env, t_token **token);
 
-void expand(t_token *token, t_env *env, char **str, int index);
+int expand(t_token *token, t_env *env, char **str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
 void export(t_env *env, t_env *export_list, char **cmd);

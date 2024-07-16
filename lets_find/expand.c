@@ -1,39 +1,71 @@
+
 #include "minishell.h"
 
-void expand(t_token *token, t_env *env, char **str, int index) {
-    if (token && strcmp(token->type, "expand") == 0) {
-        free(token);
-        t_token *next_token = malloc(sizeof(t_token));
-        //strcpy(next_token->token, str[index + 1]);
-        next_token->token = str[index + 1];
-        next_token->type = "argument";
+int expand(t_token *token, t_env *env, char **str, int index) {
+    (void)index;
+    (void)str;
+    char dest[100];
+    char strr[100];
+    int j = 0;
+    char *final = NULL;
+    int i = 0;
 
-        if (!next_token) return;
+    final = (char *)malloc(1);
+    if (!final)
+        return -1;
+    final[0] = '\0';
 
-        char dest[100];
-        int i = 0;
-
-        int len = strlen(next_token->token);
-        while (env) {
-            if (strncmp(env->line, next_token->token, len) == 0 && env->line[len] == '=') {
-                const char *value = env->line + len + 1;
-                while (*value) {
-                    dest[i++] = *value++;
-                }
-                dest[i] = '\0';
-                break;
+    while (token->token[i]) {
+        if (token->token[i] == '$') {
+            i++;
+            j = 0;
+            memset(dest, 0, sizeof(dest));
+            while (token->token[i] != '$' && token->token[i] != '\0') {
+                dest[j] = token->token[i];
+                i++;
+                j++;
             }
-            env = env->next;
+            i--;
+            int len = strlen(dest);
+            while (env) {
+                if (strncmp(env->line, dest, len) == 0 && env->line[len] == '=') {
+                    const char *path = env->line + len + 1;
+                    memset(strr, 0, sizeof(strr));
+                    j = 0;
+                    while (path[j] != '\0') {
+                        strr[j] = path[j];
+                        j++;
+                    }
+                    char *temp = (char *)malloc(strlen(final) + strlen(strr) + 1);
+                    if (!temp) {
+                        free(final);
+                        return -1;
+                    }
+                    strcpy(temp, final);
+                    strcat(temp, strr);
+                    free(final);
+                    final = temp;
+                    break;
+                }
+                env = env->next;
+            }
+        } else {
+            char *temp = (char *)malloc(strlen(final) + 2);
+            if (!temp) {
+                free(final);
+                return -1;
+            }
+            strcpy(temp, final);
+            temp[strlen(final)] = token->token[i];
+            temp[strlen(final) + 1] = '\0';
+            free(final);
+            final = temp;
         }
-
-        if (i > 0) {
-            free(next_token->token);
-            next_token->token = strdup(dest);
-        }
-
-        // Print the expanded token
-        //printf(" expand: %s\n", next_token->token);
+        i++;
     }
-    return ;
-}
+    free(token->token);
+    token->token = strdup(final);
+    free(final);
 
+    return 1;
+}

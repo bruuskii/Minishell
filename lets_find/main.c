@@ -107,9 +107,9 @@ int main(int argc, char **argv, char **envp) {
     char *pro;
     exec = initexec(envp);
     increment_shell_level(exec->env);
-    argc = 0;
-    argv = NULL;
-    int i = 0;
+    (void)argc;
+    (void)argv;
+    //int i = 0;
     while (1) 
     {
 
@@ -130,13 +130,13 @@ int main(int argc, char **argv, char **envp) {
             else
                 execute(exec);
         }
-        i = 0;
-        // if (strcmp(line, "clear") == 0)
-        //     clear_screen(envp);
+        //i = 0;
+         if (strcmp(line, "clear") == 0)
+             clear_screen(envp);
         // if(strcmp(line, "ls") == 0)
         //     ls_screen(envp);
-        // if (strcmp(line, "env") == 0)
-        //     print_env(exec->env);
+         if (strcmp(line, "env") == 0)
+             print_env(exec->env);
         // if(strcmp(line, "pwd") == 0)
         //     pwd(exec->env);
         if(strcmp(line, "exit") == 0)
