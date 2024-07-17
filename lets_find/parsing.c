@@ -8,7 +8,7 @@ int parse_every_word(char **tokens)
     int count_double = 0;
     index = 0;
 
-    while(tokens[index] != NULL)
+    while(tokens &&tokens[index] != NULL)
     {
         i = 0;
         while(tokens[index][i] != '\0')
@@ -22,11 +22,11 @@ int parse_every_word(char **tokens)
         index++;
     }
 
-    if(tokens[index - 1] && is_operator(tokens[index - 1]) != 0)
-    {
-        printf("bash: syntax error near unexpected token `newline'\n");
-        return 0;
-    }
+    // if(index > 0 && tokens[index - 1] && is_operator(tokens[index - 1]) != 0)
+    // {
+    //     printf("bash: syntax error near unexpected token `newline'\n");
+    //     return 0;
+    // }
 
     if(count_single % 2 != 0 || count_double % 2 != 0)
     {
@@ -36,6 +36,16 @@ int parse_every_word(char **tokens)
     return 1;
 }
 
+void free_tokens(t_token *head) {
+    t_token *tmp;
+    while (head) {
+        tmp = head;
+        head = head->next;
+        free(tmp->token);
+        free(tmp);
+    }
+}
+
 int print_type(char *str, t_env *env, t_token **token) {
     (void)env;
     //(void)token;
@@ -43,6 +53,13 @@ int print_type(char *str, t_env *env, t_token **token) {
         printf("here");
         return 0;
     }
+    if(*token)
+    {
+        free_tokens(*token);
+        *token = NULL;
+    }
+    if(!first_parse(str))
+        return 0;
 
     char **real_tokens = split_string(str);
     if (!parse_every_word(real_tokens)) {
@@ -56,7 +73,8 @@ int print_type(char *str, t_env *env, t_token **token) {
     t_token *head = NULL;
     t_token *current = NULL;
 
-    while (tokens[index]) {
+
+    while (tokens && tokens[index]) {
         t_token *new_token = (t_token *)malloc(sizeof(t_token));
         if (!new_token) {
             // Free previously allocated tokens and return 0
@@ -102,7 +120,8 @@ int print_type(char *str, t_env *env, t_token **token) {
         index++;
     }
 
-    printf("number of ac %d\n", current->nbr_of_args);
+    if( index > 0 && tokens[index - 1])
+        printf("number of ac %d\n", current->nbr_of_args);
     current = head;
 
     parse_every_command(current);

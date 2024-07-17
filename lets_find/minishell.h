@@ -96,6 +96,9 @@ t_cmd *parse_every_command(t_token *token);
 int print_type(char *str, t_env *env, t_token **token);
 
 int expand(t_token *token, t_env *env, char **str, int index);
+int first_parse(char *line);
+int error_return();
+int check_outfiles(char *str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
 void export(t_env *env, t_env *export_list, char **cmd);
