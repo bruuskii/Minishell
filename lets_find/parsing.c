@@ -162,23 +162,22 @@ int print_type(char *str, t_env *env, t_token **token) {
 
 
 void grep_type(t_token *token, int index, int is_command) {
-    if (index == 0 || is_command) {
-        token->type = "command";
-    } else if (strcmp(token->token, "|") == 0) {
-        token->type = "pipe";
-    } else if (strcmp(token->token, "<<") == 0 || strcmp(token->token, "<") == 0 ||
+    if (strcmp(token->token, "<<") == 0 || strcmp(token->token, "<") == 0 ||
                strcmp(token->token, ">") == 0 || strcmp(token->token, ">>") == 0) {
         token->type = "operator";
     } else if (token->prev && (strcmp(token->prev->token, ">" ) == 0|| strcmp(token->prev->token, ">>") == 0)) {
         token->type = "out";
     } else if (token->prev && (strcmp(token->prev->token, "<") == 0 || strcmp(token->prev->token, "<<") == 0)) {
         token->type = "in";
+    }else if (index == 0 || is_command) {
+        token->type = "command";
+    } else if (strcmp(token->token, "|") == 0) {
+        token->type = "pipe";
     }
     else if(strcmp(token->token,  "$") == 0)
         token->type = "expand";
-     else {
+     else
         token->type = "argument";
-    }
 }
 
 
