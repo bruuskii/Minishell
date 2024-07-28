@@ -89,8 +89,6 @@ t_exec *initexec(char **env)
         return (NULL);
     exec->env = init_env(env);
     exec->Paths = get_paths();
-    exec->inputfile = 0;
-    exec->outputfile = 1;
     exec->tokens = NULL;
     exec->cmd = NULL;
     exec->exit_status = 0;

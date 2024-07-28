@@ -13,16 +13,16 @@ int count_pipes(t_cmd *cmd)
     while (temp)
     {
         i++;
-        temp = temp->nextcmd;
+        temp = temp->next;
     }
     if (i)
         return (i -1);
     return (i);
 }
 
-int countfiles(t_filedescription *files)
+int countfiles(t_filedescriptiom *files)
 {
-    t_filedescription *filetmp;
+    t_filedescriptiom *filetmp;
     int i;
 
     filetmp = files;

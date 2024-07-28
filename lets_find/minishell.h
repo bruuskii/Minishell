@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 #include <readline/history.h>
 #include "Libft/libft.h"
+#include <fcntl.h>
 
 #define RESET "\033[0m"
 #define RED "\033[0;31m"
@@ -58,6 +59,7 @@ typedef struct s_cmd
     struct s_filedescriptiom *infile;
     struct s_filedescriptiom *outfile;
     struct s_cmd *next;
+    int *fd;
 }   t_cmd;
 
 
@@ -69,12 +71,10 @@ typedef struct s_cmd
 typedef struct s_exec
 {
     t_token *tokens;
-    char **cmd;
+    t_cmd *cmd;
     char **Paths;
     t_env *env;
     t_env *env_export;
-    int inputfile;
-    int outputfile;
     int exit_status;
 }   t_exec;
 
@@ -93,7 +93,7 @@ void save_old_pwd(t_env *env);
 void save_current_pwd(t_env *env);
 void grep_type(t_token *token, int index, int command);
 t_cmd *parse_every_command(t_token *token);
-int print_type(char *str, t_env *env, t_token **token);
+int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd);
 
 int expand(t_token *token, t_env *env, char **str, int index);
 int first_parse(char *line);
@@ -103,9 +103,14 @@ int check_outfiles(char *str, int index);
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
 void export(t_env *env, t_env *export_list, char **cmd);
 //exec;
-void execute(t_exec *exec);
+
+void execute( t_exec *exec, char **env);
 t_exec *initexec(char **env);
 char	**get_paths();
+int count_pipes(t_cmd *cmd);
+int countfiles(t_filedescriptiom *files);
+char	*get_path(t_exec *exec, char *cmd);
+int heredoc(char *delimeter);
 
 
 

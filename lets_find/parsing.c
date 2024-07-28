@@ -46,7 +46,7 @@ void free_tokens(t_token *head) {
     }
 }
 
-int print_type(char *str, t_env *env, t_token **token) {
+int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
     (void)env;
     //(void)token;
     if (!str) {
@@ -124,7 +124,7 @@ int print_type(char *str, t_env *env, t_token **token) {
         printf("number of ac %d\n", current->nbr_of_args);
     current = head;
 
-    parse_every_command(current);
+    (*cmd) = parse_every_command(current);
     index = 0;
     while (tokens[index]) {
         if (strcmp(tokens[index], "cd") == 0) {

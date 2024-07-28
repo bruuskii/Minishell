@@ -123,12 +123,12 @@ int main(int argc, char **argv, char **envp) {
         if(strlen(line) > 0)
         {
             add_history(line);
-            print_type(line, exec->env, &exec->tokens);
+            print_type(line, exec->env, &exec->tokens, &exec->cmd);
             printf("I'm in execute :\n");
-            if (!exec->tokens)
-                printf("token is NULL\n");
+            if (!exec->cmd)
+                printf("No command to execute\n");
             else
-                execute(exec);
+                execute(exec, envp);
         }
         //i = 0;
          if (strcmp(line, "clear") == 0)

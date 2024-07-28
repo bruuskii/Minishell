@@ -15,7 +15,7 @@
 
 
 //    if i have a lot of just append files;
-void heredoc(char *delimeter)
+int heredoc(char *delimeter)
 {
     int pipe_fd[2];
     char *tmp;
@@ -52,11 +52,6 @@ void heredoc(char *delimeter)
         }
     }
     close(pipe_fd[1]);
-    if (dup2(pipe_fd[0], STDIN_FILENO) == -1)
-    {
-        free(tmp);
-        exit(5);
-    }
-    //close(pipe_fd[0]);
     free(tmp);
+    return (pipe_fd[0]);
 }
