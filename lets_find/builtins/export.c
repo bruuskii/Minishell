@@ -174,48 +174,73 @@ int check_syntax(char *cmd)
     //         return (0);
     // }
 
-    if (isspace(cmd[i]))
+    if (isspace(cmd[i]) || isdigit(cmd[i]))
+    {
+        printf("%s not a valid identifier\n", cmd);
         return (0);
-
+    }
+       
     if (!strncmp(cmd, "=", strlen(cmd)))
     {
-        printf(" %s  not a valid identifier\n", cmd);
-            return (0);
+        printf("%s not a valid identifier\n", cmd);
+        return (0);
     }
-
     while (cmd[i])
     {
-        if (!(isalpha(cmd[i]) || cmd[i] == '_')   && !equalfound)
+        if (!(isalnum(cmd[i]) || cmd[i] == '_' || cmd[i] == '+' || cmd[i] == '=') 
+            && !equalfound)
         {   
-            printf(" %s  not a valid identifier\n", cmd);
+            printf("%s not a valid identifier\n", cmd);
+            return (0);
+        }
+        if (cmd[i] == '+' && (cmd[i + 1] == '\0' || cmd [i + 1] != '='))
+        {
+            printf("%s not a valid identifier\n", cmd);
             return (0);
         }
         if (cmd[i] == '=')
+        {
             equalfound = 1;
+            if (isspace(cmd[i + 1]))
+            {
+                printf("%s not a valid identifier\n", cmd);
+                return (0);   
+            }
+        } 
         i++;
     }
-
-    //expand $?;
-    return (1);
-    
+    // printf("valid syntax\n");
+    return (1); 
 }
 
 
-void export(t_env *env, t_env *export_list, char **cmd)
-{
-    int i = 0;
 
-    // if (!cmd[1])    //  cmd [0] gonna be export; 
-    // {
-    //     print_env(export_list);
-    //     return;
-    // }
+void    print_env_export(t_env *env_export)
+{
+    t_env *temp;
+
+    temp = env_export;
+    while (temp)
+    {
+        printf("declare -x %s\n", temp->line);
+        temp = temp->next;
+    }
+}
+
+void export(t_exec *exec, char **cmd)
+{
+    int i = 1;
+
+    if (!cmd[1])
+    {
+        print_env_export(exec->env_export);
+        return;
+    }
     while (cmd[i])
     {
         if (check_syntax(cmd[i]))
         {
-            
-            ft_export3(env, export_list, cmd[i]);//printf("J'ai entree\n");
+            ft_export3(exec->env, exec->env_export, cmd[i]);
         }
         i++;
     }

@@ -58,6 +58,7 @@ t_exec *initexec(char **env)
     if (!exec)
         return (NULL);
     exec->env = init_env(env);
+    exec->env_export = init_env(env);
     exec->Paths = get_paths();
     exec->cmd = NULL;
     exec->exit_status = 0;
@@ -168,8 +169,6 @@ int getoutputfile(t_cmd *cmd)
 
 void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
 {
-    // int fdout = 0; // find output;
-    // int fdin = 0; // find input
     char *commandpath;
 
     //= exec->cmd->cmd[0];
@@ -201,7 +200,7 @@ void ft_exec_builtin( t_exec *exec, t_cmd *cmd, char **env)
     if (!strcmp(cmd->cmd[0], "pwd"))
         pwd(exec->env);
     else if (!strcmp(cmd->cmd[0], "export"))
-        export(exec->env, exec->env_export, cmd->cmd);
+        export(exec, cmd->cmd);
     // else if (!strcmp(cmd->cmd[0], "unset"))
     //     return (1);
     // else if (!strcmp(cmd->cmd[0], "env"))
@@ -415,34 +414,7 @@ void execute(t_exec *exec, char **env)
         fdin = getinputfile(cmd);
         fdout = getoutputfile(cmd);
 
-        // if (cmd->outfile)
-        // {   
-        //     cmd->outfile->iswithappend = 1;
-        //     if (cmd->outfile->iswithappend)
-        //         printf("yes with append\n");
-        //     else 
-        //         printf("not with append\n");
-            
-        // }
-        // else
-        //     printf("no output file\n");
-
         // test herdoc;
-
-        if (cmd->infile)
-        {
-            if (cmd->infile->isherdoc)
-            {
-                printf("yes it's a herdoc\n");
-            }
-        }
-        else
-        {
-            printf("no it's not  a herdoc\n");
-        }
-        
-            
-
         if (cmd->next)
         {
             cmd->fd = malloc (2 * sizeof(int));
@@ -458,7 +430,6 @@ void execute(t_exec *exec, char **env)
             exit(EXIT_FAILURE);
         if (pid == 0)
         {
-            (void)fdout;
             if (fdin != STDIN_FILENO)
             {
                 dup2(fdin, STDIN_FILENO);
@@ -496,7 +467,6 @@ void execute(t_exec *exec, char **env)
                 close (prev->fd[1]);
                 // free(prev->fd);
             }
-            
             prev = cmd;
             cmd = cmd->next;
             i++;

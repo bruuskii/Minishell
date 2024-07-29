@@ -101,7 +101,7 @@ int error_return();
 int check_outfiles(char *str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
-void export(t_env *env, t_env *export_list, char **cmd);
+void export(t_exec *exec, char **cmd);
 //exec;
 
 void execute( t_exec *exec, char **env);
