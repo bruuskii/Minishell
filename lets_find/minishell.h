@@ -78,6 +78,8 @@ typedef struct s_exec
     int exit_status;
 }   t_exec;
 
+extern t_exec *g_exec;
+
 
 char **split_string(const char *str);
 int	is_operator(const char *str);
@@ -101,7 +103,7 @@ int error_return();
 int check_outfiles(char *str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
-void export(t_exec *exec, char **cmd);
+void export(char **cmd);
 //exec;
 
 void execute( t_exec *exec, char **env);

@@ -54,9 +54,10 @@ t_exec *initexec(char **env)
 {
     t_exec *exec; 
 
-    exec = malloc (sizeof (t_exec ));
+    exec =  (t_exec *)malloc (sizeof (t_exec ));
     if (!exec)
         return (NULL);
+    //exec->env_export = (t_env *) malloc (sizeof(t_env));
     exec->env = init_env(env);
     exec->env_export = init_env(env);
     exec->Paths = get_paths();
@@ -64,24 +65,6 @@ t_exec *initexec(char **env)
     exec->exit_status = 0;
     return (exec);
 }
-
-// void setuptestexecute(t_exec *exec)
-// {
-//     t_cmd *tmp1 = malloc(sizeof(t_exec *));
-//     tmp1->infile  = malloc(sizeof(t_filedescription));
-//     tmp1->outfile = malloc(sizeof(t_filedescription));
-//     tmp1->cmd = ft_split("ls -al", ' ');
-
-//     t_cmd *tmp2 = malloc(sizeof(t_exec *));
-//     tmp2->infile  = malloc(sizeof(t_filedescription));
-//     tmp2->outfile = malloc(sizeof(t_filedescription));
-//     tmp2->cmd = ft_split("Achraf", ' ');
-
-//     // tmp1->nextcmd = NULL;
-//     exec->cmd = tmp1;
-//     tmp2->next = NULL;
-//     exec->cmd->next = tmp2;
-// }
 
 int    getinputfile(t_cmd *cmd)
 {
@@ -131,7 +114,7 @@ int getoutputfile(t_cmd *cmd)
     
     i = 0;
     size = countfiles(cmd->outfile);
-    file = cmd->outfile;
+    file = cmd->outfile; 
     if (!size)
         return (STDOUT_FILENO);
     fd = malloc(size * sizeof(int));
@@ -190,7 +173,7 @@ void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
 	}
 }
 
-void ft_exec_builtin( t_exec *exec, t_cmd *cmd, char **env)
+void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
 {
     (void)env;
     // if (!strcmp(cmd->cmd[0], "echo"))
@@ -198,9 +181,12 @@ void ft_exec_builtin( t_exec *exec, t_cmd *cmd, char **env)
     // else if (!strcmp(cmd->cmd[0], "cd"))
     //     return (1);
     if (!strcmp(cmd->cmd[0], "pwd"))
-        pwd(exec->env);
+        pwd((*exec)->env);
     else if (!strcmp(cmd->cmd[0], "export"))
-        export(exec, cmd->cmd);
+    {
+        export(cmd->cmd);
+    }
+        
     // else if (!strcmp(cmd->cmd[0], "unset"))
     //     return (1);
     // else if (!strcmp(cmd->cmd[0], "env"))
@@ -235,81 +221,6 @@ int itsbuiltin(t_cmd *cmd)
         return (0);
 }
 
-
-
-// void execute( t_exec *exec, char **env)
-// {   
-//     t_cmd  *cmd = NULL;
-//     int countpipes = count_pipes(exec->cmd);
-//     int i=0;
-
-//     t_cmd *prev = NULL;
-//     cmd = exec->cmd;
-//     cmd->isfd0used = 0;
-//     cmd->isfrompipe = 0;
-//     while (i <= countpipes && cmd)
-//     {
-//         cmd->isfd0used = 0;
-//         cmd->fd = malloc (2 * sizeof (int));
-//         if (pipe(cmd->fd) == -1)
-//             exit (-1);
-//         int pid = fork();
-//         if (pid == -1)
-//             exit (-2);
-
-//         if (pid == 0)
-//         {
-//             if (!prev)
-//                 close (cmd->fd[0]);
-//             if (prev)
-//             {
-//                 dup2(prev->fd[0], STDIN_FILENO);
-//                 close (prev->fd[0]);
-//                 prev->isfd0used = 1;
-//             }
-
-//             if (cmd->next)
-//             {
-//                 dup2(cmd->fd[1], STDOUT_FILENO);
-//                 close (cmd->fd[1]);
-//             }
-
-//             if (itsbuiltin(cmd))
-//                 ft_exec_builtin(exec, cmd, env);
-//             else
-//                 ft_exec(exec, cmd, env);
-//             exit (0);
-//         }
-//         else
-//         {
-//             if (prev && prev->isfd0used)
-//                 close (prev->fd[0]);
-//             if (!prev)
-//                 close (cmd->fd[0]);
-//             if (cmd->next)
-//                 close (cmd->fd[1]);
-//         }
-//         i++;
-//         prev = cmd;
-//         cmd = cmd->next;
-//     }
-    
-
-//     cmd = exec->cmd;
-//     while (cmd)
-//     {
-//         wait (NULL);
-//         cmd = cmd->next;
-//     }
-    
-//     if (prev)
-//     {
-//         close (prev->fd[1]);
-//         close (prev->fd[0]);
-//     }
-//     // close all commands;
-//     //execute Last cmd;
-// }
 
 // void execute(t_exec *exec, char **env)
 // {
@@ -408,6 +319,7 @@ void execute(t_exec *exec, char **env)
 
     int fdin= -1;
     int fdout= -1;
+    int its_builtin;
 
     while (cmd && i <= countpipes)
     {
@@ -424,6 +336,7 @@ void execute(t_exec *exec, char **env)
                 exit (EXIT_FAILURE);
             }
         }
+        its_builtin = itsbuiltin(cmd);
 
         int pid = fork();
         if (pid == -1)
@@ -453,14 +366,19 @@ void execute(t_exec *exec, char **env)
                 close (cmd->fd[1]);
             }
 
-            if (itsbuiltin(cmd))
-                ft_exec_builtin(exec, cmd, env);
-            else
+            if (!its_builtin)
+            {
                 ft_exec(exec, cmd, env);
+                
+            }
             exit (EXIT_SUCCESS);
         }
         else
         {
+            if (its_builtin && !cmd->next && !prev)
+            {
+                ft_exec_builtin(&exec, cmd, env);
+            }
             if (prev)
             {
                 close (prev->fd[0]);
@@ -473,12 +391,16 @@ void execute(t_exec *exec, char **env)
         }
         
     }
+
+
         
     int j = -1;
     while (++j <= countpipes)
     {
         wait(NULL);
     }
+
+    
 
     // Libérer les descripteurs de fichiers alloués
     // cmd = exec->cmd;
@@ -491,154 +413,3 @@ void execute(t_exec *exec, char **env)
 
 
 }
-
-// test
-
-// void execute( t_exec *exec, char **env)
-// {   
-//     t_cmd  *cmd = NULL;
-//     int countpipes = count_pipes(exec->cmd);
-//     int i=0;
-
-//     t_cmd *prev = NULL;
-//     cmd = exec->cmd;
-//     cmd->isfd0used = 0;
-//     cmd->isfrompipe = 0;
-
-//     int fdin;
-//     int fdout;
-
-//     while (i <= countpipes && cmd)
-//     {
-//         fdin = getinputfile(cmd);
-//         fdout = getoutputfile(cmd);
-
-        
-//         cmd->isfd0used = 0;
-//         cmd->fd = malloc (2 * sizeof (int));
-//         if (cmd->next)
-//         {
-//             if (pipe(cmd->fd) == -1)
-//             exit (-1);
-//         }
-        
-//         int pid = fork();
-//         if (pid == -1)
-//             exit (-2);
-
-//         printf("fdin = %d\n", fdin);
-//         printf("fdout = %d\n", fdout);
-
-
-//         if (pid == 0)
-//         {
-//             // if (!prev && fdin == STDIN_FILENO)
-//             //     close (cmd->fd[0]);
-
-//             if (fdin != STDIN_FILENO)
-//             {
-//                 // close (cmd->fd[0]);
-//                 dup2(fdin, STDIN_FILENO); // fd[0] not closed;
-//                 close (fdin);
-//             }
-//             else if (prev)
-//             {
-//                 dup2(prev->fd[0], STDIN_FILENO); // cmd fd[0]fd[1] not closed;
-//                 close (prev->fd[0]);
-//                 prev->isfd0used = 1;
-//             }
-//             else
-//             {
-//                 close (cmd->fd[0]); // cmd[0] closed;
-//             }
-
-//             if (fdout != STDOUT_FILENO)
-//             {
-//                 // close (cmd->fd[1]);
-//                 dup2 (fdout, STDOUT_FILENO);//fd[1] not closed;
-//                 close (fdout);
-//             }
-
-//             else if (cmd->next)
-//             {
-//                 dup2(cmd->fd[1], STDOUT_FILENO); // cmd0 not closed;
-//                 close (cmd->fd[1]);
-//             }
-
-//             else 
-//             {
-//                 close (cmd->fd[1]);// cmd 1 closd;
-//                 // hello //
-//             }
-
-//             if (itsbuiltin(cmd))
-//                 ft_exec_builtin(exec, cmd, env);
-//             else
-//                 ft_exec(exec, cmd, env);
-//             exit (0);
-//         }
-//         else
-//         {
-            
-//             if (cmd->next)
-//                 close (cmd->fd[1]);
-
-//             if (!prev && fdin == STDIN_FILENO)
-//                 close (cmd->fd[0]);
-
-//             if (prev && prev->isfd0used)
-//                 close (prev->fd[0]);
-            
-            
-//         }
-//         i++;
-//         prev = cmd;
-//         cmd = cmd->next;
-//     }
-    
-
-//     cmd = exec->cmd;
-//     while (cmd)
-//     {
-//         wait (NULL);
-//         cmd = cmd->next;
-//     }
-//     if (prev)
-//     {
-//         close (prev->fd[1]);
-//         close (prev->fd[0]);
-//     }
-    
-//     // close all commands;
-//     //execute Last cmd;
-// }
-
-// void execute( t_exec *exec, char **env)
-// {   
-//     t_cmd  *command = NULL;
-//     int countpipes = count_pipes(exec->cmd);
-//     int i=0;
-
-//     t_cmd *prev = NULL;
-//     command = exec->cmd;
-//     while (i <= countpipes && command)
-//     {
-//         command->isfrompipe = 0;
-//         command->isfd0used = 0;
-//         command->fd = malloc(2 * sizeof(int));
-//         if (itsbuiltin(command))
-//             ft_execute(exec, command, env, 1, prev);
-//         else    
-//             ft_execute(exec, command, env, 0, prev);
-//         prev = command;
-//         command = command->next;
-//         i++;
-//     }
-//     if (command)
-//     {
-//         close (command->fd[1]);
-//         close (command->fd[0]);
-//     }
-//     // close all commands;
-//     //execute Last cmd;
-// }
