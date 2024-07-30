@@ -103,6 +103,7 @@ int error_return();
 int check_outfiles(char *str, int index);
 
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
+void DeleteNode(t_env **head, t_env *NodeToDelete);
 void export(char **cmd);
 //exec;
 

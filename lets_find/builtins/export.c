@@ -37,6 +37,57 @@ t_env *is_in_env(t_env *env, char *value_to_check)
     return (NULL);
 }
 
+void DeleteNode(t_env **head, t_env *NodeToDelete)
+{
+    if ((*head) == NULL || NodeToDelete == NULL) {
+        return;
+    }
+    if ((*head) == NodeToDelete) {
+        (*head) = NodeToDelete->next;
+    }
+    if (NodeToDelete->next != NULL) {
+        NodeToDelete->next->prev = NodeToDelete->prev;
+    }
+    if (NodeToDelete->prev != NULL) {
+        NodeToDelete->prev->next = NodeToDelete->next;
+    }
+    if (NodeToDelete->line)
+        free(NodeToDelete->line);  
+    if (NodeToDelete)
+        free(NodeToDelete);
+}
+
+
+
+char *remove_char_(char *str, char c)
+{
+    int i;
+    char *s;
+    int j;
+
+    s = malloc(ft_strlen(str) + 1);
+    if (!s)
+        return (NULL);
+    i = 0;
+    j = 0;
+    if (!str)
+        return (NULL);
+
+    while (str[i])
+    {
+        if (str[i] != c)
+        {
+            s[j] = str[i];
+            j++;
+        }
+        i++;
+    }
+    s[j] = '\0';
+    if (str)
+        free(str);
+    return (s);
+}
+
 
 void ft_export2(char *cmd, int indexofequal)
 {
@@ -47,13 +98,12 @@ void ft_export2(char *cmd, int indexofequal)
 
     value_to_check = malloc(indexofequal + 1);
     strncpy(value_to_check, cmd, indexofequal);
-    printf("value to check = %s\n", value_to_check);
-
     temp = is_in_env(g_exec->env, value_to_check);
     temp2 = is_in_env(g_exec->env_export, value_to_check);
-    
+
     int isappend = 0;
     char *word_to_app;
+
     if (cmd[indexofequal] == '+')
     {
         isappend = 1;
@@ -63,9 +113,7 @@ void ft_export2(char *cmd, int indexofequal)
     if (temp)
     {
         if (isappend)
-        {
             temp->line = ft_strjoin(temp->line, word_to_app);
-        }
         else
         {
             free(temp->line);
@@ -75,32 +123,12 @@ void ft_export2(char *cmd, int indexofequal)
     else
     {
         envAdd = (t_env *)  malloc (sizeof(t_env));
-        envAdd->line = ft_strdup(cmd);
+        envAdd->line = remove_char_(ft_strdup(cmd), '+');
         envAdd->next = NULL;
         InsertAtEnd(&g_exec->env, envAdd);
     }
-
     if (temp2)
-    {
-        if (isappend)
-        {
-            temp2->line = ft_strjoin(temp2->line, word_to_app);
-        }
-        else
-        {
-            free(temp2->line);
-            temp2->line = ft_strdup(cmd);
-        }
-    }
-    else
-    {
-        envAdd = (t_env *)  malloc (sizeof(t_env));
-        envAdd->line = ft_strdup(cmd);
-        envAdd->next = NULL;
-        InsertAtEnd(&g_exec->env_export, envAdd);
-    }
-
-    
+        DeleteNode(&g_exec->env_export, temp2);
 }
 
 int getequalindex(char *cmd)

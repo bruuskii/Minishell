@@ -59,7 +59,7 @@ t_exec *initexec(char **env)
         return (NULL);
     //exec->env_export = (t_env *) malloc (sizeof(t_env));
     exec->env = init_env(env);
-    exec->env_export = init_env(env);
+    exec->env_export = NULL;// init_env(env);
     exec->Paths = get_paths();
     exec->cmd = NULL;
     exec->exit_status = 0;
