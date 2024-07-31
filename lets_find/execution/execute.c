@@ -178,8 +178,10 @@ void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
     (void)env;
     if (!strcmp(cmd->cmd[0], "echo"))
         echo(cmd->cmd);
-    // else if (!strcmp(cmd->cmd[0], "cd"))
-    //     return (1);
+    else if (!strcmp(cmd->cmd[0], "cd"))
+    {
+        cd_builtin(cmd->cmd[1], g_exec->env);
+    }
     if (!strcmp(cmd->cmd[0], "pwd"))
         pwd((*exec)->env);
     else if (!strcmp(cmd->cmd[0], "export"))
@@ -380,6 +382,8 @@ void execute(t_exec *exec, char **env)
             {
                 ft_exec_builtin(&exec, cmd, env);
             }
+            if (fdin != STDIN_FILENO)
+                close (fdin);
             if (prev)
             {
                 close (prev->fd[0]);
