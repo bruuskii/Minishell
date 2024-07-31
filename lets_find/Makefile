@@ -1,7 +1,7 @@
 SRCS = parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c \
 	   main.c builtins/export.c  expand.c command_to_execution.c f_split.c \
 	   first_parse.c  execution/get_path.c execution/execute_utils.c execution/herdoc.c \
-	   execution/execute.c \
+	   execution/execute.c  builtins/unset.c\
 
 OBJS = ${SRCS:.c=.o}
 NAME = minishell

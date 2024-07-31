@@ -18,7 +18,8 @@ void    InsertAtEnd(t_env **head, t_env *node_to_add)
     while (Temp->next != NULL)
         Temp = Temp->next;
     Temp->next = node_to_add;
-    node_to_add->prev = node_to_add;
+    node_to_add->prev = Temp;
+    node_to_add->next = NULL;
 }
 
 t_env *is_in_env(t_env *env, char *value_to_check)
@@ -28,7 +29,7 @@ t_env *is_in_env(t_env *env, char *value_to_check)
     temp = env;
     while (temp)
     {
-        if (!strncmp(temp->line, value_to_check, strlen(value_to_check)))
+        if (!strncmp(temp->line, value_to_check, strlen(value_to_check) + 1))
         {
             return (temp);
         }
@@ -44,6 +45,8 @@ void DeleteNode(t_env **head, t_env *NodeToDelete)
     }
     if ((*head) == NodeToDelete) {
         (*head) = NodeToDelete->next;
+        if ((*head) != NULL)
+            (*head)->prev = NULL;
     }
     if (NodeToDelete->next != NULL) {
         NodeToDelete->next->prev = NodeToDelete->prev;
@@ -51,6 +54,7 @@ void DeleteNode(t_env **head, t_env *NodeToDelete)
     if (NodeToDelete->prev != NULL) {
         NodeToDelete->prev->next = NodeToDelete->next;
     }
+
     if (NodeToDelete->line)
         free(NodeToDelete->line);  
     if (NodeToDelete)
@@ -97,7 +101,7 @@ void ft_export2(char *cmd, int indexofequal)
     t_env *temp2;
 
     value_to_check = malloc(indexofequal + 1);
-    strncpy(value_to_check, cmd, indexofequal);
+    ft_strlcpy(value_to_check, cmd, indexofequal +1);
     temp = is_in_env(g_exec->env, value_to_check);
     temp2 = is_in_env(g_exec->env_export, value_to_check);
 
@@ -154,12 +158,16 @@ void ft_export3(char *cmd)
     int indexofequal;
     t_env *temp;
     t_env *envAdd;
+    t_env  *tmp;
 
     indexofequal = getequalindex(cmd);
     if (indexofequal == -1)
     {
             temp = is_in_env(g_exec->env_export, cmd);
-            if (!temp)
+            tmp = is_in_env(g_exec->env, cmd);
+            if (tmp)
+                printf("yes :%s:\n", tmp->line);
+            if (!temp && !tmp)
             {
                 envAdd = (t_env *)malloc(sizeof(t_env));
                 envAdd->line = ft_strdup(cmd);

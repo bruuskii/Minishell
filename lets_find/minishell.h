@@ -86,7 +86,6 @@ int	is_operator(const char *str);
 int parse_every_word(char **tokens);
 char  **double_quotes(char **tokens);
 int cd_builtin(const char *path, t_env *env);
-void pwd(t_env *env);
 void    print_env(t_env *env);
 t_env *init_env(char **str);
 void increment_shell_level(t_env *env);
@@ -102,11 +101,19 @@ int first_parse(char *line);
 int error_return();
 int check_outfiles(char *str, int index);
 
+
+// built in utils;
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
 void DeleteNode(t_env **head, t_env *NodeToDelete);
-void export(char **cmd);
-//exec;
+t_env *is_in_env(t_env *env, char *value_to_check);
+int getequalindex(char *cmd);
 
+//built in;
+void export(char **cmd);
+void unset(char **cmd);
+void pwd(t_env *env);
+
+//exec;
 void execute( t_exec *exec, char **env);
 t_exec *initexec(char **env);
 char	**get_paths();
