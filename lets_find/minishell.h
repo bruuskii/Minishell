@@ -112,6 +112,7 @@ int getequalindex(char *cmd);
 void export(char **cmd);
 void unset(char **cmd);
 void pwd(t_env *env);
+void echo(char **cmd);
 
 //exec;
 void execute( t_exec *exec, char **env);

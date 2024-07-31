@@ -176,8 +176,8 @@ void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
 void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
 {
     (void)env;
-    // if (!strcmp(cmd->cmd[0], "echo"))
-    //     return (1);
+    if (!strcmp(cmd->cmd[0], "echo"))
+        echo(cmd->cmd);
     // else if (!strcmp(cmd->cmd[0], "cd"))
     //     return (1);
     if (!strcmp(cmd->cmd[0], "pwd"))
