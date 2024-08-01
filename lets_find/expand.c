@@ -18,6 +18,14 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     while (token->token[i]) {
         if (token->token[i] == '$') {
             i++;
+            if( token && token->token[i] == '?')
+            {
+                final = ft_itoa(g_exec->exit_status);
+                free(token->token);
+                token->token = strdup(final);
+                free(final);
+                return 1;
+            }
             j = 0;
             memset(dest, 0, sizeof(dest));
             while (token->token[i] != '$' && token->token[i] != '\0') {
