@@ -133,7 +133,6 @@ int main(int argc, char **argv, char **envp) {
             else
             {
                 execute(g_exec, envp);
-                // print_env(g_exec->env);
             }
                 
         }
@@ -151,7 +150,7 @@ int main(int argc, char **argv, char **envp) {
             //free(line);
             break;
         }
-        //free(line);
+        printf("exit status :%d:\n", g_exec->exit_status);
     }
 
     return 0;

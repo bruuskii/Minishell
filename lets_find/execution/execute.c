@@ -72,26 +72,28 @@ int    getinputfile(t_cmd *cmd)
     int size;
     int     i;
     t_filedescriptiom *file;
+    int tmpfderror;
     
     i = 0;
     size = countfiles(cmd->infile);
     file = cmd->infile;
+    tmpfderror = 0;
     if (!size)
         return (0);
     while (i < size && file)
     {
         if (file->isherdoc)
-            {
-                fileinfd = heredoc(file->delimeter);
-            }
+        {
+            fileinfd = heredoc(file->delimeter);
+        }
         else
         {
             fileinfd = open(file->filename, O_RDONLY, 0777);
             if (fileinfd == -1)
             {
-                perror("file not found");//check if i need to open them wakha error;
-            }
-                
+                perror("no such file or directory\n");
+                tmpfderror = fileinfd;
+            }   
             else
             {
                 // close files;
@@ -101,6 +103,8 @@ int    getinputfile(t_cmd *cmd)
         file = file->next;
         i++;
     }
+    if (tmpfderror == -1)
+        return (tmpfderror);
     return (fileinfd);
 }
 
@@ -124,19 +128,16 @@ int getoutputfile(t_cmd *cmd)
     {
         if (file->iswithappend)
         {
-            printf("yes file with append");
             fd[i] = open(file->filename, O_RDWR | O_APPEND | O_CREAT, 0777);
         }
-            
         else  
         {
-            printf("yes file not append\n");
             fd[i] = open(file->filename, O_RDWR | O_CREAT, 0777);
         }
             
         if (fd[i] == -1)
         {
-            perror("file (name) not found");//check if i need to open them wakha error;
+            perror("file cannot opend");
         }
         if (file->next)
             close(fd[i]);
@@ -144,7 +145,6 @@ int getoutputfile(t_cmd *cmd)
         file = file->next;
     }
     fileoutfd = fd[i - 1];
-    //int j = 0;
     free(fd);
     return (fileoutfd);
 }
@@ -154,22 +154,33 @@ void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
 {
     char *commandpath;
 
-    //= exec->cmd->cmd[0];
-    // if (!commandpath)
-    //     perror("command not found");
+    if (!cmd->cmd[0])
+    {
+        ft_putstr_fd("command not found\n", 2);
+        exit(127);
+    }
     if (!ft_strchr(cmd->cmd[0], '/'))
 	{
 		commandpath = get_path(exec, cmd->cmd[0]);
         if (!commandpath)
-            {perror("command path not found");
-            printf("this is cmd : %s\n", cmd->cmd[0]);}
+        {
+            ft_putstr_fd(cmd->cmd[0], 2);
+            ft_putstr_fd(" : command path not found\n", 2);
+        }
         if (execve(commandpath, cmd->cmd, env) == -1)
-            perror("execve error");
+        {
+            free(commandpath);
+            ft_putstr_fd("execve error\n", 2);
+            exit(127);
+        }
 	}
 	else
 	{
-        if (execve(cmd->cmd[0], cmd->cmd, env) == -1)//env to tab;
-            perror("commande execve error");
+        if (execve(cmd->cmd[0], cmd->cmd, env) == -1)
+        {
+            ft_putstr_fd("execve error\n", 2);
+            exit(127);
+        }
 	}
 }
 
@@ -224,101 +235,13 @@ int itsbuiltin(t_cmd *cmd)
         return (0);
 }
 
-
-// void execute(t_exec *exec, char **env)
-// {
-//     t_cmd *cmd = exec->cmd;
-//     t_cmd *prev = NULL;
-//     int countpipes = count_pipes(cmd);
-//     int i = 0;
-
-//     while (cmd && i <= countpipes)
-//     {
-//         if (cmd->next)
-//         {
-//             cmd->fd = malloc(2 * sizeof(int));
-//             if (pipe(cmd->fd) == -1)
-//             {
-//                 perror("pipe");
-//                 exit(EXIT_FAILURE);
-//             }
-//         }
-
-//         int pid = fork();
-//         if (pid == -1)
-//         {
-//             perror("fork");
-//             exit(EXIT_FAILURE);
-//         }
-
-//         if (pid == 0) // Enfant
-//         {
-//             if (prev)
-//             {
-//                 dup2(prev->fd[0], STDIN_FILENO);
-//                 close(prev->fd[0]);
-//                 close(prev->fd[1]);
-//             }
-
-//             if (cmd->next)
-//             {
-//                 close(cmd->fd[0]);
-//                 dup2(cmd->fd[1], STDOUT_FILENO);
-//                 close(cmd->fd[1]);
-//             }
-
-//             if (itsbuiltin(cmd))
-//                 ft_exec_builtin(exec, cmd, env);
-//             else
-//                 ft_exec(exec, cmd, env);
-//             exit(EXIT_SUCCESS);
-//         }
-//         else // Parent
-//         {
-//             if (prev)
-//             {
-//                 close(prev->fd[0]);
-//                 close(prev->fd[1]);
-//                 //free(prev->fd);
-//             }
-//             prev = cmd;
-//             cmd = cmd->next;
-//             i++;
-//         }
-//     }
-
-//     // Attendre tous les enfants
-//     // for (int j = 0; j <= countpipes; j++)
-//     // {
-//     //     wait(NULL);
-//     // }
-//     int j = -1;
-//     while (++j <= countpipes)
-//     {
-//         wait(NULL);
-//             // j++;
-//     }
-
-//     // Libérer les descripteurs de fichiers alloués
-//     // cmd = exec->cmd;
-//     // while (cmd)
-//     // {
-//     //     if (cmd->fd)
-//     //         free(cmd->fd);
-//     //     cmd = cmd->next;
-//     // }
-// }
-
-
-// test au dessus origine;
-
-
 void execute(t_exec *exec, char **env)
 {
     t_cmd *cmd = exec->cmd;
     t_cmd *prev = NULL;
     int countpipes = count_pipes(cmd);
     int i = 0;
+    int pid;
 
     int fdin= -1;
     int fdout= -1;
@@ -329,7 +252,6 @@ void execute(t_exec *exec, char **env)
         fdin = getinputfile(cmd);
         fdout = getoutputfile(cmd);
 
-        // test herdoc;
         if (cmd->next)
         {
             cmd->fd = malloc (2 * sizeof(int));
@@ -341,11 +263,13 @@ void execute(t_exec *exec, char **env)
         }
         its_builtin = itsbuiltin(cmd);
 
-        int pid = fork();
+        pid = fork();
         if (pid == -1)
             exit(EXIT_FAILURE);
         if (pid == 0)
         {
+            if (fdin == -1)
+                exit(EXIT_FAILURE);
             if (fdin != STDIN_FILENO)
             {
                 dup2(fdin, STDIN_FILENO);
@@ -372,7 +296,6 @@ void execute(t_exec *exec, char **env)
             if (!its_builtin)
             {
                 ft_exec(exec, cmd, env);
-                
             }
             exit (EXIT_SUCCESS);
         }
@@ -399,10 +322,24 @@ void execute(t_exec *exec, char **env)
 
 
         
+    // int j = -1;
+    // while (++j <= countpipes)
+    // {
+    //     wait(NULL);
+    // }
+
     int j = -1;
+    int status;
+
     while (++j <= countpipes)
     {
-        wait(NULL);
+        wait(&status); 
+        if (WIFEXITED(status)) {
+            // Check if the child process terminated normally
+            g_exec->exit_status = WEXITSTATUS(status);
+        } else {
+            printf("Child process did not terminate normally\n");
+        }
     }
 
     

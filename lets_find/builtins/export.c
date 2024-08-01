@@ -279,7 +279,9 @@ void export(char **cmd)
 
     if (!cmd[1])
     {
-        print_env_export(g_exec->env_export);
+        print_env(g_exec->env);
+        print_env(g_exec->env_export);
+        
         return;
     }
     while (cmd[i])
