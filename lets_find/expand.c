@@ -18,44 +18,57 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     while (token->token[i]) {
         if (token->token[i] == '$') {
             i++;
-            if( token && token->token[i] == '?')
-            {
-                final = ft_itoa(g_exec->exit_status);
-                free(token->token);
-                token->token = strdup(final);
-                free(final);
-                return 1;
-            }
-            j = 0;
-            memset(dest, 0, sizeof(dest));
-            while (token->token[i] != '$' && token->token[i] != '\0') {
-                dest[j] = token->token[i];
-                i++;
-                j++;
-            }
-            i--;
-            int len = strlen(dest);
-            while (env) {
-                if (strncmp(env->line, dest, len) == 0 && env->line[len] == '=') {
-                    const char *path = env->line + len + 1;
-                    memset(strr, 0, sizeof(strr));
-                    j = 0;
-                    while (path[j] != '\0') {
-                        strr[j] = path[j];
-                        j++;
-                    }
-                    char *temp = (char *)malloc(strlen(final) + strlen(strr) + 1);
-                    if (!temp) {
-                        free(final);
-                        return -1;
-                    }
-                    strcpy(temp, final);
-                    strcat(temp, strr);
+            if (token->token[i] == '?') {
+                char *exit_status_str = ft_itoa(g_exec->exit_status);
+                if (!exit_status_str) {
                     free(final);
-                    final = temp;
-                    break;
+                    return -1;
                 }
-                env = env->next;
+                char *temp = (char *)malloc(strlen(final) + strlen(exit_status_str) + 1);
+                if (!temp) {
+                    free(exit_status_str);
+                    free(final);
+                    return -1;
+                }
+                strcpy(temp, final);
+                strcat(temp, exit_status_str);
+                free(exit_status_str);
+                free(final);
+                final = temp;
+                i++;
+                continue;
+            } else {
+                j = 0;
+                memset(dest, 0, sizeof(dest));
+                while (token->token[i] != '$' && token->token[i] != '\0') {
+                    dest[j] = token->token[i];
+                    i++;
+                    j++;
+                }
+                i--;
+                int len = strlen(dest);
+                while (env) {
+                    if (strncmp(env->line, dest, len) == 0 && env->line[len] == '=') {
+                        const char *path = env->line + len + 1;
+                        memset(strr, 0, sizeof(strr));
+                        j = 0;
+                        while (path[j] != '\0') {
+                            strr[j] = path[j];
+                            j++;
+                        }
+                        char *temp = (char *)malloc(strlen(final) + strlen(strr) + 1);
+                        if (!temp) {
+                            free(final);
+                            return -1;
+                        }
+                        strcpy(temp, final);
+                        strcat(temp, strr);
+                        free(final);
+                        final = temp;
+                        break;
+                    }
+                    env = env->next;
+                }
             }
         } else {
             char *temp = (char *)malloc(strlen(final) + 2);

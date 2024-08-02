@@ -178,7 +178,6 @@ void grep_type(t_token *token, int index, int is_command) {
         token->type = "expand";
      else
      {
-        token->token = ft_strjoin(token->token, " ");
         token->type = "argument";
      }
 }
