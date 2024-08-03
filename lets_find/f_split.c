@@ -45,6 +45,10 @@ int count_tokens(const char *str) {
             }
         }
 
+        if (i < len && isspace(str[i])) {
+            count++;
+        }
+
         while (i < len && isspace(str[i])) {
             i++;
         }
@@ -56,11 +60,12 @@ char **split_string(const char *str) {
     int token_count = count_tokens(str);
     char **result = (char **)malloc((token_count + 1) * sizeof(char *));
     if (!result) {
-        return NULL; // Allocation failed
+        return NULL;
     }
 
     int i = 0, index = 0;
     int len = strlen(str);
+    int skip_space = 1;
 
     while (i < len) {
         while (i < len && isspace(str[i])) {
@@ -80,7 +85,6 @@ char **split_string(const char *str) {
             int token_len = i - start;
             result[index] = (char *)malloc((token_len + 1) * sizeof(char));
             if (!result[index]) {
-                // Handle memory allocation failure
                 for (int j = 0; j < index; j++) {
                     free(result[j]);
                 }
@@ -95,7 +99,6 @@ char **split_string(const char *str) {
             if (op_len > 0) {
                 result[index] = (char *)malloc((op_len + 1) * sizeof(char));
                 if (!result[index]) {
-                    // Handle memory allocation failure
                     for (int j = 0; j < index; j++) {
                         free(result[j]);
                     }
@@ -112,7 +115,6 @@ char **split_string(const char *str) {
                 int token_len = i - start;
                 result[index] = (char *)malloc((token_len + 1) * sizeof(char));
                 if (!result[index]) {
-                    // Handle memory allocation failure
                     for (int j = 0; j < index; j++) {
                         free(result[j]);
                     }
@@ -125,6 +127,28 @@ char **split_string(const char *str) {
         }
         index++;
 
+        if (skip_space && i < len && isspace(str[i])) {
+            while (i < len && isspace(str[i])) {
+                i++;
+            }
+            skip_space = 0;
+        }
+
+        if (i < len && isspace(str[i])) {
+            result[index] = (char *)malloc(2 * sizeof(char));
+            if (!result[index]) {
+                for (int j = 0; j < index; j++) {
+                    free(result[j]);
+                }
+                free(result);
+                return NULL;
+            }
+            result[index][0] = ' ';
+            result[index][1] = '\0';
+            index++;
+            i++;
+        }
+
         while (i < len && isspace(str[i])) {
             i++;
         }
@@ -133,3 +157,4 @@ char **split_string(const char *str) {
     result[index] = NULL;
     return result;
 }
+
