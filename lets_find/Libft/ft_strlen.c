@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/22 21:41:51 by ainouni           #+#    #+#             */
-/*   Updated: 2023/11/23 20:30:25 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/03 13:47:18 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ size_t	ft_strlen(const char *s)
 {
 	size_t	i;
 
+	if (!s)
+		return (0);
 	i = 0;
 	while (*s && s[i])
 		i++;

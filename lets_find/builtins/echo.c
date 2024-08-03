@@ -18,11 +18,11 @@ void echo(char **cmd)
     iswith_nl = 1;
     while (cmd[i])
     {
-        if (i == 1  && !ft_strncmp("-n", cmd[i], 2))
+        if (i == 1  && !ft_strncmp("-n", cmd[i], ft_strlen(cmd[i])))
         {
             iswith_nl = 0;
         }
-        else if (cmd[i])
+        if (cmd[i] && !ft_strncmp("-n", cmd[i], 2))
             write(1, cmd[i], ft_strlen(cmd[i]));
         i++;
     }
