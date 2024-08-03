@@ -1,4 +1,3 @@
-
 #include "minishell.h"
 
 int expand(t_token *token, t_env *env, char **str, int index) {
@@ -16,7 +15,7 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     final[0] = '\0';
 
     while (token->token[i]) {
-        if (token->token[i] == '$') {
+        if (token->token[i] == '$' && token->token[i + 1] != '\0') {
             i++;
             if (token->token[i] == '?') {
                 char *exit_status_str = ft_itoa(g_exec->exit_status);
@@ -35,17 +34,17 @@ int expand(t_token *token, t_env *env, char **str, int index) {
                 free(exit_status_str);
                 free(final);
                 final = temp;
-                i++;
+                i++; // Move past '?'
                 continue;
             } else {
                 j = 0;
                 memset(dest, 0, sizeof(dest));
-                while (token->token[i] != '$' && token->token[i] != '\0') {
+                while (token->token[i] != '$' && token->token[i] != '\0' && token->token[i] != ' ') {
                     dest[j] = token->token[i];
                     i++;
                     j++;
                 }
-                i--;
+                i--; // Adjust for the increment at the end of the loop
                 int len = strlen(dest);
                 while (env) {
                     if (strncmp(env->line, dest, len) == 0 && env->line[len] == '=') {
