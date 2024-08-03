@@ -203,8 +203,11 @@ void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
     {
         unset(cmd->cmd);
     }
-    // else if (!strcmp(cmd->cmd[0], "env"))
-    //     return (1);
+    else if (!strcmp(cmd->cmd[0], "env"))
+    {
+        print_env(g_exec->env, 0);
+    }
+        
     // else if (!strcmp(cmd->cmd[0], "exit"))
     //     return (1);
 }

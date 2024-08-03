@@ -86,7 +86,7 @@ int	is_operator(const char *str);
 int parse_every_word(char **tokens);
 char  **double_quotes(char **tokens);
 int cd_builtin(const char *path, t_env *env);
-void    print_env(t_env *env);
+void    print_env(t_env *env, int isexport);
 t_env *init_env(char **str);
 void increment_shell_level(t_env *env);
 char	*ft_itoa(int n);

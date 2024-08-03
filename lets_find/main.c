@@ -142,7 +142,7 @@ int main(int argc, char **argv, char **envp) {
         // // if(strcmp(line, "ls") == 0)
         // //     ls_screen(envp);
          if (strcmp(line, "env") == 0)
-             print_env(g_exec->env);
+            print_env(g_exec->env, 0);
         // if(strcmp(line, "pwd") == 0)
         //     pwd(exec->env);
         if(strcmp(line, "exit") == 0)

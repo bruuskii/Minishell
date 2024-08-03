@@ -24,15 +24,27 @@ void    InsertAtEnd(t_env **head, t_env *node_to_add)
 
 t_env *is_in_env(t_env *env, char *value_to_check)
 {
-    t_env *temp;
+    t_env   *temp;
+    char    *check_with;
+    int     i;
+
+    // (void)check_with;
 
     temp = env;
+    i = 0;
     while (temp)
     {
-        if (!strncmp(temp->line, value_to_check, strlen(value_to_check) + 1))
+        i = getequalindex(temp->line);
+        check_with = malloc(i + 1);
+        if (!check_with)
+            return (NULL);
+        ft_strlcpy(check_with, temp->line, i + 1);
+        if (!strncmp(check_with, value_to_check, strlen(value_to_check) + 1))
         {
+            free(check_with);
             return (temp);
         }
+        free(check_with);
         temp = temp->next;
     }
     return (NULL);
@@ -98,12 +110,10 @@ void ft_export2(char *cmd, int indexofequal)
     char *value_to_check;
     t_env *envAdd;
     t_env *temp;
-    t_env *temp2;
 
     value_to_check = malloc(indexofequal + 1);
     ft_strlcpy(value_to_check, cmd, indexofequal +1);
     temp = is_in_env(g_exec->env, value_to_check);
-    temp2 = is_in_env(g_exec->env_export, value_to_check);
 
     int isappend = 0;
     char *word_to_app;
@@ -117,11 +127,22 @@ void ft_export2(char *cmd, int indexofequal)
     if (temp)
     {
         if (isappend)
+        {
+            if (!ft_strchr(temp->line, '='))
+            {
+                temp->line = ft_strjoin(temp->line, "=");
+            }
             temp->line = ft_strjoin(temp->line, word_to_app);
+        }
+            
         else
         {
-            free(temp->line);
-            temp->line = ft_strdup(cmd);
+            if (ft_strchr(cmd, '='))
+            {
+                free(temp->line);
+                temp->line = ft_strdup(cmd);
+            }
+            
         }
     }
     else
@@ -131,8 +152,6 @@ void ft_export2(char *cmd, int indexofequal)
         envAdd->next = NULL;
         InsertAtEnd(&g_exec->env, envAdd);
     }
-    if (temp2)
-        DeleteNode(&g_exec->env_export, temp2);
 }
 
 int getequalindex(char *cmd)
@@ -140,46 +159,20 @@ int getequalindex(char *cmd)
     int i;
 
     i = 0;
+    if (!cmd)
+        return (0);
     while (cmd[i])
     {
-        if (cmd[i] == '=')
-        {
-            if (cmd[i - 1] == '+')
-                return (i - 1);
-            return (i);
-        }
+        if (cmd[i] == '+' || cmd[i] == '=')
+            break;
         i++;
     }
-    return (-1);
+    return (i);
 }
 
-void ft_export3(char *cmd)
+void ft_export(char *cmd)
 {
-    int indexofequal;
-    t_env *temp;
-    t_env *envAdd;
-    t_env  *tmp;
-
-    indexofequal = getequalindex(cmd);
-    if (indexofequal == -1)
-    {
-            temp = is_in_env(g_exec->env_export, cmd);
-            tmp = is_in_env(g_exec->env, cmd);
-            if (tmp)
-                printf("yes :%s:\n", tmp->line);
-            if (!temp && !tmp)
-            {
-                envAdd = (t_env *)malloc(sizeof(t_env));
-                envAdd->line = ft_strdup(cmd);
-                envAdd->next = NULL;
-                printf("line to add:%s:\n", envAdd->line);
-                InsertAtEnd(&g_exec->env_export, envAdd);
-            }
-    }
-    else
-    {  
-        ft_export2(cmd, indexofequal);
-    }
+    ft_export2(cmd, getequalindex(cmd));
 }
 
 
@@ -279,16 +272,14 @@ void export(char **cmd)
 
     if (!cmd[1])
     {
-        print_env(g_exec->env);
-        print_env(g_exec->env_export);
-        
+        print_env(g_exec->env, 1);
         return;
     }
     while (cmd[i])
     {
         if (check_syntax(cmd[i]))
         {
-            ft_export3(cmd[i]);
+            ft_export(cmd[i]);
         }
         i++;
     }
