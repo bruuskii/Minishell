@@ -28,8 +28,6 @@ t_env *is_in_env(t_env *env, char *value_to_check)
     char    *check_with;
     int     i;
 
-    // (void)check_with;
-
     temp = env;
     i = 0;
     while (temp)
@@ -148,7 +146,10 @@ void ft_export2(char *cmd, int indexofequal)
     else
     {
         envAdd = (t_env *)  malloc (sizeof(t_env));
-        envAdd->line = remove_char_(ft_strdup(cmd), '+');
+        if (isappend)
+            envAdd->line = remove_char_(ft_strdup(cmd), '+');
+        else
+            envAdd->line = ft_strdup(cmd);
         envAdd->next = NULL;
         InsertAtEnd(&g_exec->env, envAdd);
     }
@@ -233,7 +234,7 @@ int check_syntax(char *cmd)
             printf("%s not a valid identifier\n", cmd);
             return (0);
         }
-        if (cmd[i] == '+' && (cmd[i + 1] == '\0' || cmd [i + 1] != '='))
+        if (cmd[i] == '+' && (cmd[i + 1] == '\0' || cmd [i + 1] != '=') && !equalfound)
         {
             printf("%s not a valid identifier\n", cmd);
             return (0);
@@ -243,6 +244,7 @@ int check_syntax(char *cmd)
             equalfound = 1;
             if (isspace(cmd[i + 1]))
             {
+                
                 printf("%s not a valid identifier\n", cmd);
                 return (0);   
             }
