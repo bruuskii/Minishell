@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-const char *operations[] = {"<<", "<", ">>", ">", "|", "\"\"", "\'"};
+const char *operations[] = {"<<", "<", ">>", ">", "|", "\"\"", "\'\'"};
 int num_operations = sizeof(operations) / sizeof(operations[0]);
 
 int is_operator(const char *str) {
