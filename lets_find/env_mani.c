@@ -40,11 +40,52 @@ t_env *init_env(char **str) {
     return head;
 }
 
-void    print_env(t_env *env)
+
+
+void    printf_dq_after(char *cmd, char c)
+{
+    int i;
+    int isfirst;
+
+    i = 0;
+    isfirst = 1;
+    while (cmd[i])
+    {
+        printf("%c", cmd[i]);
+        if (cmd[i] == c && isfirst)
+        {
+            printf("\"");
+            isfirst = 0;
+        }
+            
+        i++;
+    }
+    if (!isfirst)
+        printf("\"");
+}
+
+
+void    print_env(t_env *env, int isexport)
 {
     while (env)
     {
-        printf("%s\n", env->line);
+        if (isexport)
+        {
+            if (env->line)
+            {
+                printf("declare -x ");
+                printf_dq_after(env->line, '=');
+                printf("\n");
+            }
+        }
+        else
+        {
+            if (env->line)
+            {
+                if (ft_strchr(env->line, '='))
+                    printf("%s\n", env->line);
+            }
+        }
         env = env->next;
     }
 }
