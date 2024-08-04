@@ -128,12 +128,9 @@ int main(int argc, char **argv, char **envp) {
             add_history(line);
             print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
             printf("I'm in execute :\n");
-            if (!g_exec->cmd)
-                printf("No command to execute\n");
-            else
-            {
-                execute(g_exec, envp);
-            }
+            
+            execute(g_exec, envp);
+            
                 
         }
         //i = 0;

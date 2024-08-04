@@ -8,7 +8,7 @@ void pwd(t_env *env)
     int d = 0;
     while(env)
     {
-        if(strncmp(env->line, "PWD=", 4) == 0)
+        if(ft_strncmp(env->line, "PWD=", 4) == 0)
         {
             while(env->line[index])
             {

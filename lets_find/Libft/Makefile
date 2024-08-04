@@ -6,7 +6,7 @@
 #    By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/23 16:03:48 by ainouni           #+#    #+#              #
-#    Updated: 2023/11/23 18:39:03 by ainouni          ###   ########.fr        #
+#    Updated: 2024/08/04 16:46:07 by ainouni          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CFILES = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c \
  ft_memcmp.c ft_strnstr.c ft_atoi.c ft_calloc.c ft_strdup.c \
  ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_itoa.c \
  ft_strmapi.c  ft_striteri.c ft_putchar_fd.c ft_putstr_fd.c \
- ft_putendl_fd.c ft_putnbr_fd.c
+ ft_putendl_fd.c ft_putnbr_fd.c ft_strcmp.c \
 
 OFILES = ${CFILES:.c=.o}
 CFLAGS = -Wall -Wextra -Werror
