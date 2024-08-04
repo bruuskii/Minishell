@@ -150,7 +150,7 @@ int main(int argc, char **argv, char **envp) {
             //free(line);
             break;
         }
-        printf("exit status :%d:\n", g_exec->exit_status);
+        // printf("exit status :%d:\n", g_exec->exit_status);
     }
 
     return 0;
