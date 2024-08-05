@@ -6,53 +6,58 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/07/17 11:32:58 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/05 12:28:07 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-// static void	free_paths(char **paths)
-// {
-// 	int	i;
 
-// 	if (!paths)
-// 		return ;
-// 	i = 0;
-// 	while (paths[i])
-// 	{
-// 		free(paths[i]);
-// 		i++;
-// 	}
-// }
 
-// static char	*get_pathline_from_env(char **env)
-// {
-// 	int	i;
 
-// 	i = 0;
-// 	while (env[i])
-// 	{
-// 		if (!ft_strncmp("PATH=", env[i], 5))
-// 		{
-// 			return (env[i] + 5);
-// 		}
-// 		i++;
-// 	}
-// 	return (NULL);
-// }
+void	free_db_arr(char **arr)
+{
+	int i;
 
-char	*get_path(t_exec *exec, char *cmd)
+	i = 0;
+	while (arr[i])
+	{
+		if (arr[i])
+			free(arr[i]);
+		i++;
+	}
+	free(arr);
+}
+
+
+
+char **envpath_to_arr()
+{
+	t_env	*temp;
+	char	**env_arr;
+
+	temp = is_in_env(g_exec->env, "PATH");
+	if (!temp)
+		return (NULL);
+	env_arr = ft_split((temp->line + 4), ':');
+	if (!env_arr)
+		return (NULL);
+	return (env_arr);
+}
+
+char	*get_path(char *cmd)
 {
 	char	*path;
 	int		i = 0;
 
-	while (exec->Paths[i])
+	g_exec->Paths = envpath_to_arr();
+	while (g_exec->Paths[i])
 	{
-		path = ft_strjoin(exec->Paths[i], "/");
+		path = ft_strjoin(g_exec->Paths[i], "/");
 		path = ft_strjoin(path, cmd);
 		if (access(path, F_OK) == 0)
 		{
+			free_db_arr(g_exec->Paths);
 			return (path);
 		}
 		else
@@ -62,5 +67,6 @@ char	*get_path(t_exec *exec, char *cmd)
 		}
 		i++;
 	}
+	free_db_arr(g_exec->Paths);
 	return (NULL);
 }

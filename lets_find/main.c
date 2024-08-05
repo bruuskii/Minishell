@@ -99,24 +99,21 @@ void handle_sigint() {
 int main(int argc, char **argv, char **envp) {
 
     struct sigaction sa;
-    // t_exec *exec = NULL;
+
     sa.sa_handler = &handle_sigint;
     sa.sa_flags = SA_RESTART; // For Ctr C
     sigaction(SIGINT, &sa, NULL);
     clear_screen(envp);
     char *line;
     char *pro;
-    // exec = initexec(envp);
     g_exec = initexec(envp);
     increment_shell_level(g_exec->env);
     (void)argc;
     (void)argv;
-    //int i = 0;
     while (1) 
     {
         
         pro = prompt();
-        //print_env(g_exec->env);
         line = readline(pro);
         if(!line)
         {
@@ -127,27 +124,15 @@ int main(int argc, char **argv, char **envp) {
         {
             add_history(line);
             print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
-            printf("I'm in execute :\n");
-            
             execute(g_exec, envp);
-            
-                
         }
-        //i = 0;
-         if (strcmp(line, "clear") == 0)
-             clear_screen(envp);
-        // // if(strcmp(line, "ls") == 0)
-        // //     ls_screen(envp);
-         if (strcmp(line, "env") == 0)
-            print_env(g_exec->env, 0);
-        // if(strcmp(line, "pwd") == 0)
-        //     pwd(exec->env);
+        if (strcmp(line, "clear") == 0)
+            clear_screen(envp);
         if(strcmp(line, "exit") == 0)
         {
             //free(line);
             break;
         }
-        // printf("exit status :%d:\n", g_exec->exit_status);
     }
 
     return 0;

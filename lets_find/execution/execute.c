@@ -52,15 +52,13 @@ Achraf
 
 t_exec *initexec(char **env)
 {
-    t_exec *exec; 
+    t_exec *exec;
 
     exec =  (t_exec *)malloc (sizeof (t_exec ));
     if (!exec)
         return (NULL);
-    //exec->env_export = (t_env *) malloc (sizeof(t_env));
     exec->env = init_env(env);
-    exec->env_export = NULL;// init_env(env);
-    exec->Paths = get_paths();
+    exec->Paths = NULL;
     exec->cmd = NULL;
     exec->exit_status = 0;
     return (exec);
@@ -150,7 +148,7 @@ int getoutputfile(t_cmd *cmd)
 }
 
 
-void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
+void ft_exec(t_cmd *cmd, char **env)
 {
     char *commandpath;
 
@@ -161,11 +159,12 @@ void ft_exec( t_exec *exec, t_cmd *cmd, char **env)
     }
     if (!ft_strchr(cmd->cmd[0], '/'))
 	{
-		commandpath = get_path(exec, cmd->cmd[0]);
+		commandpath = get_path(cmd->cmd[0]);
         if (!commandpath)
         {
             ft_putstr_fd(cmd->cmd[0], 2);
             ft_putstr_fd(" : command path not found\n", 2);
+            exit(127);
         }
         if (execve(commandpath, cmd->cmd, env) == -1)
         {
@@ -188,13 +187,19 @@ void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
 {
     (void)env;
     if (!ft_strcmp(cmd->cmd[0], "echo"))
+    {
         echo(cmd->cmd);
+    }
+        
     else if (!ft_strcmp(cmd->cmd[0], "cd"))
     {
         cd_builtin(cmd->cmd[1], g_exec->env);
     }
     if (!ft_strcmp(cmd->cmd[0], "pwd"))
+    {
         pwd((*exec)->env);
+    }
+        
     else if (!ft_strcmp(cmd->cmd[0], "export"))
     {
         export(cmd->cmd);
@@ -305,7 +310,7 @@ void execute(t_exec *exec, char **env)
             set_upfdfiles(fdin, fdout, cmd, prev);
             if (!its_builtin)
             {
-                ft_exec(exec, cmd, env);
+                ft_exec(cmd, env);
             }
             exit (EXIT_SUCCESS);
         }
@@ -338,14 +343,6 @@ void execute(t_exec *exec, char **env)
         }
         
     }
-
-
-        
-    // int j = -1;
-    // while (++j <= countpipes)
-    // {
-    //     wait(NULL);
-    // }
 
     int j = -1;
     int status;

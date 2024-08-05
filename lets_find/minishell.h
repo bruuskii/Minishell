@@ -74,7 +74,6 @@ typedef struct s_exec
     t_cmd *cmd;
     char **Paths;
     t_env *env;
-    t_env *env_export;
     int exit_status;
 }   t_exec;
 
@@ -120,7 +119,7 @@ t_exec *initexec(char **env);
 char	**get_paths();
 int count_pipes(t_cmd *cmd);
 int countfiles(t_filedescriptiom *files);
-char	*get_path(t_exec *exec, char *cmd);
+char	*get_path(char *cmd);
 int heredoc(char *delimeter);
 
 
