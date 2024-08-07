@@ -61,10 +61,25 @@ void Delete_env_Node(t_env **head, t_env *NodeToDelete)
     }
 
     if (NodeToDelete->line)
-        free(NodeToDelete->line);  
+        free(NodeToDelete->line);
     if (NodeToDelete)
         free(NodeToDelete);
 }
+
+void    Delete_env()
+{
+    t_env   *env;
+    t_env   *tmp;
+
+    env = g_exec->env; 
+    while (env && env->next)
+    {
+        tmp = env;
+        env = env->next;
+        Delete_env_Node(&g_exec->env, tmp);
+    }
+}
+
 
 void Delete_token_Node(t_token **head, t_token *NodeToDelete)
 {
@@ -89,6 +104,20 @@ void Delete_token_Node(t_token **head, t_token *NodeToDelete)
         free (NodeToDelete->type);
     if (NodeToDelete)
         free(NodeToDelete);
+}
+
+void    Delete_tokens()
+{
+    t_token *token;
+    t_token *tmp;
+
+    token = g_exec->tokens;
+    while (token && token->next)
+    {
+        tmp = token;
+        token = token->next;
+        Delete_token_Node(&g_exec->tokens, tmp);
+    }
 }
 
 void	free_db_arr(char **arr)
