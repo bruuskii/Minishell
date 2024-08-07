@@ -48,31 +48,6 @@ t_env *is_in_env(t_env *env, char *value_to_check)
     return (NULL);
 }
 
-void DeleteNode(t_env **head, t_env *NodeToDelete)
-{
-    if ((*head) == NULL || NodeToDelete == NULL) {
-        return;
-    }
-    if ((*head) == NodeToDelete) {
-        (*head) = NodeToDelete->next;
-        if ((*head) != NULL)
-            (*head)->prev = NULL;
-    }
-    if (NodeToDelete->next != NULL) {
-        NodeToDelete->next->prev = NodeToDelete->prev;
-    }
-    if (NodeToDelete->prev != NULL) {
-        NodeToDelete->prev->next = NodeToDelete->next;
-    }
-
-    if (NodeToDelete->line)
-        free(NodeToDelete->line);  
-    if (NodeToDelete)
-        free(NodeToDelete);
-}
-
-
-
 char *remove_char_(char *str, char c)
 {
     int i;

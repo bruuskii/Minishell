@@ -14,7 +14,7 @@ void unset(char **cmd)
     {
         env = is_in_env(g_exec->env, cmd[i]);
         if (env)
-            DeleteNode(&g_exec->env, env);
+            Delete_env_Node(&g_exec->env, env);
         i++;
     }
 }

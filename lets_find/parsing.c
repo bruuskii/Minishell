@@ -53,11 +53,11 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
         printf("here");
         return 0;
     }
-    if(*token)
-    {
-        free_tokens(*token);
-        *token = NULL;
-    }
+    // if(*token)
+    // {
+    //     free_tokens(*token);
+    //     *token = NULL;
+    // }
     // if(!first_parse(str))
     //     return 0;
     char **real_tokens = split_string(str);

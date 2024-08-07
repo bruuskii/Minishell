@@ -103,7 +103,15 @@ int check_outfiles(char *str, int index);
 
 // built in utils;
 void    InsertAtEnd(t_env **head, t_env *node_to_add);
-void DeleteNode(t_env **head, t_env *NodeToDelete);
+
+// free utils;
+void Delete_env_Node(t_env **head, t_env *NodeToDelete);
+void Delete_token_Node(t_token **head, t_token *NodeToDelete);
+void	free_db_arr(char **arr);
+void Delete_cmd_Node(t_cmd **head, t_cmd *NodeToDelete);
+void    free_exec(int isexit);
+
+
 t_env *is_in_env(t_env *env, char *value_to_check);
 int getequalindex(char *cmd);
 
