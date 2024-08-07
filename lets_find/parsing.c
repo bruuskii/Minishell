@@ -8,12 +8,17 @@ int parse_every_word(char **tokens)
     int count_double = 0;
     index = 0;
 
-    while(tokens &&tokens[index] != NULL)
+    while(tokens && tokens[index] != NULL)
     {
         i = 0;
-        while(tokens[index][i] != '\0')
+        int len = strlen(tokens[index]);
+        while(tokens[index][i])
         {
-            if(tokens[index][i] == '\'')
+            if(tokens[index][i] == '\'' && tokens[index][len - 1] == '\'' && len > 1)
+                break;
+            else if (tokens[index][i] == '"' && tokens[index][len - 1] == '"' && len > 1)
+                break;
+            else if(tokens[index][i] == '\'')
                 count_single++;
             else if(tokens[index][i] == '\"')
                 count_double++;
@@ -58,8 +63,8 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
     //     free_tokens(*token);
     //     *token = NULL;
     // }
-    // if(!first_parse(str))
-    //     return 0;
+    if(!first_parse(str))
+        return 0;
     char **real_tokens = split_string(str);
     if (!parse_every_word(real_tokens)) {
         return 0;

@@ -15,7 +15,7 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     final[0] = '\0';
 
     while (token->token[i]) {
-        if (token->token[i] == '$' && token->token[i + 1] != '\0') {
+        if (token->token[i] == '$' && token->token[i + 1] != '\0' && token->token[0] != '\'') {
             i++;
             if (token->token[i] == '?') {
                 char *exit_status_str = ft_itoa(g_exec->exit_status);
@@ -39,7 +39,7 @@ int expand(t_token *token, t_env *env, char **str, int index) {
             } else {
                 j = 0;
                 memset(dest, 0, sizeof(dest));
-                while (token->token[i] != '$' && token->token[i] != '\0' && token->token[i] != ' ') {
+                while (token->token[i] != '$' && token->token[i] != '\0' && token->token[i] != ' ' && (token->token[i] != '\'' || token->token[i] != '"') && token->token[i] != '?') {
                     dest[j] = token->token[i];
                     i++;
                     j++;

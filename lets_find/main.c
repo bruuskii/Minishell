@@ -91,7 +91,8 @@ void handle_sigint() {
 // {
 //     void *ptr;
 //     ptr = malloc(size);
-//     if (!ptr)
+//     if (!ptr)ls
+
 //         return NULL;
 //     return ptr;
 // }
