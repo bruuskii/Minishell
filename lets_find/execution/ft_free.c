@@ -154,9 +154,24 @@ void Delete_cmd_Node(t_cmd **head, t_cmd *NodeToDelete)
         free_db_arr(NodeToDelete->cmd);
     if (NodeToDelete->fd)
         free (NodeToDelete->fd);
-    // free in out files;
+    Delete_fd_Nodes(&NodeToDelete->outfile);
+    Delete_fd_Nodes(&NodeToDelete->infile);
     if (NodeToDelete)
         free (NodeToDelete);
+}
+
+void    Delete_cmds_node()
+{
+    t_cmd *tmp;
+    t_cmd  *cmd;
+
+    cmd = g_exec->cmd;
+    while (cmd && cmd->next)
+    {
+        tmp = cmd;
+        cmd = cmd->next;
+        Delete_cmd_Node(&g_exec->cmd, tmp);
+    }
 }
 
 void Delete_fd_Node(t_filedescriptiom **head, t_filedescriptiom *NodeToDelete)
@@ -184,6 +199,19 @@ void Delete_fd_Node(t_filedescriptiom **head, t_filedescriptiom *NodeToDelete)
         free (NodeToDelete);
 }
 
+void Delete_fd_Nodes(t_filedescriptiom **src)
+{
+    t_filedescriptiom *tmp;
+    t_filedescriptiom *fd;
+
+    fd = (*src);
+    while (fd && fd->next)
+    {
+        tmp = fd;
+        fd = fd->next;
+        Delete_fd_Node(src, tmp);
+    }
+}
 
 void    free_exec(int isexit)
 {

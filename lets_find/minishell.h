@@ -109,6 +109,10 @@ void Delete_env_Node(t_env **head, t_env *NodeToDelete);
 void Delete_token_Node(t_token **head, t_token *NodeToDelete);
 void	free_db_arr(char **arr);
 void Delete_cmd_Node(t_cmd **head, t_cmd *NodeToDelete);
+void    Delete_env();
+void    Delete_tokens();
+void    Delete_cmds_node();
+void Delete_fd_Nodes(t_filedescriptiom **src);
 void    free_exec(int isexit);
 
 
