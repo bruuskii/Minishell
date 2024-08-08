@@ -66,9 +66,10 @@ char **split_string(const char *str) {
     int i = 0, index = 0;
     int len = strlen(str);
     int skip_space = 1;
+    int skip_after_operator = 0;
 
     while (i < len) {
-        while (i < len && isspace(str[i])) {
+        while (i < len && isspace(str[i]) && (skip_space || skip_after_operator)) {
             i++;
         }
 
@@ -108,6 +109,15 @@ char **split_string(const char *str) {
                 strncpy(result[index], &str[i], op_len);
                 result[index][op_len] = '\0';
                 i += op_len;
+                
+                // Set flag to skip spaces after operators
+                if (strcmp(result[index], "|") == 0 ||
+                    strcmp(result[index], "<") == 0 ||
+                    strcmp(result[index], ">") == 0 ||
+                    strcmp(result[index], "<<") == 0 ||
+                    strcmp(result[index], ">>") == 0) {
+                    skip_after_operator = 1;
+                }
             } else {
                 while (i < len && !isspace(str[i]) && !is_operator(&str[i]) && str[i] != '"' && str[i] != '\'') {
                     i++;
@@ -127,14 +137,15 @@ char **split_string(const char *str) {
         }
         index++;
 
-        if (skip_space && i < len && isspace(str[i])) {
+        if ((skip_space || skip_after_operator) && i < len && isspace(str[i])) {
             while (i < len && isspace(str[i])) {
                 i++;
             }
             skip_space = 0;
+            skip_after_operator = 0;
         }
 
-        if (i < len && isspace(str[i])) {
+        if (i < len && isspace(str[i]) && !skip_space && !skip_after_operator) {
             result[index] = (char *)malloc(2 * sizeof(char));
             if (!result[index]) {
                 for (int j = 0; j < index; j++) {

@@ -166,46 +166,40 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
 
 
 void grep_type(t_token *token, int index, int is_command) {
-    if (strcmp(token->token, "<<") == 0 || strcmp(token->token, "<") == 0 ||
-        strcmp(token->token, ">") == 0 || strcmp(token->token, ">>") == 0) {
-        token->type = "operator";
-    } 
-    else if (token->prev && (strcmp(token->prev->token, ">") == 0 || strcmp(token->prev->token, ">>") == 0)) {
-        if (strcmp(token->token, " ") == 0) {
-            token->type = "space";
-        } else {
-            token->type = "out";
+    if (strcmp(token->token, " ") == 0) {
+        t_token *mine = token;
+        while (mine->prev && strcmp(mine->prev->token, "|") != 0) {
+            mine = mine->prev;
         }
-    } 
-    else if (token->prev && (strcmp(token->prev->token, "<") == 0 || strcmp(token->prev->token, "<<") == 0)) {
-        if (strcmp(token->token, " ") == 0) {
-            token->type = "space";
-        } else {
-            token->type = "in";
-        }
-    }
-    else if (token->prev && strcmp(token->prev->token, " ") == 0) {
-        if (token->prev->prev && (strcmp(token->prev->prev->token, "<") == 0 || strcmp(token->prev->prev->token, "<<") == 0)) {
-            token->type = "in";
-        } else if (token->prev->prev && (strcmp(token->prev->prev->token, ">") == 0 || strcmp(token->prev->prev->token, ">>") == 0)) {
-            token->type = "out";
-        } else {
+        if (strcmp(mine->token, "|") == 0)
+            mine = mine->next;
+        if (strcmp(mine->token, "echo") == 0) {
             token->type = "argument";
+            return;
         }
-    }
+        else
+        {
+            token->type = "space";
+            return;
+        }
+    } else if (strcmp(token->token, "<<") == 0 || strcmp(token->token, "<") == 0 ||
+               strcmp(token->token, ">") == 0 || strcmp(token->token, ">>") == 0 ||
+               strcmp(token->token, "$") == 0) {
+        token->type = "operator";
+    } else if ((token->prev && strcmp(token->prev->token, ">") == 0) || (token->prev && strcmp(token->prev->token, ">>") == 0) ) {
+        token->type = "out";
+    } else if ((token->prev && strcmp(token->prev->token, "<") == 0) || (token->prev && strcmp(token->prev->token, "<<") == 0)) {
+        token->type = "in";
+    } 
     else if (index == 0 || is_command) {
         token->type = "command";
-    } 
-    else if (strcmp(token->token, "|") == 0) {
+    } else if (strcmp(token->token, "|") == 0)
         token->type = "pipe";
-    } 
-    else if (strcmp(token->token, "$") == 0) {
-        token->type = "expand";
-    } 
     else {
         token->type = "argument";
     }
 }
+
 
 
 
