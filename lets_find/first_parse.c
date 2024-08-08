@@ -6,7 +6,7 @@ int first_parse(char *line)
     int len = strlen(line) - 1;
     while (isspace(line[i]))
         i++;
-    if (is_operator(&line[i]))
+    if (is_operator(&line[i]) && strncmp(line, "<<", 2) != 0)
         return error_return();
     while (len > 0 && isspace(line[len]))
         len--;
