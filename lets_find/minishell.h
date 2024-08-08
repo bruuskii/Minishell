@@ -124,6 +124,7 @@ void export(char **cmd);
 void unset(char **cmd);
 void pwd(t_env *env);
 void echo(char **cmd);
+void    ft_exit(char **cmd);
 
 //exec;
 void execute( t_exec *exec, char **env);

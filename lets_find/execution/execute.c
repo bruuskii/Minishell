@@ -136,6 +136,8 @@ int getoutputfile(t_cmd *cmd)
         if (fd[i] == -1)
         {
             perror("file cannot opend");
+            return (-1);
+
         }
         if (file->next)
             close(fd[i]);
@@ -213,8 +215,10 @@ void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
         print_env(g_exec->env, 0);
     }
         
-    // else if (!strcmp(cmd->cmd[0], "exit"))
-    //     return (1);
+    else if (!strcmp(cmd->cmd[0], "exit"))
+    {
+        ft_exit(cmd->cmd);
+    }
 }
 
 
@@ -291,6 +295,14 @@ void execute(t_exec *exec, char **env)
         fdin = getinputfile(cmd);
         fdout = getoutputfile(cmd);
 
+        if (fdin == -1 || fdout == -1)
+        {
+            cmd = cmd->next;
+            i++;
+            continue;
+        }
+            
+
         if (cmd->next)
         {
             cmd->fd = malloc (2 * sizeof(int));
@@ -344,19 +356,25 @@ void execute(t_exec *exec, char **env)
         
     }
 
-    int j = -1;
-    int status;
 
-    while (++j <= countpipes)
-    {
-        wait(&status); 
-        if (WIFEXITED(status)) {
-            // Check if the child process terminated normally
-            g_exec->exit_status = WEXITSTATUS(status);
+
+    // if (!its_builtin)
+    // {
+        int j = -1;
+        int status;
+
+        while (++j <= countpipes)
+        {
+            wait(&status); 
+            if (WIFEXITED(status)) {
+                // Check if the child process terminated normally
+                g_exec->exit_status = WEXITSTATUS(status);
         } else {
             printf("Child process did not terminate normally\n");
         }
     }
+    // }
+    
 
     
 

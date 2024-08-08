@@ -6,16 +6,12 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/11 11:28:03 by ainouni           #+#    #+#             */
-/*   Updated: 2023/11/23 16:46:08 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/08 13:47:23 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	is_blanks(char c)
-{
-	return ((c >= 9 && c <= 13) || c == 32);
-}
 
 int	ft_atoi(const char *nptr)
 {
