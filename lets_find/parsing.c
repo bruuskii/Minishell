@@ -168,9 +168,11 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
 void grep_type(t_token *token, int index, int is_command) {
     if (strcmp(token->token, " ") == 0) {
         t_token *mine = token;
-        while (mine->prev) {
+        while (mine->prev && strcmp(mine->prev->token, "|") != 0) {
             mine = mine->prev;
         }
+        if (strcmp(mine->token, "|") == 0)
+            mine = mine->next;
         if (strcmp(mine->token, "echo") == 0) {
             token->type = "argument";
             return;
