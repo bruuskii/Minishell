@@ -7,7 +7,6 @@ int is_number_valid(char *nb)
 {
     int i;
     int nbsign;
-    int isdigitfound;
 
     i = 0;
     nbsign = 0; 
@@ -18,8 +17,6 @@ int is_number_valid(char *nb)
             return (2);
         if (nb[i] == '-' || nb[i] == '+')
             nbsign++;
-        if (ft_isdigit(nb[i]))
-            isdigitfound = 1;
         i++;
     }
     if (nbsign > 1)
@@ -27,35 +24,43 @@ int is_number_valid(char *nb)
     return (1);
 }
 
-void    ft_exit(char **cmd)
+
+void ft_exit1(char **cmd)
 {
     int i;
-    int status;
+    unsigned long long num;
 
-    status = 0;
+    i = 1;
+    while (cmd[i])
+    {
+        if (is_number_valid(cmd[i]) == 2)
+        {
+            ft_putstr_fd("exit\n", 1);
+            ft_putstr_fd("exit : numeric argument required\n", 2);
+            free_exec(1);
+            exit(2);
+        }
+        i++;
+    }
+    if (!(i - 1 > 1))
+    {
+        ft_putstr_fd("exit\n", 1);
+        num = ft_atoi(cmd[1]);
+        free_exec(1);
+        exit (num);
+    }
+    g_exec->exit_status = 1;
+    ft_putstr_fd("exit : too many arguments\n", 2);
+}
+
+void    ft_exit(char **cmd)
+{
+    
     if (!cmd[1])
     {
-        //free ALL things;
+        ft_putstr_fd("exit\n", 1);
+        free_exec(1);
         exit(0);
     }
-    i = -1;
-    while (cmd[++i])
-    {
-        status = is_number_valid(cmd[i]);
-        if (status == 2)
-        {
-            ft_putstr_fd("exit numeric argument required\n", 2);
-            //free all;
-            exit (2);
-        }
-        // i++;
-    }
-
-    if (i > 1)
-        ft_putstr_fd("exit: too many arguments\n", 2);
-    else
-    {
-        exit (ft_atoi(cmd[1]));
-        // free all things;
-    }
+    ft_exit1(cmd);
 }
