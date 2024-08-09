@@ -173,7 +173,7 @@ void grep_type(t_token *token, int index, int is_command) {
         }
         if (strcmp(mine->token, "|") == 0)
             mine = mine->next;
-        if (strcmp(mine->token, "echo") == 0) {
+        if (strcmp(mine->token, "echo") == 0 && strncmp(mine->next->token, "-", 1) != 0) {
             token->type = "argument";
             return;
         }

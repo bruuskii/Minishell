@@ -10,7 +10,7 @@ int is_number_valid(char *nb)
     int isdigitfound;
 
     i = 0;
-    nbsign = 0;
+    nbsign = 0; 
     while (nb[i])
     {
         if (!(ft_isdigit(nb[i]) || nb[i] == '+' 
