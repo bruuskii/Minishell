@@ -357,24 +357,23 @@ void execute(t_exec *exec, char **env)
     }
 
 
-
-    // if (!its_builtin)
-    // {
         int j = -1;
         int status;
 
         while (++j <= countpipes)
         {
-            wait(&status); 
+            wait(&status);
             if (WIFEXITED(status)) {
                 // Check if the child process terminated normally
-                g_exec->exit_status = WEXITSTATUS(status);
+                if (!its_builtin)
+                    g_exec->exit_status = WEXITSTATUS(status);
         } else {
             printf("Child process did not terminate normally\n");
         }
     }
-    // }
     
+
+    free_exec(0);
 
     
 

@@ -214,19 +214,16 @@ void Delete_fd_Nodes(t_filedescriptiom **src)
 }
 
 void    free_exec(int isexit)
-{
-    
-    // if not exit
-    // free_tokens();
-    // free_cmd();
-    // free_dpchar_arr();
-    // free filedescription;
+{    
+    Delete_cmds_node();
+    // if (g_exec->tokens)
+    //     Delete_tokens(); // probleme in check the first call or if it's null
+    if (g_exec->Paths)
+        free_db_arr(g_exec->Paths);
     if (isexit)
     {
-        // free all with : 
-        // free_env();
+        Delete_env();
+        if (g_exec)
+            free(g_exec);
     }
-
-    
-    
 }
