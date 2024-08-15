@@ -80,6 +80,15 @@ int    getinputfile(t_cmd *cmd)
         return (0);
     while (i < size && file)
     {
+        if (!*file->filename)
+        {
+            ft_putstr_fd("bash : ambiguous redirect\n", 2);
+            file = file->next;
+            i++;
+            tmpfderror = -1;
+            continue;
+        }
+
         if (file->isherdoc)
         {
             fileinfd = heredoc(file->delimeter);
@@ -89,6 +98,7 @@ int    getinputfile(t_cmd *cmd)
             fileinfd = open(file->filename, O_RDONLY, 0777);
             if (fileinfd == -1)
             {
+                printf(":%d:\n", fileinfd);
                 perror("no such file or directory\n");
                 tmpfderror = fileinfd;
             }   
@@ -137,7 +147,6 @@ int getoutputfile(t_cmd *cmd)
         {
             perror("file cannot opend");
             return (-1);
-
         }
         if (file->next)
             close(fd[i]);
@@ -185,9 +194,8 @@ void ft_exec(t_cmd *cmd, char **env)
 	}
 }
 
-void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
+void ft_exec_builtin(t_cmd *cmd)
 {
-    (void)env;
     if (!ft_strcmp(cmd->cmd[0], "echo"))
     {
         echo(cmd->cmd);
@@ -195,11 +203,11 @@ void ft_exec_builtin(t_exec **exec, t_cmd *cmd, char **env)
         
     else if (!ft_strcmp(cmd->cmd[0], "cd"))
     {
-        cd_builtin(cmd->cmd[1], g_exec->env);
+        cd(cmd->cmd);
     }
     if (!ft_strcmp(cmd->cmd[0], "pwd"))
     {
-        pwd((*exec)->env);
+        pwd();
     }
         
     else if (!ft_strcmp(cmd->cmd[0], "export"))
@@ -299,10 +307,9 @@ void execute(t_exec *exec, char **env)
         {
             cmd = cmd->next;
             i++;
+            g_exec->exit_status = 1;
             continue;
         }
-            
-
         if (cmd->next)
         {
             cmd->fd = malloc (2 * sizeof(int));
@@ -334,12 +341,12 @@ void execute(t_exec *exec, char **env)
                 {
                     dup2(fdout, STDOUT_FILENO);
                     close (fdout);
-                    ft_exec_builtin(&exec, cmd, env);
+                    ft_exec_builtin(cmd);
                     dup2(savedout, STDOUT_FILENO);
                     close (savedout);
                 }
                 else
-                    ft_exec_builtin(&exec, cmd, env);
+                    ft_exec_builtin(cmd);
             }
             if (fdin != STDIN_FILENO)
                 close (fdin);
@@ -371,8 +378,6 @@ void execute(t_exec *exec, char **env)
             printf("Child process did not terminate normally\n");
         }
     }
-    
-
     free_exec(0);
 
     

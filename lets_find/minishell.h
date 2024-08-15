@@ -13,6 +13,7 @@
 #include <readline/history.h>
 #include "Libft/libft.h"
 #include <fcntl.h>
+#include <limits.h>
 
 #define RESET "\033[0m"
 #define RED "\033[0;31m"
@@ -84,7 +85,7 @@ char **split_string(const char *str);
 int	is_operator(const char *str);
 int parse_every_word(char **tokens);
 char  **double_quotes(char **tokens);
-int cd_builtin(const char *path, t_env *env);
+int cd(char **cmd);
 void    print_env(t_env *env, int isexport);
 t_env *init_env(char **str);
 void increment_shell_level(t_env *env);
@@ -122,7 +123,7 @@ int getequalindex(char *cmd);
 //built in;
 void export(char **cmd);
 void unset(char **cmd);
-void pwd(t_env *env);
+void pwd();
 void echo(char **cmd);
 void    ft_exit(char **cmd);
 

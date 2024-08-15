@@ -258,6 +258,8 @@ void export(char **cmd)
         {
             ft_export(cmd[i]);
         }
+        else
+            g_exec->exit_status = 1;
         i++;
     }
 }

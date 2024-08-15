@@ -130,21 +130,21 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
 
     (*cmd) = parse_every_command(current);
     index = 0;
-    while (tokens[index]) {
-        if (strcmp(tokens[index], "cd") == 0) {
-            if (tokens[index + 1]) {
-                if (cd_builtin(tokens[index + 1], env) == 0) {
-                    printf("cd: failed to change directory\n");
-                }
-                index++;
-            } else {
-                if (cd_builtin(NULL, env) == 0) {
-                    printf("cd: failed to change directory\n");
-                }
-            }
-        }
-        index++;
-    }
+    // while (tokens[index]) {
+    //     if (strcmp(tokens[index], "cd") == 0) {
+    //         if (tokens[index + 1]) {
+    //             if (cd_builtin(tokens[index + 1], env) == 0) {
+    //                 printf("cd: failed to change directory\n");
+    //             }
+    //             index++;
+    //         } else {
+    //             if (cd_builtin(NULL, env) == 0) {
+    //                 printf("cd: failed to change directory\n");
+    //             }
+    //         }
+    //     }
+    //     index++;
+    // }
 
     index = 0;
     while (tokens[index]) {
