@@ -24,6 +24,7 @@ void echo(char **cmd)
 {
     int i;
     int iswith_nl;
+    int wordfound;
 
     if (!cmd[1])
     {
@@ -32,18 +33,26 @@ void echo(char **cmd)
     }
     i = 1;
     iswith_nl = 1;
+    wordfound = 0;
     while (cmd[i])
     {
-        
-        if (!ft_strncmp(cmd[i], "-n", 2) && i == 1)
+        if (!ft_strncmp(cmd[i], "-n", 2) && !wordfound)
         {
             if (count_char(cmd[i], '-') > 1)
+            {
                 printf("%s", cmd[i]);
+                wordfound = 1;
+            }
+                
             else
                 iswith_nl = 0;
         }  
         else
+        {
             printf("%s", cmd[i]);
+            wordfound = 1;
+        }
+            
         
         i++;
     }
