@@ -166,7 +166,12 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
 
 
 void grep_type(t_token *token, int index, int is_command) {
-    if (strcmp(token->token, " ") == 0) {
+    if ((token->prev && strcmp(token->prev->token, ">") == 0) || (token->prev && strcmp(token->prev->token, ">>") == 0) ) {
+        token->type = "out";
+    } else if ((token->prev && strcmp(token->prev->token, "<") == 0) || (token->prev && strcmp(token->prev->token, "<<") == 0)) {
+        token->type = "in";
+    } 
+    else if (strcmp(token->token, " ") == 0) {
         if(strcmp(token->prev->type ,"command") == 0)
         {
             token->type = "argument";
@@ -191,10 +196,6 @@ void grep_type(t_token *token, int index, int is_command) {
                strcmp(token->token, ">") == 0 || strcmp(token->token, ">>") == 0 ||
                strcmp(token->token, "$") == 0) {
         token->type = "operator";
-    } else if ((token->prev && strcmp(token->prev->token, ">") == 0) || (token->prev && strcmp(token->prev->token, ">>") == 0) ) {
-        token->type = "out";
-    } else if ((token->prev && strcmp(token->prev->token, "<") == 0) || (token->prev && strcmp(token->prev->token, "<<") == 0)) {
-        token->type = "in";
     } 
     else if (index == 0 || is_command) {
         token->type = "command";
