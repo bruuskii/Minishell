@@ -8,6 +8,8 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     int j = 0;
     char *final = NULL;
     int i = 0;
+    int in_single_quote = 0;
+    int in_double_quote = 0;
 
     final = (char *)malloc(1);
     if (!final)
@@ -15,7 +17,13 @@ int expand(t_token *token, t_env *env, char **str, int index) {
     final[0] = '\0';
 
     while (token->token[i]) {
-        if (token->token[i] == '$' && token->token[i + 1] != '\0' && token->token[0] != '\'') {
+        if (token->token[i] == '\'' && !in_double_quote) {
+            in_single_quote = !in_single_quote;
+        } else if (token->token[i] == '"' && !in_single_quote) {
+            in_double_quote = !in_double_quote;
+        }
+
+        if (token->token[i] == '$' && token->token[i + 1] != '\0' && !in_single_quote) {
             i++;
             if (token->token[i] == '?') {
                 char *exit_status_str = ft_itoa(g_exec->exit_status);
@@ -39,7 +47,7 @@ int expand(t_token *token, t_env *env, char **str, int index) {
             } else {
                 j = 0;
                 memset(dest, 0, sizeof(dest));
-                while (token->token[i] != '$' && token->token[i] != '\0' && token->token[i] != ' ' && (token->token[i] != '\'' || token->token[i] != '"') && token->token[i] != '?') {
+                while (token->token[i] != '$' && token->token[i] != '\0' && token->token[i] != ' ' && token->token[i] != '\'' && token->token[i] != '"' && token->token[i] != '?') {
                     dest[j] = token->token[i];
                     i++;
                     j++;

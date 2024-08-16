@@ -65,12 +65,12 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
     // }
     if(!first_parse(str))
         return 0;
-    char **real_tokens = split_string(str);
-    if (!parse_every_word(real_tokens)) {
+    char **tokens = split_string(str);
+    if (!parse_every_word(tokens)) {
         return 0;
     }
 
-    char **tokens = double_quotes(real_tokens);
+    //char **tokens = double_quotes(real_tokens);
     int index = 0;
     int args_nbr = 0;
     int is_command = 1;
@@ -106,6 +106,7 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
         grep_type(current, index, is_command);
 
         expand(current, env, tokens, index);
+        current->token = double_quotes(current->token);
 
         if (strcmp(current->type, "pipe") != 0 && index != 0 && strcmp(current->type, "argument") == 0) {
             args_nbr++;
@@ -146,19 +147,19 @@ int print_type(char *str, t_env *env, t_token **token, t_cmd **cmd) {
     //     index++;
     // }
 
-    index = 0;
-    while (tokens[index]) {
-        free(tokens[index]);
-        index++;
-    }
-    free(tokens);
+    // index = 0;
+    // while (tokens[index]) {
+    //     free(tokens[index]);
+    //     index++;
+    // }
+    // free(tokens);
 
-    index = 0;
-    while (real_tokens[index]) {
-        free(real_tokens[index]);
-        index++;
-    }
-    free(real_tokens);
+    // index = 0;
+    // while (real_tokens[index]) {
+    //     free(real_tokens[index]);
+    //     index++;
+    // }
+    // free(real_tokens);
     
     (*token) = head;
     return 1;
@@ -210,60 +211,32 @@ void grep_type(t_token *token, int index, int is_command) {
 
 
 
-char **double_quotes(char **tokens) {
-    int i = 0;
-    while (tokens[i]) {
+char *double_quotes(char *token) {
+    if (!token) return NULL;
+
+    int len = strlen(token);
+    char *new_token = malloc((len + 1) * sizeof(char));
+    if (!new_token) return NULL;
+
+    int i = 0, pos = 0;
+    int in_quote = 0;
+    char current_quote = '\0';
+
+    while (i < len) {
+        if ((token[i] == '"' || token[i] == '\'') && !in_quote) {
+            in_quote = 1;
+            current_quote = token[i];
+        } else if (token[i] == current_quote && in_quote) {
+            in_quote = 0;
+            current_quote = '\0';
+        } else {
+            new_token[pos] = token[i];
+            pos++;
+        }
         i++;
     }
-    
-    char **real_tokens = (char **)malloc((i + 1) * sizeof(char *));
-    if(!real_tokens)
-    {
-        free(real_tokens);
-        return 0;
-    }
-    i = 0;
-    int index = 0;
 
-    while (tokens[i]) {
-        int len = strlen(tokens[i]);
-        int k = 0, pos = 0;
-        int in_quote = 0;
-        char current_quote = '\0';
-
-        real_tokens[index] = (char *)malloc((len + 1) * sizeof(char));
-        if(!real_tokens || !real_tokens[index])
-        {
-            int j = 0;
-            while(j < len)
-            {
-                free(real_tokens[j]);
-                j++;
-            }
-            free(real_tokens);
-            return NULL;
-        }
-        while (k < len) {
-            if ((tokens[i][k] == '"' || tokens[i][k] == '\'') && !in_quote) {
-                in_quote = 1;
-                current_quote = tokens[i][k];
-            } else if (tokens[i][k] == current_quote && in_quote) {
-                in_quote = 0;
-                current_quote = '\0';
-            } else {
-                real_tokens[index][pos] = tokens[i][k];
-                pos++;
-            }
-            k++;
-        }
-
-        real_tokens[index][pos] = '\0';
-        i++;
-        index++;
-    }
-    real_tokens[index] = NULL;
-
-    return real_tokens;
+    new_token[pos] = '\0';
+    return new_token;
 }
-
 
