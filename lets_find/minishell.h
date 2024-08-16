@@ -41,7 +41,14 @@ typedef struct s_env
 
 
 
-
+typedef struct s_token_process
+{
+	char	*token;
+	char	*new_token;
+	int		i;
+	int		pos;
+	int		fully_quoted;
+}	t_token_process;
 
 typedef struct s_filedescriptiom
 {
