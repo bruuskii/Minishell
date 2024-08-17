@@ -91,11 +91,7 @@ extern t_exec *g_exec;
 char **split_string(const char *str);
 int	is_operator(const char *str);
 int parse_every_word(char **tokens);
-<<<<<<< HEAD
-char  **double_quotes(char **tokens);
-=======
 char  *double_quotes(char *tokens);
->>>>>>> 0158cdf6b93864f77469af8767c1d3eb46d9c0ef
 int cd(char **cmd);
 void    print_env(t_env *env, int isexport);
 t_env *init_env(char **str);

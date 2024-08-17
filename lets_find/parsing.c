@@ -42,100 +42,6 @@ static int	check_quotes(char *token, char *current_quote)
 {
 	int	i;
 
-<<<<<<< HEAD
-    char **tokens = double_quotes(real_tokens);
-    int index = 0;
-    int args_nbr = 0;
-    int is_command = 1;
-    t_token *head = NULL;
-    t_token *current = NULL;
-
-
-    while (tokens && tokens[index]) {
-        t_token *new_token = (t_token *)malloc(sizeof(t_token));
-        if (!new_token) {
-            // Free previously allocated tokens and return 0
-            t_token *tmp = head;
-            while (tmp) {
-                t_token *next = tmp->next;
-                free(tmp->token);
-                free(tmp);
-                tmp = next;
-            }
-            return 0;
-        }
-
-        new_token->token = strdup(tokens[index]);
-        new_token->next = NULL;
-        new_token->prev = current;
-        new_token->nbr_of_args = args_nbr;
-        if (current) {
-            current->next = new_token;
-        } else {
-            head = new_token;
-        }
-
-        current = new_token;
-        grep_type(current, index, is_command);
-
-        expand(current, env, tokens, index);
-
-        if (strcmp(current->type, "pipe") != 0 && index != 0 && strcmp(current->type, "argument") == 0) {
-            args_nbr++;
-            current->nbr_of_args = args_nbr;
-        }
-
-        if (strcmp(current->type, "pipe") == 0) {
-            is_command = 1;
-            printf("the number of these arguments %d\n", current->nbr_of_args);
-            args_nbr = 0;
-        } else {
-            is_command = 0;
-        }
-
-        printf("token: %s, and type: %s\n", current->token, current->type);
-        index++;
-    }
-
-    if( index > 0 && tokens[index - 1])
-        printf("number of ac %d\n", current->nbr_of_args);
-    current = head;
-
-    (*cmd) = parse_every_command(current);
-    index = 0;
-    // while (tokens[index]) {
-    //     if (strcmp(tokens[index], "cd") == 0) {
-    //         if (tokens[index + 1]) {
-    //             if (cd_builtin(tokens[index + 1], env) == 0) {
-    //                 printf("cd: failed to change directory\n");
-    //             }
-    //             index++;
-    //         } else {
-    //             if (cd_builtin(NULL, env) == 0) {
-    //                 printf("cd: failed to change directory\n");
-    //             }
-    //         }
-    //     }
-    //     index++;
-    // }
-
-    index = 0;
-    while (tokens[index]) {
-        free(tokens[index]);
-        index++;
-    }
-    free(tokens);
-
-    index = 0;
-    while (real_tokens[index]) {
-        free(real_tokens[index]);
-        index++;
-    }
-    free(real_tokens);
-    
-    (*token) = head;
-    return 1;
-=======
 	i = 0;
 	while (token[i])
 	{
@@ -143,7 +49,6 @@ static int	check_quotes(char *token, char *current_quote)
 		i++;
 	}
 	return (*current_quote != '\0');
->>>>>>> 0158cdf6b93864f77469af8767c1d3eb46d9c0ef
 }
 
 int	parse_every_word(char **tokens)
