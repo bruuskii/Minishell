@@ -53,5 +53,6 @@ void	ft_putendl_fd(char *s, int fd);
 void	ft_putnbr_fd(int n, int fd);
 int	    ft_strcmp(const char *s1, const char *s2);
 int	    is_blanks(char c);
+int     ft_isspace(char c);
 
 #endif
