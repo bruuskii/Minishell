@@ -20,6 +20,31 @@ int count_char(char *cmd, char c)
 }
 
 
+void    ft_echo(char **cmd, int wordfound, int i, int iswith_nl)
+{
+    while (cmd[i])
+    {
+        if (!ft_strncmp(cmd[i], "-n", 2) && !wordfound)
+        {
+            if (count_char(cmd[i], '-') > 1)
+            {
+                printf("%s", cmd[i]);
+                wordfound = 1;
+            }
+            else
+                iswith_nl = 0;
+        }  
+        else
+        {
+            printf("%s", cmd[i]);
+            wordfound = 1;
+        }
+        i++;
+    }
+    if (iswith_nl)
+        printf("\n");
+}
+
 void echo(char **cmd)
 {
     int i;
@@ -34,31 +59,5 @@ void echo(char **cmd)
     i = 1;
     iswith_nl = 1;
     wordfound = 0;
-    while (cmd[i])
-    {
-        if (!ft_strncmp(cmd[i], "-n", 2) && !wordfound)
-        {
-            if (count_char(cmd[i], '-') > 1)
-            {
-                printf("%s", cmd[i]);
-                wordfound = 1;
-            }
-                
-            else
-                iswith_nl = 0;
-        }  
-        else
-        {
-            printf("%s", cmd[i]);
-            wordfound = 1;
-        }
-            
-        
-        i++;
-    }
-    if (iswith_nl)
-    {
-        printf("\n");
-    }
-        
+    ft_echo(cmd, wordfound, i, iswith_nl);
 }

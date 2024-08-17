@@ -331,11 +331,13 @@ void execute(t_exec *exec, char **env)
             {
                 ft_exec(cmd, env);
             }
+            else if (its_builtin && !cmd->cmd[1])
+                ft_exec_builtin(cmd);
             exit (EXIT_SUCCESS);
         }
         else
         {
-            if (its_builtin && !cmd->next && !prev)
+            if (its_builtin && !cmd->next && !prev && cmd->cmd[1])
             {
                 if (fdout != STDOUT_FILENO)
                 {
@@ -354,7 +356,6 @@ void execute(t_exec *exec, char **env)
             {
                 close (prev->fd[0]);
                 close (prev->fd[1]);
-                // free(prev->fd);
             }
             prev = cmd;
             cmd = cmd->next;
