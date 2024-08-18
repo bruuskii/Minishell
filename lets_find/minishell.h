@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/18 18:18:19 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/18 18:20:31 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,21 +91,12 @@ typedef struct s_exec_utils
 
 typedef struct s_exec
 {
-<<<<<<< HEAD
-    t_token *tokens;
-    t_cmd *cmd;
-    char **paths;
-    t_env *env;
-    int exit_status;
-}   t_exec;
-=======
 	t_token				*tokens;
 	t_cmd				*cmd;
 	char				**paths;
 	t_env				*env;
 	int					exit_status;
 }					t_exec;
->>>>>>> refs/remotes/origin/main
 
 extern t_exec		*g_exec;
 
@@ -152,5 +143,6 @@ int					count_pipes(t_cmd *cmd);
 int					countfiles(t_filedescriptiom *files);
 char				*get_path(char *cmd);
 int					heredoc(char *delimeter);
+char	            **init_env_arr();
 
 #endif
