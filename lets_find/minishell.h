@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/18 15:41:57 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/18 15:48:15 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,12 +66,28 @@ typedef struct s_filedescriptiom
 
 typedef struct s_cmd
 {
-	char				**cmd;
-	t_filedescriptiom	*infile;
-	t_filedescriptiom	*outfile;
-	struct s_cmd		*next;
-	int					*fd;
-}					t_cmd;
+    char **cmd;
+    struct s_filedescriptiom *infile;
+    struct s_filedescriptiom *outfile;
+    struct s_cmd *next;
+    int *fd;
+}   t_cmd;
+
+
+typedef struct s_exec_utils
+{
+
+    int countpipes;
+    int i;
+    int pid;
+    int fdin;
+    int savedout;
+    int fdout;
+    int its_builtin;
+}   t_exec_utils;
+
+
+
 
 typedef struct s_exec
 {

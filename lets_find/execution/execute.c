@@ -230,11 +230,6 @@ void ft_exec_builtin(t_cmd *cmd)
 }
 
 
-
-
-
-
-
 int itsbuiltin(t_cmd *cmd)
 {
     if (!cmd->cmd[0])
@@ -285,112 +280,221 @@ void set_upfdfiles(int fdin, int fdout, t_cmd *cmd, t_cmd *prev)
     }
 }
 
+
+void    execute_parent(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev)
+{
+    if (exec_utils.its_builtin && !cmd->next && !prev && cmd->cmd[1])
+    {
+        if (exec_utils.fdout != STDOUT_FILENO)
+        {
+            dup2(exec_utils.fdout, STDOUT_FILENO);
+            close (exec_utils.fdout);
+            ft_exec_builtin(cmd);
+            dup2(exec_utils.savedout, STDOUT_FILENO);
+            close (exec_utils.savedout);
+        }
+        else
+                ft_exec_builtin(cmd);
+    }
+    if (exec_utils.fdin != STDIN_FILENO)
+        close (exec_utils.fdin);
+    if (prev)
+    {
+        close (prev->fd[0]);
+        close (prev->fd[1]);
+    }
+}
+
+void    execute_child(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev, char **env)
+{
+    set_upfdfiles(exec_utils.fdin, exec_utils.fdout, cmd, prev);
+    if (!exec_utils.its_builtin)
+    {
+        ft_exec(cmd, env);
+    }
+    else if (exec_utils.its_builtin && !cmd->cmd[1])
+        ft_exec_builtin(cmd);
+    exit (EXIT_SUCCESS);
+}
+
+
+void    ft_execute(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev, char **env)
+{
+    if (cmd->next)
+    {
+        cmd->fd = malloc (2 * sizeof(int));
+        if (pipe(cmd->fd) == -1)
+        {
+            perror("pipe error\n");
+            exit (EXIT_FAILURE);
+        }
+    }
+    exec_utils.its_builtin = itsbuiltin(cmd);
+    exec_utils.pid = fork();
+    if (exec_utils.pid == -1)
+        exit(EXIT_FAILURE);
+    if (exec_utils.pid == 0)
+        execute_child(exec_utils, cmd, prev, env);
+    else
+        execute_parent(exec_utils, cmd, prev);
+}
+
+void    get_exitstatus(t_exec_utils exec_utils)
+{
+    int j = -1;
+    int status;
+
+    while (++j <= exec_utils.countpipes)
+    {
+        wait(&status);
+        if (WIFEXITED(status)) {
+            if (!exec_utils.its_builtin)
+                g_exec->exit_status = WEXITSTATUS(status);
+    } else {
+        printf("Child process did not terminate normally\n");
+    }
+    }
+}
+
+
+t_exec_utils init_exec_utils(t_cmd *cmd)
+{
+    t_exec_utils    exec_utils;
+
+    exec_utils.countpipes = count_pipes(cmd);
+    exec_utils.i = 0;
+    exec_utils.fdin= -1;
+    exec_utils.savedout = dup(STDOUT_FILENO);
+    exec_utils.fdout= -1;
+    return (exec_utils);
+}
+
 void execute(t_exec *exec, char **env)
 {
-    t_cmd *cmd = exec->cmd;
-    t_cmd *prev = NULL;
-    int countpipes = count_pipes(cmd);
-    int i = 0;
-    int pid;
+    t_cmd *cmd;
+    t_cmd *prev;
+    t_exec_utils    exec_utils;
 
-    int fdin= -1;
-    int savedout = dup(STDOUT_FILENO);
-    int fdout= -1;
-    int its_builtin;
-
-    while (cmd && i <= countpipes)
+    cmd = exec->cmd;
+    prev = NULL;
+    exec_utils = init_exec_utils(cmd);
+    while (cmd && exec_utils.i <= exec_utils.countpipes)
     {
-        fdin = getinputfile(cmd);
-        fdout = getoutputfile(cmd);
-
-        if (fdin == -1 || fdout == -1)
+        exec_utils.fdin = getinputfile(cmd);
+        exec_utils.fdout = getoutputfile(cmd);
+        if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
         {
             cmd = cmd->next;
-            i++;
+            exec_utils.i++;
             g_exec->exit_status = 1;
             continue;
         }
-        if (cmd->next)
-        {
-            cmd->fd = malloc (2 * sizeof(int));
-            if (pipe(cmd->fd) == -1)
-            {
-                perror("pipe error\n");
-                exit (EXIT_FAILURE);
-            }
-        }
-        
-        its_builtin = itsbuiltin(cmd);
-        pid = fork();
-        if (pid == -1)
-            exit(EXIT_FAILURE);
-        if (pid == 0)
-        {
-            set_upfdfiles(fdin, fdout, cmd, prev);
-            if (!its_builtin)
-            {
-                ft_exec(cmd, env);
-            }
-            else if (its_builtin && !cmd->cmd[1])
-                ft_exec_builtin(cmd);
-            exit (EXIT_SUCCESS);
-        }
-        else
-        {
-            if (its_builtin && !cmd->next && !prev && cmd->cmd[1])
-            {
-                if (fdout != STDOUT_FILENO)
-                {
-                    dup2(fdout, STDOUT_FILENO);
-                    close (fdout);
-                    ft_exec_builtin(cmd);
-                    dup2(savedout, STDOUT_FILENO);
-                    close (savedout);
-                }
-                else
-                    ft_exec_builtin(cmd);
-            }
-            if (fdin != STDIN_FILENO)
-                close (fdin);
-            if (prev)
-            {
-                close (prev->fd[0]);
-                close (prev->fd[1]);
-            }
-            prev = cmd;
-            cmd = cmd->next;
-            i++;
-        }
-        
+        ft_execute(exec_utils, cmd, prev, env);
+        prev = cmd;
+        cmd = cmd->next;
+        exec_utils.i++;
     }
-
-
-        int j = -1;
-        int status;
-
-        while (++j <= countpipes)
-        {
-            wait(&status);
-            if (WIFEXITED(status)) {
-                // Check if the child process terminated normally
-                if (!its_builtin)
-                    g_exec->exit_status = WEXITSTATUS(status);
-        } else {
-            printf("Child process did not terminate normally\n");
-        }
-    }
+    get_exitstatus(exec_utils);
     free_exec(0);
-
-    
-
-    // Libérer les descripteurs de fichiers alloués
-    // cmd = exec->cmd;
-    // while (cmd)
-    // {
-    //     if (cmd->fd)
-    //         free(cmd->fd);
-    //     cmd = cmd->next;
-    // }
-
-
 }
+
+
+
+
+// void execute(t_exec *exec, char **env)
+// {
+//     t_cmd *cmd = exec->cmd;
+//     t_cmd *prev = NULL;
+//     int countpipes = count_pipes(cmd);
+//     int i = 0;
+//     int pid;
+
+//     int fdin= -1;
+//     int savedout = dup(STDOUT_FILENO);
+//     int fdout= -1;
+//     int its_builtin;
+
+//     while (cmd && i <= countpipes)
+//     {
+//         fdin = getinputfile(cmd);
+//         fdout = getoutputfile(cmd);
+
+//         if (fdin == -1 || fdout == -1)
+//         {
+//             cmd = cmd->next;
+//             i++;
+//             g_exec->exit_status = 1;
+//             continue;
+//         }
+//         if (cmd->next)
+//         {
+//             cmd->fd = malloc (2 * sizeof(int));
+//             if (pipe(cmd->fd) == -1)
+//             {
+//                 perror("pipe error\n");
+//                 exit (EXIT_FAILURE);
+//             }
+//         }
+        
+//         its_builtin = itsbuiltin(cmd);
+//         pid = fork();
+//         if (pid == -1)
+//             exit(EXIT_FAILURE);
+//         if (pid == 0)
+//         {
+//             //execute child process;
+//             set_upfdfiles(fdin, fdout, cmd, prev);
+//             if (!its_builtin)
+//             {
+//                 ft_exec(cmd, env);
+//             }
+//             else if (its_builtin && !cmd->cmd[1])
+//                 ft_exec_builtin(cmd);
+//             exit (EXIT_SUCCESS);
+//         }
+//         else
+//         {
+//             // execute parent process;
+//             if (its_builtin && !cmd->next && !prev && cmd->cmd[1])
+//             {
+//                 if (fdout != STDOUT_FILENO)
+//                 {
+//                     dup2(fdout, STDOUT_FILENO);
+//                     close (fdout);
+//                     ft_exec_builtin(cmd);
+//                     dup2(savedout, STDOUT_FILENO);
+//                     close (savedout);
+//                 }
+//                 else
+//                     ft_exec_builtin(cmd);
+//             }
+//             if (fdin != STDIN_FILENO)
+//                 close (fdin);
+//             if (prev)
+//             {
+//                 close (prev->fd[0]);
+//                 close (prev->fd[1]);
+//             }
+//             prev = cmd;
+//             cmd = cmd->next;
+//             i++;
+//         }
+        
+//     }
+
+//         // get exit status;
+//         int j = -1;
+//         int status;
+
+//         while (++j <= countpipes)
+//         {
+//             wait(&status);
+//             if (WIFEXITED(status)) {
+//                 if (!its_builtin)
+//                     g_exec->exit_status = WEXITSTATUS(status);
+//         } else {
+//             printf("Child process did not terminate normally\n");
+//         }
+//     }
+//     free_exec(0);
+// }
