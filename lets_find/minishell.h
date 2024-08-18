@@ -71,7 +71,17 @@ typedef struct s_cmd
 }   t_cmd;
 
 
+typedef struct s_exec_utils
+{
 
+    int countpipes;
+    int i;
+    int pid;
+    int fdin;
+    int savedout;
+    int fdout;
+    int its_builtin;
+}   t_exec_utils;
 
 
 
