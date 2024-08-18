@@ -1,98 +1,141 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   command_to_execution.c                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/18 15:15:00 by izouine           #+#    #+#             */
+/*   Updated: 2024/08/18 15:16:06 by izouine          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-t_cmd *parse_every_command(t_token *token) {
-    t_cmd *cmd_head = NULL;
-    t_cmd *cmd_current = NULL;
-    t_filedescriptiom *last_infile = NULL;
-    t_filedescriptiom *last_outfile = NULL;
+static t_cmd	*init_new_cmd(void)
+{
+	t_cmd	*new_cmd;
 
-    while (token) {
-        t_cmd *new_cmd = (t_cmd *)malloc(sizeof(t_cmd));
-        if (!new_cmd)
-            return NULL;
-        new_cmd->cmd = NULL;
-        new_cmd->infile = NULL;
-        new_cmd->outfile = NULL;
-        new_cmd->next = NULL;
+	new_cmd = (t_cmd *)malloc(sizeof(t_cmd));
+	if (!new_cmd)
+		return (NULL);
+	new_cmd->cmd = NULL;
+	new_cmd->infile = NULL;
+	new_cmd->outfile = NULL;
+	new_cmd->next = NULL;
+	return (new_cmd);
+}
 
-        t_token *temp = token;
-        int nbr_of_args = 0;
+static int	count_args(t_token *token)
+{
+	int		nbr_of_args;
+	t_token	*temp;
 
-        while (temp && strcmp(temp->type, "pipe") != 0) {
-            if (strcmp(temp->type, "command") == 0 || strcmp(temp->type, "argument") == 0) {
-                nbr_of_args++;
-            }
-            temp = temp->next;
-        }
+	nbr_of_args = 0;
+	temp = token;
+	while (temp && ft_strcmp(temp->type, "pipe") != 0)
+	{
+		if (ft_strcmp(temp->type, "command") == 0
+			|| ft_strcmp(temp->type, "argument") == 0)
+			nbr_of_args++;
+		temp = temp->next;
+	}
+	return (nbr_of_args);
+}
 
-        new_cmd->cmd = (char **)malloc((nbr_of_args + 1) * sizeof(char *));
-        if (!new_cmd->cmd)
-            return NULL;
+static t_filedescriptiom	*create_file_desc(t_token *token, int is_infile)
+{
+	t_filedescriptiom	*new_file;
 
-        int i = 0;
-        while (token && strcmp(token->type, "pipe") != 0) {
-            if (strcmp(token->type, "command") == 0 || strcmp(token->type, "argument") == 0) {
-                new_cmd->cmd[i++] = strdup(token->token);
-            } else if (strcmp(token->type, "in") == 0) {
-                t_filedescriptiom *new_infile = (t_filedescriptiom *)malloc(sizeof(t_filedescriptiom));
-                if (!new_infile)
-                    return NULL;
-                new_infile->filename = strdup(token->token);
-                new_infile->isherdoc = 0;
-                new_infile->iswithappend = 0;
-                new_infile->next = NULL;
+	new_file = (t_filedescriptiom *)malloc(sizeof(t_filedescriptiom));
+	if (!new_file)
+		return (NULL);
+	new_file->filename = ft_strdup(token->token);
+	new_file->isherdoc = 0;
+	new_file->iswithappend = 0;
+	new_file->next = NULL;
+	if (is_infile && token->prev && ft_strcmp(token->prev->token, "<<") == 0)
+	{
+		new_file->isherdoc = 1;
+		new_file->delimeter = token->token;
+	}
+	else if (!is_infile && token->prev
+		&& ft_strcmp(token->prev->token, ">>") == 0)
+		new_file->iswithappend = 1;
+	return (new_file);
+}
 
-                if (token->prev && strcmp(token->prev->token, "<<") == 0) {
-                    new_infile->isherdoc = 1;
-                    new_infile->delimeter = token->token;
-                }
+static void	add_file_to_cmd(t_cmd *cmd, t_filedescriptiom *new_file,
+							int is_infile)
+{
+	t_filedescriptiom	**last_file;
 
-                if (last_infile) {
-                    last_infile->next = new_infile;
-                } else {
-                    new_cmd->infile = new_infile;
-                }
-                last_infile = new_infile;
-            } else if (strcmp(token->type, "out") == 0) {
-                t_filedescriptiom *new_outfile = (t_filedescriptiom *)malloc(sizeof(t_filedescriptiom));
-                if (!new_outfile)
-                    return NULL;
-                new_outfile->filename = strdup(token->token);
-                new_outfile->isherdoc = 0;
-                new_outfile->iswithappend = 0;
-                new_outfile->next = NULL;
+	if (is_infile)
+		last_file = &(cmd->infile);
+	else
+		last_file = &(cmd->outfile);
+	while (*last_file)
+		last_file = &((*last_file)->next);
+	*last_file = new_file;
+}
 
-                if (token->prev && strcmp(token->prev->token, ">>") == 0) {
-                    new_outfile->iswithappend = 1;
-                }
+static int	process_token(t_cmd *new_cmd, t_token **token, int *i)
+{
+	if (ft_strcmp((*token)->type, "command") == 0
+		|| ft_strcmp((*token)->type, "argument") == 0)
+		new_cmd->cmd[(*i)++] = ft_strdup((*token)->token);
+	else if (ft_strcmp((*token)->type, "in") == 0)
+		add_file_to_cmd(new_cmd, create_file_desc(*token, 1), 1);
+	else if (ft_strcmp((*token)->type, "out") == 0)
+		add_file_to_cmd(new_cmd, create_file_desc(*token, 0), 0);
+	*token = (*token)->next;
+	return (1);
+}
 
-                if (last_outfile) {
-                    last_outfile->next = new_outfile;
-                } else {
-                    new_cmd->outfile = new_outfile;
-                }
-                last_outfile = new_outfile;
-            }
-            token = token->next;
-            //printf("the commnd %s", cmd_current->cmd[0]);
-        }
+static t_cmd	*parse_command(t_token **token)
+{
+	t_cmd	*new_cmd;
+	int		nbr_of_args;
+	int		i;
 
-        new_cmd->cmd[i] = NULL;
+	new_cmd = init_new_cmd();
+	if (!new_cmd)
+		return (NULL);
+	nbr_of_args = count_args(*token);
+	new_cmd->cmd = (char **)malloc((nbr_of_args + 1) * sizeof(char *));
+	if (!new_cmd->cmd)
+	{
+		free(new_cmd);
+		return (NULL);
+	}
+	i = 0;
+	while (*token && ft_strcmp((*token)->type, "pipe") != 0)
+		if (!process_token(new_cmd, token, &i))
+			return (NULL);
+	new_cmd->cmd[i] = NULL;
+	return (new_cmd);
+}
 
-        if (cmd_current) {
-            cmd_current->next = new_cmd;
-        } else {
-            cmd_head = new_cmd;
-        }
-        cmd_current = new_cmd;
+t_cmd	*parse_every_command(t_token *token)
+{
+	t_cmd	*cmd_head;
+	t_cmd	*cmd_current;
+	t_cmd	*new_cmd;
 
-        if (token) {
-            token = token->next;
-        }
-
-        last_infile = NULL;
-        last_outfile = NULL;
-    }
-
-    return cmd_head;
+	cmd_head = NULL;
+	cmd_current = NULL;
+	while (token)
+	{
+		new_cmd = parse_command(&token);
+		if (!new_cmd)
+			return (NULL);
+		if (cmd_current)
+			cmd_current->next = new_cmd;
+		else
+			cmd_head = new_cmd;
+		cmd_current = new_cmd;
+		if (token && ft_strcmp(token->type, "pipe") == 0)
+			token = token->next;
+	}
+	return (cmd_head);
 }

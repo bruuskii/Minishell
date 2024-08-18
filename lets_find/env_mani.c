@@ -1,188 +1,230 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   env_mani.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/18 15:25:17 by izouine           #+#    #+#             */
+/*   Updated: 2024/08/18 15:31:49 by izouine          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-t_env *init_env(char **str) {
-    if (str == NULL || str[0] == NULL) {
-        return NULL;
-    }
-
-    t_env *head = NULL;
-    t_env *current = NULL;
-    t_env *previous = NULL;
-    int i = 0;
-
-    while (str[i]) {
-        current = (t_env *)malloc(sizeof(t_env));
-        if (!current) {
-            while (head) {
-                t_env *tmp = head;
-                head = head->next;
-                free(tmp);
-            }
-            return NULL;
-        }
-
-        current->line = strdup(str[i]);
-        current->next = NULL;
-        current->prev = previous;
-
-        if (head == NULL) {
-            head = current;
-        }
-
-        if (previous != NULL) {
-            previous->next = current;
-        }
-
-        previous = current;
-        i++;
-    }
-
-    return head;
-}
-
-
-
-void    printf_dq_after(char *cmd, char c)
+static t_env	*create_env_node(char *str)
 {
-    int i;
-    int isfirst;
+	t_env	*node;
 
-    i = 0;
-    isfirst = 1;
-    while (cmd[i])
-    {
-        printf("%c", cmd[i]);
-        if (cmd[i] == c && isfirst)
-        {
-            printf("\"");
-            isfirst = 0;
-        }
-            
-        i++;
-    }
-    if (!isfirst)
-        printf("\"");
+	node = (t_env *)malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	node->line = ft_strdup(str);
+	if (!node->line)
+	{
+		free(node);
+		return (NULL);
+	}
+	node->next = NULL;
+	node->prev = NULL;
+	return (node);
 }
 
-
-void    print_env(t_env *env, int isexport)
+static void	free_env_list(t_env *head)
 {
-    while (env)
-    {
-        if (isexport)
-        {
-            if (env->line)
-            {
-                printf("declare -x ");
-                printf_dq_after(env->line, '=');
-                printf("\n");
-            }
-        }
-        else
-        {
-            if (env->line)
-            {
-                if (ft_strchr(env->line, '='))
-                    printf("%s\n", env->line);
-            }
-        }
-        env = env->next;
-    }
+	t_env	*current;
+
+	while (head)
+	{
+		current = head;
+		head = head->next;
+		free(current->line);
+		free(current);
+	}
 }
 
-
-// i added the increment shlvl function, 
-// i will make sure to channge all the forbiden function (strlen...)
-void increment_shell_level(t_env *env) {
-    t_env *current = env;
-    char *shlvl_prefix = "SHLVL=";
-    size_t prefix_len = strlen(shlvl_prefix);
-    int shlvl_value;
-
-    while (current) {
-        if (strncmp(current->line, shlvl_prefix, prefix_len) == 0) {
-            shlvl_value = atoi(current->line + prefix_len);
-            shlvl_value++;
-            
-            char new_shlvl[16];
-            char *i = ft_itoa(shlvl_value);
-            strcpy(new_shlvl, shlvl_prefix);
-            strcat(new_shlvl, i);
-            free(current->line);
-            current->line = strdup(new_shlvl);
-            return;
-        }
-        current = current->next;
-    }
-
-    t_env *new_node = (t_env *)malloc(sizeof(t_env));
-    if (new_node) {
-        new_node->line = strdup("SHLVL=1");
-        new_node->next = env;
-        new_node->prev = NULL;
-        if (env) {
-            env->prev = new_node;
-        }
-        env = new_node;
-    }
-}
-
-void save_old_pwd(t_env *env)
+static t_env	*add_env_node(t_env **head, t_env **prev, char *str)
 {
-    int index = 4;
-    t_env *pwd = env;
-    char oldpwd[100];
-    int i = 0;
-    while(pwd)
-    {
-        if(strncmp(pwd->line, "PWD=", 4) == 0)
-        {
-            while(pwd->line[index] != '\0')
-            {
-                oldpwd[i] = pwd->line[index];
-                i++;
-                index++; 
-            }
-            oldpwd[i] = '\0';
-            break;
-        }
-        pwd = pwd->next;
-    }
-    while(env)
-    {
-        if(strncmp(env->line, "OLDPWD=", 7) == 0)
-        {
-            free(env->line);
-            size_t nbr_maloc = 7 + strlen(oldpwd) + 1;
-            char *line = malloc(nbr_maloc);
-            strcpy(line, "OLDPWD=");
-            strcat(line, oldpwd);
-            env->line = strdup(line);
-            free(line);
-            return ;
-        }
-        env = env->next;
-    }
+	t_env	*current;
+
+	current = create_env_node(str);
+	if (!current)
+	{
+		free_env_list(*head);
+		return (NULL);
+	}
+	if (!*head)
+		*head = current;
+	if (*prev)
+	{
+		(*prev)->next = current;
+		current->prev = *prev;
+	}
+	*prev = current;
+	return (current);
 }
 
-void save_current_pwd(t_env *env)
+t_env	*init_env(char **str)
 {
-    char pwd[1024];
-    getcwd(pwd, 1024);
-    char  *temp;
-    while(env)
-    {
-        if(strncmp(env->line, "PWD=", 4) == 0)
-        {
-            size_t nbr_malloc = 4 + strlen(pwd) + 1;
-            temp = malloc(nbr_malloc);
-            strcpy(temp, "PWD=");
-            strcat(temp, pwd);
-            free(env->line);
-            env->line = strdup(temp);
-            free(temp);
-            return ;
-        }
-        env = env->next;
-    }
+	t_env	*head;
+	t_env	*previous;
+
+	if (!str || !str[0])
+		return (NULL);
+	head = NULL;
+	previous = NULL;
+	while (*str)
+	{
+		if (!add_env_node(&head, &previous, *str))
+			return (NULL);
+		str++;
+	}
+	return (head);
+}
+
+void	printf_dq_after(char *cmd, char c)
+{
+	int	i;
+	int	isfirst;
+
+	i = 0;
+	isfirst = 1;
+	while (cmd[i])
+	{
+		ft_putchar_fd(cmd[i], 1);
+		if (cmd[i] == c && isfirst)
+		{
+			ft_putchar_fd('"', 1);
+			isfirst = 0;
+		}
+		i++;
+	}
+	if (!isfirst)
+		ft_putchar_fd('"', 1);
+}
+
+void	print_env(t_env *env, int isexport)
+{
+	while (env)
+	{
+		if (env->line)
+		{
+			if (isexport)
+			{
+				ft_putstr_fd("declare -x ", 1);
+				printf_dq_after(env->line, '=');
+				ft_putchar_fd('\n', 1);
+			}
+			else if (ft_strchr(env->line, '='))
+			{
+				ft_putendl_fd(env->line, 1);
+			}
+		}
+		env = env->next;
+	}
+}
+
+static void	update_shlvl(t_env *env, const char *shlvl_prefix)
+{
+	int		shlvl_value;
+	char	*new_shlvl;
+	char	*value_str;
+
+	shlvl_value = ft_atoi(env->line + ft_strlen(shlvl_prefix)) + 1;
+	value_str = ft_itoa(shlvl_value);
+	new_shlvl = ft_strjoin(shlvl_prefix, value_str);
+	free(value_str);
+	free(env->line);
+	env->line = new_shlvl;
+}
+
+void	increment_shell_level(t_env *env)
+{
+	t_env		*current;
+	const char	*shlvl_prefix;
+
+	shlvl_prefix = "SHLVL=";
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, shlvl_prefix,
+				ft_strlen(shlvl_prefix)) == 0)
+		{
+			update_shlvl(current, shlvl_prefix);
+			return ;
+		}
+		current = current->next;
+	}
+	current = create_env_node("SHLVL=1");
+	if (current)
+	{
+		current->next = env;
+		if (env)
+			env->prev = current;
+		env = current;
+	}
+}
+
+static char	*find_pwd(t_env *env)
+{
+	t_env	*current;
+
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, "PWD=", 4) == 0)
+			return (current->line + 4);
+		current = current->next;
+	}
+	return (NULL);
+}
+
+static void	update_oldpwd(t_env *env, char *pwd)
+{
+	t_env	*current;
+	char	*oldpwd;
+
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, "OLDPWD=", 7) == 0)
+		{
+			free(current->line);
+			oldpwd = ft_strjoin("OLDPWD=", pwd);
+			current->line = oldpwd;
+			return ;
+		}
+		current = current->next;
+	}
+}
+
+void	save_old_pwd(t_env *env)
+{
+	char	*pwd;
+
+	pwd = find_pwd(env);
+	if (pwd)
+		update_oldpwd(env, pwd);
+}
+
+void	save_current_pwd(t_env *env)
+{
+	char	pwd[1024];
+	char	*new_pwd;
+	t_env	*current;
+
+	if (!getcwd(pwd, sizeof(pwd)))
+		return ;
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, "PWD=", 4) == 0)
+		{
+			free(current->line);
+			new_pwd = ft_strjoin("PWD=", pwd);
+			current->line = new_pwd;
+			return ;
+		}
+		current = current->next;
+	}
 }

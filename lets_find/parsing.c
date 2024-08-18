@@ -186,6 +186,8 @@ int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
 	char	**tokens;
 	t_token	*head;
 
+	*token = NULL;
+	*cmd = NULL;
 	if (!str || !first_parse(str))
 		return (0);
 	tokens = split_string(str);
@@ -198,13 +200,13 @@ int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
 	free_string_array(tokens);
 	if (!head)
 		return (0);
-	(*cmd) = parse_every_command(head);
+	*cmd = parse_every_command(head);
 	if (!(*cmd))
 	{
 		free_tokens(head);
 		return (0);
 	}
-	(*token) = head;
+	*token = head;
 	return (1);
 }
 
