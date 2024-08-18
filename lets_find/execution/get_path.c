@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_path.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/05 12:28:07 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/18 15:41:57 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ char	*get_path(char *cmd)
 	char	*path;
 	int		i = 0;
 
-	g_exec->Paths = envpath_to_arr();
-	while (g_exec->Paths[i])
+	g_exec->paths = envpath_to_arr();
+	while (g_exec->paths[i])
 	{
-		path = ft_strjoin(g_exec->Paths[i], "/");
+		path = ft_strjoin(g_exec->paths[i], "/");
 		path = ft_strjoin(path, cmd);
 		if (access(path, F_OK) == 0)
 		{
-			free_db_arr(g_exec->Paths);
+			free_db_arr(g_exec->paths);
 			return (path);
 		}
 		else
@@ -49,6 +49,6 @@ char	*get_path(char *cmd)
 		}
 		i++;
 	}
-	free_db_arr(g_exec->Paths);
+	free_db_arr(g_exec->paths);
 	return (NULL);
 }
