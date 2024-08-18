@@ -115,6 +115,7 @@ void ft_export2(char *cmd, int indexofequal)
     value_to_check = malloc(indexofequal + 1);
     ft_strlcpy(value_to_check, cmd, indexofequal +1);
     temp = is_in_env(g_exec->env, value_to_check);
+    word_to_app = NULL;
     isappend = 0;
     if (cmd[indexofequal] == '+')
     {
