@@ -130,6 +130,7 @@ void ft_export2(char *cmd, int indexofequal)
         free (word_to_app);
     if (value_to_check)
         free (value_to_check);
+    // update_env_arr();
 }
 
 int getequalindex(char *cmd)

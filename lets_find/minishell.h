@@ -90,7 +90,7 @@ typedef struct s_exec
 {
     t_token *tokens;
     t_cmd *cmd;
-    char **Paths;
+    char **paths;
     t_env *env;
     int exit_status;
 }   t_exec;
@@ -145,13 +145,15 @@ void echo(char **cmd);
 void    ft_exit(char **cmd);
 
 //exec;
-void execute( t_exec *exec, char **env);
+void execute( t_exec *exec);
 t_exec *initexec(char **env);
 char	**get_paths();
 int count_pipes(t_cmd *cmd);
 int countfiles(t_filedescriptiom *files);
 char	*get_path(char *cmd);
 int heredoc(char *delimeter);
+void	update_env_arr();
+char	**init_env_arr();
 
 
 

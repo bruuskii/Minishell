@@ -25,7 +25,7 @@
    /*
         small execute;
 
-        1 - get cmd as double pointer; 
+        1 - get cmd as double pointer;
                 if cmd is builtin execute built in;
         2 - get input and output file;
             if (heredoc)
@@ -50,6 +50,9 @@ Achraf
 */
 // }
 
+
+
+
 t_exec *initexec(char **env)
 {
     t_exec *exec;
@@ -58,7 +61,7 @@ t_exec *initexec(char **env)
     if (!exec)
         return (NULL);
     exec->env = init_env(env);
-    exec->Paths = NULL;
+    exec->paths = NULL;
     exec->cmd = NULL;
     exec->exit_status = 0;
     return (exec);
@@ -159,38 +162,48 @@ int getoutputfile(t_cmd *cmd)
 }
 
 
-void ft_exec(t_cmd *cmd, char **env)
+void    exit_with_message(char *s, int exit_value)
+{
+    ft_putstr_fd(s, 2);
+    exit(exit_value);
+}
+
+
+void    ft_exec_no_path(t_cmd *cmd, char **env, char *commandpath)
+{
+    commandpath = get_path(cmd->cmd[0]);
+    if (!commandpath)
+    {
+        ft_putstr_fd(cmd->cmd[0], 2);
+        exit_with_message(" : command path not found\n", 127);
+    }
+    if (execve(commandpath, cmd->cmd, env) == -1)
+    {
+        free(commandpath);
+        exit_with_message("execve error\n", 127);
+        free_db_arr(env);
+    }
+}
+
+
+void ft_exec(t_cmd *cmd)
 {
     char *commandpath;
+    char    **env;
 
-    if (!cmd->cmd[0])
-    {
-        ft_putstr_fd("command not found\n", 2);
-        exit(127);
-    }
+    commandpath = NULL;
+    env = init_env_arr();
     if (!ft_strchr(cmd->cmd[0], '/'))
 	{
-		commandpath = get_path(cmd->cmd[0]);
-        if (!commandpath)
-        {
-            ft_putstr_fd(cmd->cmd[0], 2);
-            ft_putstr_fd(" : command path not found\n", 2);
-            exit(127);
-        }
-        if (execve(commandpath, cmd->cmd, env) == -1)
-        {
-            free(commandpath);
-            ft_putstr_fd("execve error\n", 2);
-            exit(127);
-        }
+		ft_exec_no_path(cmd, env, commandpath);
 	}
 	else
 	{
         if (execve(cmd->cmd[0], cmd->cmd, env) == -1)
         {
-            ft_putstr_fd("execve error\n", 2);
-            exit(127);
-        }
+            exit_with_message("execve error\n", 127);
+            free_db_arr(env);
+        } 
 	}
 }
 
@@ -281,23 +294,24 @@ void set_upfdfiles(int fdin, int fdout, t_cmd *cmd, t_cmd *prev)
 }
 
 
-void    execute_parent(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev)
+void    execute_parent(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-    if (exec_utils.its_builtin && !cmd->next && !prev && cmd->cmd[1])
+    if (exec_utils->its_builtin && !cmd->next && !prev && (cmd->cmd[1]
+         || !ft_strcmp(cmd->cmd[0], "cd")))
     {
-        if (exec_utils.fdout != STDOUT_FILENO)
+        if (exec_utils->fdout != STDOUT_FILENO)
         {
-            dup2(exec_utils.fdout, STDOUT_FILENO);
-            close (exec_utils.fdout);
+            dup2(exec_utils->fdout, STDOUT_FILENO);
+            close (exec_utils->fdout);
             ft_exec_builtin(cmd);
-            dup2(exec_utils.savedout, STDOUT_FILENO);
-            close (exec_utils.savedout);
+            dup2(exec_utils->savedout, STDOUT_FILENO);
+            close (exec_utils->savedout);
         }
         else
-                ft_exec_builtin(cmd);
+            ft_exec_builtin(cmd);
     }
-    if (exec_utils.fdin != STDIN_FILENO)
-        close (exec_utils.fdin);
+    if (exec_utils->fdin != STDIN_FILENO)
+        close (exec_utils->fdin);
     if (prev)
     {
         close (prev->fd[0]);
@@ -305,20 +319,18 @@ void    execute_parent(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev)
     }
 }
 
-void    execute_child(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev, char **env)
+void    execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-    set_upfdfiles(exec_utils.fdin, exec_utils.fdout, cmd, prev);
-    if (!exec_utils.its_builtin)
-    {
-        ft_exec(cmd, env);
-    }
-    else if (exec_utils.its_builtin && !cmd->cmd[1])
+    set_upfdfiles(exec_utils->fdin, exec_utils->fdout, cmd, prev);
+    if (!exec_utils->its_builtin)
+        ft_exec(cmd);
+    else if (exec_utils->its_builtin && !cmd->cmd[1])
         ft_exec_builtin(cmd);
     exit (EXIT_SUCCESS);
 }
 
 
-void    ft_execute(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev, char **env)
+void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
     if (cmd->next)
     {
@@ -329,12 +341,12 @@ void    ft_execute(t_exec_utils exec_utils, t_cmd *cmd, t_cmd *prev, char **env)
             exit (EXIT_FAILURE);
         }
     }
-    exec_utils.its_builtin = itsbuiltin(cmd);
-    exec_utils.pid = fork();
-    if (exec_utils.pid == -1)
+    exec_utils->its_builtin = itsbuiltin(cmd);
+    exec_utils->pid = fork();
+    if (exec_utils->pid == -1)
         exit(EXIT_FAILURE);
-    if (exec_utils.pid == 0)
-        execute_child(exec_utils, cmd, prev, env);
+    if (exec_utils->pid == 0)
+        execute_child(exec_utils, cmd, prev);
     else
         execute_parent(exec_utils, cmd, prev);
 }
@@ -349,7 +361,10 @@ void    get_exitstatus(t_exec_utils exec_utils)
         wait(&status);
         if (WIFEXITED(status)) {
             if (!exec_utils.its_builtin)
+            {
                 g_exec->exit_status = WEXITSTATUS(status);
+            }
+                
     } else {
         printf("Child process did not terminate normally\n");
     }
@@ -369,7 +384,7 @@ t_exec_utils init_exec_utils(t_cmd *cmd)
     return (exec_utils);
 }
 
-void execute(t_exec *exec, char **env)
+void execute(t_exec *exec)
 {
     t_cmd *cmd;
     t_cmd *prev;
@@ -389,7 +404,7 @@ void execute(t_exec *exec, char **env)
             g_exec->exit_status = 1;
             continue;
         }
-        ft_execute(exec_utils, cmd, prev, env);
+        ft_execute(&exec_utils, cmd, prev);
         prev = cmd;
         cmd = cmd->next;
         exec_utils.i++;

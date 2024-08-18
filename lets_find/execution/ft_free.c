@@ -124,14 +124,18 @@ void	free_db_arr(char **arr)
 {
 	int i;
 
-	i = 0;
-	while (arr[i])
-	{
-		if (arr[i])
-			free(arr[i]);
-		i++;
-	}
-	free(arr);
+    i = 0;
+    if (arr != NULL)
+    {
+	    while (arr[i])
+	    {
+		    if (arr[i])
+			    free(arr[i]);
+		    i++;
+	    }
+    free(arr);
+    }
+	
 }
 
 void Delete_cmd_Node(t_cmd **head, t_cmd *NodeToDelete)
@@ -218,8 +222,8 @@ void    free_exec(int isexit)
     Delete_cmds_node();
     // if (g_exec->tokens)
     //     Delete_tokens(); // probleme in check the first call or if it's null
-    if (g_exec->Paths)
-        free_db_arr(g_exec->Paths);
+    if (g_exec->paths)
+        free_db_arr(g_exec->paths);
     if (isexit)
     {
         Delete_env();

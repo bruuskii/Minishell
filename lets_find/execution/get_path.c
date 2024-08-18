@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/05 12:28:07 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/18 17:51:49 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ char	*get_path(char *cmd)
 	char	*path;
 	int		i = 0;
 
-	g_exec->Paths = envpath_to_arr();
-	while (g_exec->Paths[i])
+	g_exec->paths = envpath_to_arr();
+	while (g_exec->paths[i])
 	{
-		path = ft_strjoin(g_exec->Paths[i], "/");
+		path = ft_strjoin(g_exec->paths[i], "/");
 		path = ft_strjoin(path, cmd);
 		if (access(path, F_OK) == 0)
 		{
-			free_db_arr(g_exec->Paths);
+			free_db_arr(g_exec->paths);
 			return (path);
 		}
 		else
@@ -49,6 +49,68 @@ char	*get_path(char *cmd)
 		}
 		i++;
 	}
-	free_db_arr(g_exec->Paths);
+	free_db_arr(g_exec->paths);
 	return (NULL);
 }
+
+
+char	**init_env_arr()
+{
+	int i;
+	t_env	*tmp;
+	char	**arr;
+
+	i = 0;
+	tmp = g_exec->env;
+
+	while (tmp)
+	{
+		i++;
+		tmp = tmp->next;
+	}
+	arr = (char **) malloc (i + 1);
+	if (!arr)
+		return (NULL);
+	tmp = g_exec->env;
+	i = 0;
+	while (tmp)
+	{
+		if (tmp->line)
+		{
+			arr[i] = ft_strdup(tmp->line);
+			i++;
+		}
+		tmp = tmp->next;
+	}
+	arr[i] = NULL;
+	if (!arr)
+		return (NULL);
+	return (arr);
+}
+
+
+// void	update_env_arr()
+// {
+// 	int i = 0;
+// 	t_env	*tmp = g_exec->env;
+
+// 	while (tmp)
+// 	{
+// 		i++;
+// 		tmp = tmp->next;
+// 	}
+// 	if (g_exec->env_arr != NULL)
+// 		printf("no it's not null");
+// 	g_exec->env_arr = (char **) malloc (i + 1);
+// 	if (!g_exec->env_arr)
+// 		return;
+// 	tmp = g_exec->env;
+// 	i = 0;
+// 	while (tmp)
+// 	{
+// 		g_exec->env_arr[i] = ft_strdup(tmp->line);
+// 		tmp = tmp->next;
+// 		i++;
+// 	}
+// 	g_exec->env_arr[i] = NULL;
+// }
