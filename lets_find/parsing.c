@@ -233,14 +233,14 @@ void	grep_type_space(t_token *token)
 
 void	grep_type(t_token *token, int index, int is_command)
 {
-	if ((token->prev && ft_strcmp(token->prev->token, ">") == 0)
+	if (ft_strcmp(token->token, " ") == 0)
+		grep_type_space(token);
+	else if ((token->prev && ft_strcmp(token->prev->token, ">") == 0)
 		|| (token->prev && ft_strcmp(token->prev->token, ">>") == 0))
 		token->type = "out";
 	else if ((token->prev && ft_strcmp(token->prev->token, "<") == 0)
 		|| (token->prev && ft_strcmp(token->prev->token, "<<") == 0))
 		token->type = "in";
-	else if (ft_strcmp(token->token, " ") == 0)
-		grep_type_space(token);
 	else if (ft_strcmp(token->token, "<<") == 0
 		|| ft_strcmp(token->token, "<") == 0
 		|| ft_strcmp(token->token, ">") == 0
