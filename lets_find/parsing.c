@@ -105,8 +105,8 @@ static t_token	*create_new_token(char *token_str, int args_nbr)
 	return (new_token);
 }
 
-static void	update_args_and_command(t_token *current, int index,
-				int *args_nbr, int *is_command)
+static void	update_args_and_command(t_token *current, int index, int *args_nbr,
+		int *is_command)
 {
 	if (ft_strcmp(current->type, "pipe") != 0 && index != 0
 		&& ft_strcmp(current->type, "argument") == 0)
@@ -124,7 +124,7 @@ static void	update_args_and_command(t_token *current, int index,
 }
 
 static void	process_token(t_token *current, t_env *env, char **tokens,
-				int index)
+		int index)
 {
 	static int	args_nbr = 0;
 	static int	is_command = 1;
@@ -224,8 +224,8 @@ void	grep_type_space(t_token *token)
 		mine = mine->prev;
 	if (ft_strcmp(mine->token, "|") == 0)
 		mine = mine->next;
-	if (ft_strcmp(mine->token, "echo") == 0
-		&& ft_strncmp(mine->next->token, "-", 1) != 0)
+	if (ft_strcmp(mine->token, "echo") == 0 && ft_strncmp(mine->next->token,
+			"-", 1) != 0)
 		token->type = "argument";
 	else
 		token->type = "space";
@@ -236,16 +236,20 @@ void	grep_type(t_token *token, int index, int is_command)
 	if (ft_strcmp(token->token, " ") == 0)
 		grep_type_space(token);
 	else if ((token->prev && ft_strcmp(token->prev->token, ">") == 0)
-		|| (token->prev && ft_strcmp(token->prev->token, ">>") == 0))
+		|| (token->prev && ft_strcmp(token->prev->token, " ") == 0
+			&& token->prev->prev && ft_strcmp(token->prev->prev->token,
+				">") == 0) || (token->prev && ft_strcmp(token->prev->token,
+				">>") == 0) || (token->prev && ft_strcmp(token->prev->token,
+				" ") == 0 && token->prev->prev
+			&& ft_strcmp(token->prev->prev->token, ">>") == 0))
 		token->type = "out";
 	else if ((token->prev && ft_strcmp(token->prev->token, "<") == 0)
 		|| (token->prev && ft_strcmp(token->prev->token, "<<") == 0))
 		token->type = "in";
-	else if (ft_strcmp(token->token, "<<") == 0
-		|| ft_strcmp(token->token, "<") == 0
-		|| ft_strcmp(token->token, ">") == 0
-		|| ft_strcmp(token->token, ">>") == 0
-		|| ft_strcmp(token->token, "$") == 0)
+	else if (ft_strcmp(token->token, "<<") == 0 || ft_strcmp(token->token,
+			"<") == 0 || ft_strcmp(token->token, ">") == 0
+		|| ft_strcmp(token->token, ">>") == 0 || ft_strcmp(token->token,
+			"$") == 0)
 		token->type = "operator";
 	else if (index == 0 || is_command)
 		token->type = "command";
