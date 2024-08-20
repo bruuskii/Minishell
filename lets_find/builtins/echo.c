@@ -43,6 +43,7 @@ void    ft_echo(char **cmd, int wordfound, int i, int iswith_nl)
     }
     if (iswith_nl)
         printf("\n");
+    g_exec->exit_status = 0;
 }
 
 void echo(char **cmd)

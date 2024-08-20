@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:07:23 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/18 15:08:42 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/20 14:56:16 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ int	first_parse(char *line)
 int	error_return(void)
 {
 	ft_putstr_fd("bash: Syntax error near \\n\n", 2);
+	g_exec->exit_status = 2;
 	return (0);
 }
 
@@ -98,5 +99,6 @@ int	check_outfiles(char *str, int index)
 {
 	if (str[index] == '>' && str[index + 1] == '>' && str[index + 2] == '>')
 		return (1);
+	// g_exec->exit_status = 2;
 	return (0);
 }
