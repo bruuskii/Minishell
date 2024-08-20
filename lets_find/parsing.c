@@ -244,7 +244,12 @@ void	grep_type(t_token *token, int index, int is_command)
 			&& ft_strcmp(token->prev->prev->token, ">>") == 0))
 		token->type = "out";
 	else if ((token->prev && ft_strcmp(token->prev->token, "<") == 0)
-		|| (token->prev && ft_strcmp(token->prev->token, "<<") == 0))
+		|| (token->prev && ft_strcmp(token->prev->token, " ") == 0
+			&& token->prev->prev && ft_strcmp(token->prev->prev->token,
+				"<") == 0) || (token->prev && ft_strcmp(token->prev->token,
+				"<<") == 0) || (token->prev && ft_strcmp(token->prev->token,
+				" ") == 0 && token->prev->prev
+			&& ft_strcmp(token->prev->prev->token, "<<") == 0))
 		token->type = "in";
 	else if (ft_strcmp(token->token, "<<") == 0 || ft_strcmp(token->token,
 			"<") == 0 || ft_strcmp(token->token, ">") == 0
