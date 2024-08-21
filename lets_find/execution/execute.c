@@ -189,20 +189,29 @@ void    ft_exec_no_path(t_cmd *cmd, char **env, char *commandpath)
 void ft_exec(t_cmd *cmd)
 {
     char *commandpath;
-    char    **env;
+    char    **envtemp;
 
     commandpath = NULL;
-    env = init_env_arr();
+    envtemp = init_env_arr();
+
+    // printf("\n\n=========================================================\n\n");
+    // int i = 0;
+    // while (env[i])
+    // {
+    //     printf("%s\n", env[i]);
+    //     i++;
+    // }
+    // printf("\n\n=========================================================\n\n");
     if (!ft_strchr(cmd->cmd[0], '/'))
 	{
-		ft_exec_no_path(cmd, env, commandpath);
+		ft_exec_no_path(cmd, envtemp, commandpath);
 	}
 	else
 	{
-        if (execve(cmd->cmd[0], cmd->cmd, env) == -1)
+        if (execve(cmd->cmd[0], cmd->cmd, envtemp) == -1)
         {
             exit_with_message("execve error\n", 127);
-            free_db_arr(env);
+            free_db_arr(envtemp);
         } 
 	}
 }
@@ -294,10 +303,11 @@ void set_upfdfiles(int fdin, int fdout, t_cmd *cmd, t_cmd *prev)
 }
 
 
+
+
 void    execute_parent(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-    if (exec_utils->its_builtin && !cmd->next && !prev && (cmd->cmd[1]
-         || !ft_strcmp(cmd->cmd[0], "cd")))
+    if (exec_utils->its_builtin && !cmd->next && !prev)
     {
         if (exec_utils->fdout != STDOUT_FILENO)
         {
@@ -324,6 +334,8 @@ void    execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
     set_upfdfiles(exec_utils->fdin, exec_utils->fdout, cmd, prev);
     if (!exec_utils->its_builtin)
         ft_exec(cmd);
+    else if (!ft_strcmp(cmd->cmd[0], "pwd")  && !cmd->next)
+        exit(EXIT_SUCCESS);
     else if (exec_utils->its_builtin && !cmd->cmd[1])
         ft_exec_builtin(cmd);
     exit (EXIT_SUCCESS);
@@ -350,6 +362,64 @@ void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
     else
         execute_parent(exec_utils, cmd, prev);
 }
+
+
+// void    execute_parent(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
+// {
+//     if (exec_utils->its_builtin && !cmd->next && !prev && (cmd->cmd[1]
+//          || !ft_strcmp(cmd->cmd[0], "cd")))
+//     {
+//         if (exec_utils->fdout != STDOUT_FILENO)
+//         {
+//             dup2(exec_utils->fdout, STDOUT_FILENO);
+//             close (exec_utils->fdout);
+//             ft_exec_builtin(cmd);
+//             dup2(exec_utils->savedout, STDOUT_FILENO);
+//             close (exec_utils->savedout);
+//         }
+//         else
+//             ft_exec_builtin(cmd);
+//     }
+//     if (exec_utils->fdin != STDIN_FILENO)
+//         close (exec_utils->fdin);
+//     if (prev)
+//     {
+//         close (prev->fd[0]);
+//         close (prev->fd[1]);
+//     }
+// }
+
+// void    execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
+// {
+//     set_upfdfiles(exec_utils->fdin, exec_utils->fdout, cmd, prev);
+//     if (!exec_utils->its_builtin)
+//         ft_exec(cmd);
+//     else if (exec_utils->its_builtin && !cmd->cmd[1])
+//         ft_exec_builtin(cmd);
+//     exit (EXIT_SUCCESS);
+// }
+
+
+// void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
+// {
+//     if (cmd->next)
+//     {
+//         cmd->fd = malloc (2 * sizeof(int));
+//         if (pipe(cmd->fd) == -1)
+//         {
+//             perror("pipe error\n");
+//             exit (EXIT_FAILURE);
+//         }
+//     }
+//     exec_utils->its_builtin = itsbuiltin(cmd);
+//     exec_utils->pid = fork();
+//     if (exec_utils->pid == -1)
+//         exit(EXIT_FAILURE);
+//     if (exec_utils->pid == 0)
+//         execute_child(exec_utils, cmd, prev);
+//     else
+//         execute_parent(exec_utils, cmd, prev);
+// }
 
 void    get_exitstatus(t_exec_utils exec_utils)
 {

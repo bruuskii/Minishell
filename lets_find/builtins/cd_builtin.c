@@ -86,6 +86,8 @@ void    cd_path(char *path)
     }
 }
 
+
+
 void cd_builtin(char **cmd)
 {
     if (!cmd[1])
@@ -100,6 +102,7 @@ void cd_builtin(char **cmd)
 
 int cd (char **cmd)
 {
+    // return 0;
     if (cmd[1] && cmd[2])
     {
         g_exec->exit_status = 1;

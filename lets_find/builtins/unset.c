@@ -17,6 +17,4 @@ void unset(char **cmd)
             Delete_env_Node(&g_exec->env, env);
         i++;
     }
-    printf("yeah here\n");
-    // update_env_arr();
 }

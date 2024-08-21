@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/18 18:18:48 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/21 00:55:54 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ char	*get_path(char *cmd)
 	int		i = 0;
 
 	g_exec->paths = envpath_to_arr();
+	if (!g_exec->paths)
+		return (NULL);
 	while (g_exec->paths[i])
 	{
 		path = ft_strjoin(g_exec->paths[i], "/");
@@ -62,13 +64,12 @@ char	**init_env_arr()
 
 	i = 0;
 	tmp = g_exec->env;
-
 	while (tmp)
 	{
 		i++;
 		tmp = tmp->next;
 	}
-	arr = (char **) malloc (i + 1);
+	arr = (char **) malloc ((i + 1) * sizeof(char *));
 	if (!arr)
 		return (NULL);
 	tmp = g_exec->env;
@@ -83,8 +84,6 @@ char	**init_env_arr()
 		tmp = tmp->next;
 	}
 	arr[i] = NULL;
-	if (!arr)
-		return (NULL);
 	return (arr);
 }
 
