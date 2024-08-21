@@ -129,11 +129,6 @@ int main(int argc, char **argv, char **envp) {
         }
         if (strcmp(line, "clear") == 0)
             clear_screen(envp);
-        if(strcmp(line, "exit") == 0)
-        {
-            //free(line);
-            break;
-        }
     }
 
     return 0;

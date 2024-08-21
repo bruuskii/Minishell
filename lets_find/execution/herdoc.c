@@ -2,19 +2,19 @@
 
 
 
-// void handle_sig_herdoc(int sig)
-// {
-//     if (sig == SIGINT)
-//     {
-//         write(1, "\n", 1);
-//         exit(99);
-//          free()all all;
-//     }
-// }
+void handle_sig_herdoc(int sig)
+{
+    if (sig == SIGINT)
+    {
+        printf("controle + c pressed\n");
+        // g_exec->exit_status = 130;
+        g_exec->herdoc_sig = 1;
+        printf("\n:%d:\n", g_exec->herdoc_sig);
+    }
+}
 
 
 
-//    if i have a lot of just append files;
 int heredoc(char *delimeter)
 {
     int pipe_fd[2];
@@ -22,33 +22,39 @@ int heredoc(char *delimeter)
 
     if (pipe(pipe_fd) == -1)
     {
-        printf("error pipe");
-        exit(-5);//  handle les ressources;
+        ft_putstr_fd("error pipe\n", 2);
+        return (-1);
     }
-
-    // signal(SIGQUIT, SIG_IGN);
-    // signal(SIGINT, handle_sig_herdoc);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGINT, handle_sig_herdoc);
     while (1)
     {
+        if (g_exec->herdoc_sig == 1)
+            return (-1);
+        
         tmp = readline("> ");
         if (tmp == NULL)
         {
-            printf("tmp = NULL\n");
-            exit(-5);
+            ft_putstr_fd("bash: warning: here-document\n", 2);
+            return (-1);
         }
-        if (ft_strncmp(tmp, delimeter, ft_strlen(delimeter)) == 0)
+        if (ft_strcmp(tmp, delimeter) == 0)
             break;
         if (write(pipe_fd[1], tmp, ft_strlen(tmp)) == -1)
         {
-            printf("Error");
-            free(tmp);// close pipes;
-            exit(-5);
+            ft_putstr_fd("write error\n", 2);
+            close (pipe_fd[0]);
+            close (pipe_fd[1]);
+            free(tmp);
+            return (-1);
         }
         if (write(pipe_fd[1], "\n", 1) == -1)
         {
-            printf("Error");
-            free(tmp);// close pipes;
-            exit(-5);
+            ft_putstr_fd("write error\n", 2);
+            close (pipe_fd[0]);
+            close (pipe_fd[1]);
+            free(tmp);
+            return (-1);
         }
     }
     close(pipe_fd[1]);

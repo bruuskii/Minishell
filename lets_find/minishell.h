@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/21 00:14:07 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/21 18:06:40 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # include "Libft/libft.h"
 # include <fcntl.h>
 # include <limits.h>
+# include <signal.h>
 
 # define RESET "\033[0m"
 # define RED "\033[0;31m"
@@ -96,6 +97,7 @@ typedef struct s_exec
 	char				**paths;
 	t_env				*env;
 	int					exit_status;
+	int					herdoc_sig;
 }					t_exec;
 
 extern t_exec		*g_exec;

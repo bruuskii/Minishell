@@ -64,6 +64,7 @@ t_exec *initexec(char **env)
     exec->paths = NULL;
     exec->cmd = NULL;
     exec->exit_status = 0;
+    exec->herdoc_sig = -1;
     return (exec);
 }
 
@@ -104,11 +105,6 @@ int    getinputfile(t_cmd *cmd)
                 printf(":%d:\n", fileinfd);
                 perror("no such file or directory\n");
                 tmpfderror = fileinfd;
-            }   
-            else
-            {
-                // close files;
-                // if size > 2  // close file while  i=0<size-1;
             }
         }
         file = file->next;
@@ -191,17 +187,10 @@ void ft_exec(t_cmd *cmd)
     char *commandpath;
     char    **envtemp;
 
+    if (!cmd->cmd[0])
+        return;
     commandpath = NULL;
     envtemp = init_env_arr();
-
-    // printf("\n\n=========================================================\n\n");
-    // int i = 0;
-    // while (env[i])
-    // {
-    //     printf("%s\n", env[i]);
-    //     i++;
-    // }
-    // printf("\n\n=========================================================\n\n");
     if (!ft_strchr(cmd->cmd[0], '/'))
 	{
 		ft_exec_no_path(cmd, envtemp, commandpath);
