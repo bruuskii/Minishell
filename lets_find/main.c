@@ -84,6 +84,7 @@ void handle_sigint() {
     printf("\n");
     char *str = prompt();
     printf("%s", str);
+    g_exec->exit_status = 130;
     fflush(stdout);
 }
 
@@ -113,7 +114,7 @@ int main(int argc, char **argv, char **envp) {
     (void)argv;
     while (1) 
     {
-        
+        g_exec->herdoc_sig = 0;
         pro = prompt();
         line = readline(pro);
         if(!line)

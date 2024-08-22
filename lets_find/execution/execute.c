@@ -64,13 +64,17 @@ t_exec *initexec(char **env)
     exec->paths = NULL;
     exec->cmd = NULL;
     exec->exit_status = 0;
-    exec->herdoc_sig = -1;
+    exec->herdoc_sig = 0;
     return (exec);
 }
 
 int    getinputfile(t_cmd *cmd)
 {
-    int fileinfd;
+    struct sigaction sa;
+
+    sa.sa_handler = &handle_sigint;
+    sa.sa_flags = SA_RESTART; // For Ctr C
+    int fileinfd=-1;
     int size;
     int     i;
     t_filedescriptiom *file;
@@ -92,17 +96,49 @@ int    getinputfile(t_cmd *cmd)
             tmpfderror = -1;
             continue;
         }
-
         if (file->isherdoc)
         {
-            fileinfd = heredoc(file->delimeter);
+            
+            int fd[2];
+
+            if (pipe(fd) == -1)
+                return (-1);
+            int pid = fork();
+            if (pid == -1)
+                return (-1);
+            else if (pid == 0)
+            {
+                close (fd[0]);
+                heredoc(file->delimeter,fd[1]);
+                close (fd[1]);
+                exit(0);
+            }
+            else
+            {
+                int status;
+                close (fd[1]);
+                wait(&status);
+                int exit_status = WEXITSTATUS(status);
+
+                if (exit_status == 1)
+                {
+                    g_exec->exit_status = exit_status;
+                    return (-1);
+                }
+                else if (exit_status == 2)
+                {
+                    g_exec->herdoc_sig = 1;
+                    return -1;
+                }
+                fileinfd = fd[0];
+            }
         }
         else
         {
             fileinfd = open(file->filename, O_RDONLY, 0777);
             if (fileinfd == -1)
             {
-                printf(":%d:\n", fileinfd);
+                printf("yes here the probleme :%d:\n", fileinfd);
                 perror("no such file or directory\n");
                 tmpfderror = fileinfd;
             }
@@ -456,6 +492,12 @@ void execute(t_exec *exec)
     {
         exec_utils.fdin = getinputfile(cmd);
         exec_utils.fdout = getoutputfile(cmd);
+        if (g_exec->herdoc_sig)
+        {
+            printf("before seg");
+            break;
+        }
+            
         if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
         {
             cmd = cmd->next;

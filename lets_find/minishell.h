@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/21 18:06:40 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/23 00:08:22 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,8 @@ char				**get_paths(void);
 int					count_pipes(t_cmd *cmd);
 int					countfiles(t_filedescriptiom *files);
 char				*get_path(char *cmd);
-int					heredoc(char *delimeter);
+int					heredoc(char *delimeter, int fd);
 char	            **init_env_arr();
+void 				handle_sigint();
 
 #endif
