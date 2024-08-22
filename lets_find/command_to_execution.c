@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:15:00 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/18 15:16:06 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/22 12:30:00 by assistant        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static int	count_args(t_token *token)
 	return (nbr_of_args);
 }
 
-static t_filedescriptiom	*create_file_desc(t_token *token, int is_infile)
+static t_filedescriptiom	*create_file_desc(t_token *token)
 {
 	t_filedescriptiom	*new_file;
 
@@ -54,14 +54,7 @@ static t_filedescriptiom	*create_file_desc(t_token *token, int is_infile)
 	new_file->isherdoc = 0;
 	new_file->iswithappend = 0;
 	new_file->next = NULL;
-	if (is_infile && token->prev && ft_strcmp(token->prev->token, "<<") == 0)
-	{
-		new_file->isherdoc = 1;
-		new_file->delimeter = token->token;
-	}
-	else if (!is_infile && token->prev
-		&& ft_strcmp(token->prev->token, ">>") == 0)
-		new_file->iswithappend = 1;
+	new_file->delimeter = NULL;
 	return (new_file);
 }
 
@@ -81,13 +74,55 @@ static void	add_file_to_cmd(t_cmd *cmd, t_filedescriptiom *new_file,
 
 static int	process_token(t_cmd *new_cmd, t_token **token, int *i)
 {
+	while (*token && ft_strcmp((*token)->type, "space") == 0)
+		*token = (*token)->next;
+
+	if (!*token || ft_strcmp((*token)->type, "pipe") == 0)
+		return (1);
+
 	if (ft_strcmp((*token)->type, "command") == 0
 		|| ft_strcmp((*token)->type, "argument") == 0)
+	{
 		new_cmd->cmd[(*i)++] = ft_strdup((*token)->token);
-	else if (ft_strcmp((*token)->type, "in") == 0)
-		add_file_to_cmd(new_cmd, create_file_desc(*token, 1), 1);
-	else if (ft_strcmp((*token)->type, "out") == 0)
-		add_file_to_cmd(new_cmd, create_file_desc(*token, 0), 0);
+	}
+	else if (ft_strcmp((*token)->type, "operator") == 0)
+	{
+		int is_heredoc = (ft_strcmp((*token)->token, "<<") == 0);
+		int is_input = (ft_strcmp((*token)->token, "<") == 0 || is_heredoc);
+		int is_append = (ft_strcmp((*token)->token, ">>") == 0);
+
+		*token = (*token)->next;
+		while (*token && ft_strcmp((*token)->type, "space") == 0)
+			*token = (*token)->next;
+
+		if (*token && (ft_strcmp((*token)->type, "in") == 0
+			|| ft_strcmp((*token)->type, "out") == 0
+			|| ft_strcmp((*token)->type, "argument") == 0))
+		{
+			t_filedescriptiom *new_file = create_file_desc(*token);
+			if (new_file)
+			{
+				new_file->isherdoc = is_heredoc;
+				new_file->iswithappend = is_append;
+				if (is_heredoc)
+					new_file->delimeter = ft_strdup((*token)->token);
+				add_file_to_cmd(new_cmd, new_file, is_input);
+			}
+			else
+			{
+				return (0);  // Memory allocation failed
+			}
+		}
+		else
+		{
+			return (0);  // Expected file or delimiter not found
+		}
+	}
+	else
+	{
+		return (0);  // Unexpected token type
+	}
+
 	*token = (*token)->next;
 	return (1);
 }
@@ -110,8 +145,14 @@ static t_cmd	*parse_command(t_token **token)
 	}
 	i = 0;
 	while (*token && ft_strcmp((*token)->type, "pipe") != 0)
+	{
 		if (!process_token(new_cmd, token, &i))
+		{
+			// Clean up and return NULL on error
+			// TODO: Add a function to free the t_cmd structure
 			return (NULL);
+		}
+	}
 	new_cmd->cmd[i] = NULL;
 	return (new_cmd);
 }
@@ -128,7 +169,10 @@ t_cmd	*parse_every_command(t_token *token)
 	{
 		new_cmd = parse_command(&token);
 		if (!new_cmd)
+		{
+			// TODO: Add cleanup for previously allocated commands
 			return (NULL);
+		}
 		if (cmd_current)
 			cmd_current->next = new_cmd;
 		else
