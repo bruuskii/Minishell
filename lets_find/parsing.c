@@ -262,6 +262,7 @@ void	grep_type(t_token *token, int index, int is_command)
 		token->type = "pipe";
 	else
 		token->type = "argument";
+	printf("token , %s .. type %s\n", token->token, token->type);
 }
 
 static int	is_quote(char c)
