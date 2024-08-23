@@ -139,6 +139,7 @@ static void	process_token(t_token *current, t_env *env, char **tokens,
 		current->token = processed_token;
 	}
 	update_args_and_command(current, index, &args_nbr, &is_command);
+	free(processed_token);
 }
 
 static void	link_tokens(t_token **head, t_token **current, t_token *new_token)
@@ -166,7 +167,7 @@ static t_token	*tokenize_input_helper(char **tokens, t_env *env)
 		new_token = create_new_token(tokens[index], 0);
 		if (!new_token)
 		{
-			free_tokens(head);
+			free_tokens(new_token);
 			return (NULL);
 		}
 		link_tokens(&head, &current, new_token);
@@ -207,6 +208,7 @@ int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
 		return (0);
 	}
 	*token = head;
+	free(head);
 	return (1);
 }
 
