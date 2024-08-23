@@ -220,8 +220,6 @@ void Delete_fd_Nodes(t_filedescriptiom **src)
 void    free_exec(int isexit)
 {    
     Delete_cmds_node();
-    // if (g_exec->tokens)
-    //     Delete_tokens(); // probleme in check the first call or if it's null
     if (g_exec->paths)
         free_db_arr(g_exec->paths);
     if (isexit)
@@ -229,5 +227,6 @@ void    free_exec(int isexit)
         Delete_env();
         if (g_exec)
             free(g_exec);
+        ft_putstr_fd("exit\n", STDOUT_FILENO);
     }
 }

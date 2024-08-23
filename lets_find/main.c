@@ -85,18 +85,10 @@ void handle_sigint() {
     char *str = prompt();
     printf("%s", str);
     g_exec->exit_status = 130;
+    free_exec(0);
     fflush(stdout);
 }
 
-// void    *_malloc(size_t size)
-// {
-//     void *ptr;
-//     ptr = malloc(size);
-//     if (!ptr)ls
-
-//         return NULL;
-//     return ptr;
-// }
 
 int main(int argc, char **argv, char **envp) {
 
@@ -104,10 +96,10 @@ int main(int argc, char **argv, char **envp) {
 
     sa.sa_handler = &handle_sigint;
     sa.sa_flags = SA_RESTART; // For Ctr C
+    signal(SIGQUIT, SIG_IGN);
     sigaction(SIGINT, &sa, NULL);
     clear_screen(envp);
     char *line;
-    char *pro;
     g_exec = initexec(envp);
     increment_shell_level(g_exec->env);
     (void)argc;
@@ -115,21 +107,20 @@ int main(int argc, char **argv, char **envp) {
     while (1) 
     {
         g_exec->herdoc_sig = 0;
-        pro = prompt();
-        line = readline(pro);
+        line = readline(prompt());
         if(!line)
         {
-            printf("exit\n");
+            free_exec(1);
             break;
         }
-        if(strlen(line) > 0)
+        if(ft_strlen(line) > 0)
         {
             add_history(line);
             print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
             execute(g_exec);
         }
-        if (strcmp(line, "clear") == 0)
-            clear_screen(envp);
+        // if (strcmp(line, "clear") == 0)
+        //     clear_screen(envp);
     }
 
     return 0;
