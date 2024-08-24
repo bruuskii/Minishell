@@ -70,10 +70,10 @@ t_exec *initexec(char **env)
 
 int    getinputfile(t_cmd *cmd)
 {
-    struct sigaction sa;
+    // struct sigaction sa;
 
-    sa.sa_handler = &handle_sigint;
-    sa.sa_flags = SA_RESTART; // For Ctr C
+    // sa.sa_handler = &handle_sigint;
+    // sa.sa_flags = SA_RESTART; // For Ctr C
     int fileinfd=-1;
     int size;
     int     i;
