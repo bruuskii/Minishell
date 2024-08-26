@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:38 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 18:57:15 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 21:43:22 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,9 @@ void	execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 		ft_exec(cmd);
 	else if (!ft_strcmp(cmd->cmd[0], "pwd") && !cmd->next)
 		exit(EXIT_SUCCESS);
-	else if (exec_utils->its_builtin && !cmd->cmd[1])
+	else if (((exec_utils->its_builtin && !cmd->cmd[1])
+			|| (exec_utils->its_builtin && !ft_strcmp("echo", cmd->cmd[0])))
+		&& (cmd->next || prev))
 		ft_exec_builtin(cmd);
 	exit(EXIT_SUCCESS);
 }
@@ -83,8 +85,6 @@ void	get_exitstatus(t_exec_utils exec_utils)
 			if (!exec_utils.its_builtin)
 				g_exec->exit_status = WEXITSTATUS(status);
 		}
-		else
-			printf("Child process did not terminate normally\n");
 	}
 	if (exec_utils.exit_state == 130)
 		g_exec->exit_status = 130;
