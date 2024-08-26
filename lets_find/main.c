@@ -121,7 +121,7 @@ int main(int argc, char **argv, char **envp) {
             execute(g_exec);
         }
         //free_exec(0);
-        cleanup_commands(g_exec->cmd);
+        // cleanup_commands(g_exec->cmd);
         g_exec->cmd = NULL;
         // free(g_exec->cmd->cmd);
         // free(g_exec->cmd);

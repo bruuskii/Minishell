@@ -1,48 +1,99 @@
 #include "../minishell.h"
 
-
-
-
-int count_pipes(t_cmd *cmd)
+void    execute_parent(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-    int i;
-    t_cmd   *temp;
-
-    i = 0;
-    temp = cmd;
-    while (temp)
+    if (exec_utils->its_builtin && !cmd->next && !prev)
     {
-        i++;
-        temp = temp->next;
+        if (exec_utils->fdout != STDOUT_FILENO)
+        {
+            dup2(exec_utils->fdout, STDOUT_FILENO);
+            close (exec_utils->fdout);
+            ft_exec_builtin(cmd);
+            dup2(exec_utils->savedout, STDOUT_FILENO);
+            close (exec_utils->savedout);
+        }
+        else
+            ft_exec_builtin(cmd);
     }
-    if (i)
-        return (i -1);
-    return (i);
+    if (exec_utils->fdin != STDIN_FILENO)
+        close (exec_utils->fdin);
+    if (prev)
+    {
+        close (prev->fd[0]);
+        close (prev->fd[1]);
+    }
 }
 
-int countfiles(t_filedescriptiom *files)
+void    execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-    t_filedescriptiom *filetmp;
-    int i;
-
-    filetmp = files;
-    i = 0;
-    while (filetmp)
-    {
-        i++;
-        filetmp = filetmp->next;
-    }
-    return (i);
+    set_upfdfiles(exec_utils->fdin, exec_utils->fdout, cmd, prev);
+    if (!exec_utils->its_builtin)
+        ft_exec(cmd);
+    else if (!ft_strcmp(cmd->cmd[0], "pwd")  && !cmd->next)
+        exit(EXIT_SUCCESS);
+    else if (exec_utils->its_builtin && !cmd->cmd[1])
+        ft_exec_builtin(cmd);
+    exit (EXIT_SUCCESS);
 }
 
 
-
-char	**get_paths()
+void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
-	char	**paths;
+    if (cmd->next)
+    {
+        cmd->fd = malloc (2 * sizeof(int));
+        if (pipe(cmd->fd) == -1)
+        {
+            perror("pipe error\n");
+            exit (EXIT_FAILURE);
+        }
+    }
+    exec_utils->its_builtin = itsbuiltin(cmd);
+    exec_utils->pid = fork();
+    if (exec_utils->pid == -1)
+        exit(EXIT_FAILURE);
+    if (exec_utils->pid == 0)
+        execute_child(exec_utils, cmd, prev);
+    else
+        execute_parent(exec_utils, cmd, prev);
+}
 
-	paths = ft_split(getenv("PATH"), ':');
-    if (!paths)
-        return (NULL);
-    return (paths);
+
+void    get_exitstatus(t_exec_utils exec_utils)
+{
+    int j;
+    int status;
+
+    j = -1;
+    while (++j <= exec_utils.countpipes)
+    {
+        wait(&status);
+        if (WIFEXITED(status))
+        {
+            if (!exec_utils.its_builtin)
+                g_exec->exit_status = WEXITSTATUS(status);
+        }
+        else
+        printf("Child process did not terminate normally\n");
+    }
+    if (exec_utils.exit_state == 130)
+        g_exec->exit_status = 130;
+    else if (exec_utils.sig_rec == 3)
+        g_exec->exit_status = 0;
+}
+
+
+t_exec_utils init_exec_utils(t_cmd *cmd)
+{
+    t_exec_utils    exec_utils;
+
+    exec_utils.countpipes = count_pipes(cmd);
+    exec_utils.i = 0;
+    exec_utils.fdin= -1;
+    exec_utils.savedout = dup(STDOUT_FILENO);
+    exec_utils.fdout= -1;
+    exec_utils.file = NULL;
+    exec_utils.exit_state = 0;
+    exec_utils.sig_rec = 0;
+    return (exec_utils);
 }

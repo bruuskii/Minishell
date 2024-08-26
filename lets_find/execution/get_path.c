@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/21 00:55:54 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:01:58 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	*get_path(char *cmd)
 	while (g_exec->paths[i])
 	{
 		path = ft_strjoin(g_exec->paths[i], "/");
-		path = ft_strjoin(path, cmd);
+		path = ft_strjoin2(path, cmd);
 		if (access(path, F_OK) == 0)
 		{
 			free_db_arr(g_exec->paths);

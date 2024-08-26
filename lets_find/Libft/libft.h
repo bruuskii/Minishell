@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/23 18:28:19 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/09 16:05:25 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 16:57:17 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,5 +54,6 @@ void	ft_putnbr_fd(int n, int fd);
 int	    ft_strcmp(const char *s1, const char *s2);
 int	    is_blanks(char c);
 int     ft_isspace(char c);
+char	*ft_strjoin2(char *s1, char *s2);
 
 #endif

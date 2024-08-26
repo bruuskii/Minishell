@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/23 00:08:22 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 17:56:23 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,8 @@ typedef struct s_exec_utils
     int savedout;
     int fdout;
     int its_builtin;
+	int	exit_state;
+	int	sig_rec;
 }   t_exec_utils;
 
 
@@ -131,6 +133,7 @@ void				Delete_env(void);
 void				Delete_tokens(void);
 void				Delete_cmds_node(void);
 void				Delete_fd_Nodes(t_filedescriptiom **src);
+void 				Delete_fd_Node(t_filedescriptiom **head, t_filedescriptiom *NodeToDelete);
 void				free_exec(int isexit);
 t_env				*is_in_env(t_env *env, char *value_to_check);
 int					getequalindex(char *cmd);
@@ -149,5 +152,18 @@ int					heredoc(char *delimeter, int fd);
 char	            **init_env_arr();
 void 				handle_sigint();
 void 				cleanup_commands(t_cmd *cmd_head);
+int 				getoutputfile(t_cmd *cmd, t_exec_utils *exec_utils);
+int    				getinputfile(t_cmd *cmd, t_exec_utils *exec_utils);
+int 				execute_herdoc(t_exec_utils *exec_utils, int *fileinfd);
+void 				set_upfdfiles(int fdin, int fdout, t_cmd *cmd, t_cmd *prev);
+void    			get_exitstatus(t_exec_utils exec_utils);
+t_exec_utils 		init_exec_utils(t_cmd *cmd);
+void    			ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev);
+int 				itsbuiltin(t_cmd *cmd);
+void    			ft_exec_no_path(t_cmd *cmd, char **env, char *commandpath);
+void 				ft_exec(t_cmd *cmd);
+void 				ft_exec_builtin(t_cmd *cmd);
+void    			exit_with_message(char *s, int exit_value);
+int 				ft_heredoc(char *delimeter, int fd, char *tmp);
 
 #endif
