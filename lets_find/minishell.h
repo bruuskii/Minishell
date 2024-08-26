@@ -72,6 +72,7 @@ typedef struct s_cmd
     struct s_filedescriptiom *outfile;
     struct s_cmd *next;
     int *fd;
+	int cleanup_ready;
 }   t_cmd;
 
 
