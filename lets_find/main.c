@@ -90,6 +90,7 @@ void handle_sigint() {
 }
 
 
+
 int main(int argc, char **argv, char **envp) {
 
     struct sigaction sa;
@@ -110,7 +111,7 @@ int main(int argc, char **argv, char **envp) {
         line = readline(prompt());
         if(!line)
         {
-            free_exec(1);
+            //free_exec(1);
             break;
         }
         if(ft_strlen(line) > 0)
@@ -119,6 +120,10 @@ int main(int argc, char **argv, char **envp) {
             print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
             execute(g_exec);
         }
+        free_exec(0);
+        free(g_exec->cmd->cmd);
+        free(g_exec->cmd);
+        //free(g_exec);
         // if (strcmp(line, "clear") == 0)
         //     clear_screen(envp);
     }

@@ -203,7 +203,7 @@ int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
 	*cmd = parse_every_command(head);
 	if (!(*cmd))
 	{
-		free_tokens(head);
+		free(cmd);
 		return (0);
 	}
 	free_tokens(head);
