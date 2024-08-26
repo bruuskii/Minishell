@@ -154,8 +154,8 @@ void Delete_cmd_Node(t_cmd **head, t_cmd *NodeToDelete)
     }
     if (current->next)
         current->next = NodeToDelete->next;
-    if (NodeToDelete->cmd)
-        free_db_arr(NodeToDelete->cmd);
+    //if (NodeToDelete->cmd)
+    free_db_arr(NodeToDelete->cmd);
     if (NodeToDelete->fd)
         free (NodeToDelete->fd);
     Delete_fd_Nodes(&NodeToDelete->outfile);

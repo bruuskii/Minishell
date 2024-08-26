@@ -72,6 +72,7 @@ typedef struct s_cmd
     struct s_filedescriptiom *outfile;
     struct s_cmd *next;
     int *fd;
+	int cleanup_ready;
 }   t_cmd;
 
 
@@ -147,5 +148,6 @@ char				*get_path(char *cmd);
 int					heredoc(char *delimeter, int fd);
 char	            **init_env_arr();
 void 				handle_sigint();
+void 				cleanup_commands(t_cmd *cmd_head);
 
 #endif

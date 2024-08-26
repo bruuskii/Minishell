@@ -115,6 +115,7 @@ static int	process_token(t_cmd *new_cmd, t_token **token, int *i)
 		}
 		else
 		{
+			free(new_cmd->cmd);
 			return (0);  // Expected file or delimiter not found
 		}
 	}
@@ -135,11 +136,15 @@ static t_cmd	*parse_command(t_token **token)
 
 	new_cmd = init_new_cmd();
 	if (!new_cmd)
+	{
+		free(new_cmd);
 		return (NULL);
+	}
 	nbr_of_args = count_args(*token);
 	new_cmd->cmd = (char **)malloc((nbr_of_args + 1) * sizeof(char *));
 	if (!new_cmd->cmd)
 	{
+		free(new_cmd->cmd);
 		free(new_cmd);
 		return (NULL);
 	}
@@ -150,6 +155,8 @@ static t_cmd	*parse_command(t_token **token)
 		{
 			// Clean up and return NULL on error
 			// TODO: Add a function to free the t_cmd structure
+			free(new_cmd->cmd);
+			free(new_cmd);
 			return (NULL);
 		}
 	}
@@ -171,6 +178,8 @@ t_cmd	*parse_every_command(t_token *token)
 		if (!new_cmd)
 		{
 			// TODO: Add cleanup for previously allocated commands
+			free(new_cmd->cmd);
+			free(new_cmd);
 			return (NULL);
 		}
 		if (cmd_current)

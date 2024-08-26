@@ -425,4 +425,245 @@ void execute(t_exec *exec)
     }
     get_exitstatus(exec_utils);
     free_exec(0);
+<<<<<<< HEAD
+=======
+}
+
+
+
+
+// void execute(t_exec *exec, char **env)
+// {
+//     t_cmd *cmd = exec->cmd;
+//     t_cmd *prev = NULL;
+//     int countpipes = count_pipes(cmd);
+//     int i = 0;
+//     int pid;
+
+//     int fdin= -1;
+//     int savedout = dup(STDOUT_FILENO);
+//     int fdout= -1;
+//     int its_builtin;
+
+//     while (cmd && i <= countpipes)
+//     {
+//         fdin = getinputfile(cmd);
+//         fdout = getoutputfile(cmd);
+
+//         if (fdin == -1 || fdout == -1)
+//         {
+//             cmd = cmd->next;
+//             i++;
+//             g_exec->exit_status = 1;
+//             continue;
+//         }
+//         if (cmd->next)
+//         {
+//             cmd->fd = malloc (2 * sizeof(int));
+//             if (pipe(cmd->fd) == -1)
+//             {
+//                 perror("pipe error\n");
+//                 exit (EXIT_FAILURE);
+//             }
+//         }
+        
+//         its_builtin = itsbuiltin(cmd);
+//         pid = fork();
+//         if (pid == -1)
+//             exit(EXIT_FAILURE);
+//         if (pid == 0)
+//         {
+//             //execute child process;
+//             set_upfdfiles(fdin, fdout, cmd, prev);
+//             if (!its_builtin)
+//             {
+//                 ft_exec(cmd, env);
+//             }
+//             else if (its_builtin && !cmd->cmd[1])
+//                 ft_exec_builtin(cmd);
+//             exit (EXIT_SUCCESS);
+//         }
+//         else
+//         {
+//             // execute parent process;
+//             if (its_builtin && !cmd->next && !prev && cmd->cmd[1])
+//             {
+//                 if (fdout != STDOUT_FILENO)
+//                 {
+//                     dup2(fdout, STDOUT_FILENO);
+//                     close (fdout);
+//                     ft_exec_builtin(cmd);
+//                     dup2(savedout, STDOUT_FILENO);
+//                     close (savedout);
+//                 }
+//                 else
+//                     ft_exec_builtin(cmd);
+//             }
+//             if (fdin != STDIN_FILENO)
+//                 close (fdin);
+//             if (prev)
+//             {
+//                 close (prev->fd[0]);
+//                 close (prev->fd[1]);
+//             }
+//             prev = cmd;
+//             cmd = cmd->next;
+//             i++;
+//         }
+        
+//     }
+
+//         // get exit status;
+//         int j = -1;
+//         int status;
+
+//         while (++j <= countpipes)
+//         {
+//             wait(&status);
+//             if (WIFEXITED(status)) {
+//                 if (!its_builtin)
+//                     g_exec->exit_status = WEXITSTATUS(status);
+//         } else {
+//             printf("Child process did not terminate normally\n");
+//         }
+//     }
+//     free_exec(0);
+// }
+
+
+
+void free_filedescriptiom(t_filedescriptiom *file)
+{
+    t_filedescriptiom *current;
+    t_filedescriptiom *next;
+
+    fprintf(stderr, "Entering free_filedescriptiom\n");
+    current = file;
+    while (current)
+    {
+        fprintf(stderr, "Processing filedescriptiom: %p\n", (void*)current);
+        next = current->next;
+        if (current->filename)
+        {
+            fprintf(stderr, "Freeing filename: %p\n", (void*)current->filename);
+            free(current->filename);
+        }
+        if (current->delimeter)
+        {
+            fprintf(stderr, "Freeing delimeter: %p\n", (void*)current->delimeter);
+            free(current->delimeter);
+        }
+        if (!current->isherdoc)  // Only free non-heredoc descriptors
+        {
+            fprintf(stderr, "Freeing non-heredoc filedescriptiom: %p\n", (void*)current);
+            free(current);
+        }
+        else
+        {
+            fprintf(stderr, "Skipping heredoc filedescriptiom: %p\n", (void*)current);
+        }
+        current = next;
+    }
+    fprintf(stderr, "Exiting free_filedescriptiom\n");
+}
+
+void free_cmd(t_cmd *cmd)
+{
+    if (!cmd || !cmd->cleanup_ready)
+    {
+        return; // Don't free if not ready for cleanup
+    }
+    int i;
+
+    fprintf(stderr, "Entering free_cmd for cmd: %p\n", (void*)cmd);
+    if (!cmd)
+    {
+        fprintf(stderr, "cmd is NULL, exiting free_cmd\n");
+        return;
+    }
+
+    fprintf(stderr, "Freeing cmd->cmd\n");
+    if (cmd->cmd)
+    {
+        for (i = 0; cmd->cmd[i]; i++)
+        {
+            fprintf(stderr, "Freeing cmd->cmd[%d]: %p\n", i, (void*)cmd->cmd[i]);
+            free(cmd->cmd[i]);
+        }
+        fprintf(stderr, "Freeing cmd->cmd array itself\n");
+        free(cmd->cmd);
+        cmd->cmd = NULL;
+    }
+    else
+    {
+        fprintf(stderr, "cmd->cmd is NULL\n");
+    }
+
+    fprintf(stderr, "Checking cmd->infile: %p\n", (void*)cmd->infile);
+    if (cmd->infile)
+    {
+        fprintf(stderr, "Freeing cmd->infile\n");
+        free_filedescriptiom(cmd->infile);
+        cmd->infile = NULL;
+    }
+    else
+    {
+        fprintf(stderr, "cmd->infile is NULL\n");
+    }
+
+    fprintf(stderr, "Checking cmd->outfile: %p\n", (void*)cmd->outfile);
+    if (cmd->outfile)
+    {
+        fprintf(stderr, "Freeing cmd->outfile\n");
+        free_filedescriptiom(cmd->outfile);
+        cmd->outfile = NULL;
+    }
+    else
+    {
+        fprintf(stderr, "cmd->outfile is NULL\n");
+    }
+
+    fprintf(stderr, "Checking cmd->fd: %p\n", (void*)cmd->fd);
+    if (cmd->fd && cmd->fd != (int *)0xbebebebebebebebe)
+    {
+        fprintf(stderr, "Freeing cmd->fd\n");
+        if (cmd->fd[0] != -1)
+        {
+            fprintf(stderr, "Closing cmd->fd[0]: %d\n", cmd->fd[0]);
+            close(cmd->fd[0]);
+        }
+        if (cmd->fd[1] != -1)
+        {
+            fprintf(stderr, "Closing cmd->fd[1]: %d\n", cmd->fd[1]);
+            close(cmd->fd[1]);
+        }
+        free(cmd->fd);
+    }
+    else
+    {
+        fprintf(stderr, "cmd->fd is NULL or invalid\n");
+    }
+    cmd->fd = NULL;
+
+    fprintf(stderr, "Freeing cmd itself\n");
+    free(cmd);
+    fprintf(stderr, "Exiting free_cmd\n");
+}
+
+void cleanup_commands(t_cmd *cmd_head)
+{
+    t_cmd *current;
+    t_cmd *next;
+
+    fprintf(stderr, "Entering cleanup_commands\n");
+    current = cmd_head;
+    while (current)
+    {
+        fprintf(stderr, "Processing cmd: %p\n", (void*)current);
+        next = current->next;
+        free_cmd(current);
+        current = next;
+    }
+    fprintf(stderr, "Exiting cleanup_commands\n");
+>>>>>>> refs/remotes/origin/main
 }
