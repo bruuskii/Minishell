@@ -425,8 +425,6 @@ void execute(t_exec *exec)
     }
     get_exitstatus(exec_utils);
     free_exec(0);
-<<<<<<< HEAD
-=======
 }
 
 
@@ -665,5 +663,4 @@ void cleanup_commands(t_cmd *cmd_head)
         current = next;
     }
     fprintf(stderr, "Exiting cleanup_commands\n");
->>>>>>> refs/remotes/origin/main
 }
