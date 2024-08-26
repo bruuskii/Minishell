@@ -1,58 +1,6 @@
 #include  "../minishell.h"
 
 
-// void execute(t_token *token)
-// {
-//     // how can i execute ?;
-
-//     /*
-//         split command into nodes pipe if number of pipes > 0; 1;
-//             else (execute last) command;
-
-//         in every small execute;
-
-//             *** check if the command is a buitl in;
-//             *** i need to have the input and out file;
-//                 *** check if there is herdoc;
-//             *** list of command;
-//             *** save exit status;
-//             *** create files in redirection;
-    
-    //token->type == token.pipe
-        
-//     */
-
-   /*
-        small execute;
-
-        1 - get cmd as double pointer;
-                if cmd is builtin execute built in;
-        2 - get input and output file;
-            if (heredoc)
-                in = herdoc file;
-            else if (< )  input =  file after < 
-            else in = entree standart;
-        3 - dup entree sortie;
-        4 - execute;  save exit status;
-
-        //
-        whats list i need;
-
-        tokens;
-        Path;
-        env;
-        env_export;
-        inputfile;
-        output;
-        exit status;
-Achraf
-
-*/
-// }
-
-
-
-
 t_exec *initexec(char **env)
 {
     t_exec *exec;
@@ -68,35 +16,68 @@ t_exec *initexec(char **env)
     return (exec);
 }
 
-int    getinputfile(t_cmd *cmd)
-{
-    // struct sigaction sa;
 
-    // sa.sa_handler = &handle_sigint;
-    // sa.sa_flags = SA_RESTART; // For Ctr C
+int execute_herdoc(t_exec_utils *exec_utils, int fileinfd)
+{
+    int fd[2];
+
+    if (pipe(fd) == -1)
+        return (-1);
+            int pid = fork();
+    if (pid == -1)
+        return (-1);
+    else if (pid == 0)
+    {
+        close (fd[0]);
+        heredoc(exec_utils->file->delimeter,fd[1]);
+        close (fd[1]);
+        exit(0);
+    }
+    else
+    {
+        int status;
+        close (fd[1]);
+        wait(&status);
+        int exit_status = WEXITSTATUS(status); 
+        if (exit_status == 1)
+        {
+            g_exec->exit_status = exit_status;
+            return (-1);
+        }
+        else if (exit_status == 2)
+        {
+            g_exec->herdoc_sig = 1;
+            return -1;
+        }
+            fileinfd = fd[0];
+    }
+    return(fileinfd);
+}
+
+int    getinputfile(t_cmd *cmd, t_exec_utils *exec_utils)
+{
     int fileinfd=-1;
     int size;
     int     i;
-    t_filedescriptiom *file;
     int tmpfderror;
     
     i = 0;
     size = countfiles(cmd->infile);
-    file = cmd->infile;
+    exec_utils->file = cmd->infile;
     tmpfderror = 0;
     if (!size)
         return (0);
-    while (i < size && file)
+    while (i < size && exec_utils->file)
     {
-        if (!*file->filename)
+        if (!*exec_utils->file->filename)
         {
             ft_putstr_fd("bash : ambiguous redirect\n", 2);
-            file = file->next;
+            exec_utils->file = exec_utils->file->next;
             i++;
             tmpfderror = -1;
             continue;
         }
-        if (file->isherdoc)
+        if (exec_utils->file->isherdoc)
         {
             
             int fd[2];
@@ -109,7 +90,7 @@ int    getinputfile(t_cmd *cmd)
             else if (pid == 0)
             {
                 close (fd[0]);
-                heredoc(file->delimeter,fd[1]);
+                heredoc(exec_utils->file->delimeter,fd[1]);
                 close (fd[1]);
                 exit(0);
             }
@@ -135,7 +116,7 @@ int    getinputfile(t_cmd *cmd)
         }
         else
         {
-            fileinfd = open(file->filename, O_RDONLY, 0777);
+            fileinfd = open(exec_utils->file->filename, O_RDONLY, 0777);
             if (fileinfd == -1)
             {
                 printf("yes here the probleme :%d:\n", fileinfd);
@@ -143,7 +124,7 @@ int    getinputfile(t_cmd *cmd)
                 tmpfderror = fileinfd;
             }
         }
-        file = file->next;
+        exec_utils->file = exec_utils->file->next;
         i++;
     }
     if (tmpfderror == -1)
@@ -151,33 +132,18 @@ int    getinputfile(t_cmd *cmd)
     return (fileinfd);
 }
 
-int getoutputfile(t_cmd *cmd)
+
+int get_lastoutfile(t_filedescriptiom *file, int *fd, int size)
 {
-    int fileoutfd;
-    int size;
-    int     i;
-    t_filedescriptiom *file;
-    int *fd;
-    
+    int i;
+
     i = 0;
-    size = countfiles(cmd->outfile);
-    file = cmd->outfile; 
-    if (!size)
-        return (STDOUT_FILENO);
-    fd = malloc(size * sizeof(int));
-    if (!fd)
-        return (0);
     while (i < size && file)
     {
         if (file->iswithappend)
-        {
             fd[i] = open(file->filename, O_RDWR | O_APPEND | O_CREAT, 0777);
-        }
         else  
-        {
             fd[i] = open(file->filename, O_RDWR | O_CREAT, 0777);
-        }
-            
         if (fd[i] == -1)
         {
             perror("file cannot opend");
@@ -187,6 +153,30 @@ int getoutputfile(t_cmd *cmd)
             close(fd[i]);
         i++;
         file = file->next;
+    }
+    return (i);
+}
+
+int getoutputfile(t_cmd *cmd, t_exec_utils *exec_utils)
+{
+    int fileoutfd;
+    int size;
+    int     i;
+    int *fd;
+    
+    i = 0;
+    size = countfiles(cmd->outfile);
+    exec_utils->file = cmd->outfile;
+    if (!size)
+        return (STDOUT_FILENO);
+    fd = malloc(size * sizeof(int));
+    if (!fd)
+        return (0);
+    i = get_lastoutfile(exec_utils->file, fd, size);
+    if (i == -1)
+    {
+        free(fd);
+        return (-1);
     }
     fileoutfd = fd[i - 1];
     free(fd);
@@ -207,13 +197,13 @@ void    ft_exec_no_path(t_cmd *cmd, char **env, char *commandpath)
     if (!commandpath)
     {
         ft_putstr_fd(cmd->cmd[0], 2);
-        exit_with_message(" : command path not found\n", 127);
+        exit_with_message(": command path not found\n", 127);
     }
     if (execve(commandpath, cmd->cmd, env) == -1)
     {
         free(commandpath);
-        exit_with_message("execve error\n", 127);
         free_db_arr(env);
+        exit_with_message("execve error\n", 127);
     }
 }
 
@@ -243,37 +233,22 @@ void ft_exec(t_cmd *cmd)
 
 void ft_exec_builtin(t_cmd *cmd)
 {
+    if (!cmd->cmd[0])
+        return;
     if (!ft_strcmp(cmd->cmd[0], "echo"))
-    {
         echo(cmd->cmd);
-    }
-        
     else if (!ft_strcmp(cmd->cmd[0], "cd"))
-    {
         cd(cmd->cmd);
-    }
     if (!ft_strcmp(cmd->cmd[0], "pwd"))
-    {
         pwd();
-    }
-        
     else if (!ft_strcmp(cmd->cmd[0], "export"))
-    {
         export(cmd->cmd);
-    }
     else if (!ft_strcmp(cmd->cmd[0], "unset"))
-    {
         unset(cmd->cmd);
-    }
     else if (!ft_strcmp(cmd->cmd[0], "env"))
-    {
         print_env(g_exec->env, 0);
-    }
-        
     else if (!strcmp(cmd->cmd[0], "exit"))
-    {
         ft_exit(cmd->cmd);
-    }
 }
 
 
@@ -389,63 +364,6 @@ void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 }
 
 
-// void    execute_parent(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
-// {
-//     if (exec_utils->its_builtin && !cmd->next && !prev && (cmd->cmd[1]
-//          || !ft_strcmp(cmd->cmd[0], "cd")))
-//     {
-//         if (exec_utils->fdout != STDOUT_FILENO)
-//         {
-//             dup2(exec_utils->fdout, STDOUT_FILENO);
-//             close (exec_utils->fdout);
-//             ft_exec_builtin(cmd);
-//             dup2(exec_utils->savedout, STDOUT_FILENO);
-//             close (exec_utils->savedout);
-//         }
-//         else
-//             ft_exec_builtin(cmd);
-//     }
-//     if (exec_utils->fdin != STDIN_FILENO)
-//         close (exec_utils->fdin);
-//     if (prev)
-//     {
-//         close (prev->fd[0]);
-//         close (prev->fd[1]);
-//     }
-// }
-
-// void    execute_child(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
-// {
-//     set_upfdfiles(exec_utils->fdin, exec_utils->fdout, cmd, prev);
-//     if (!exec_utils->its_builtin)
-//         ft_exec(cmd);
-//     else if (exec_utils->its_builtin && !cmd->cmd[1])
-//         ft_exec_builtin(cmd);
-//     exit (EXIT_SUCCESS);
-// }
-
-
-// void    ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
-// {
-//     if (cmd->next)
-//     {
-//         cmd->fd = malloc (2 * sizeof(int));
-//         if (pipe(cmd->fd) == -1)
-//         {
-//             perror("pipe error\n");
-//             exit (EXIT_FAILURE);
-//         }
-//     }
-//     exec_utils->its_builtin = itsbuiltin(cmd);
-//     exec_utils->pid = fork();
-//     if (exec_utils->pid == -1)
-//         exit(EXIT_FAILURE);
-//     if (exec_utils->pid == 0)
-//         execute_child(exec_utils, cmd, prev);
-//     else
-//         execute_parent(exec_utils, cmd, prev);
-// }
-
 void    get_exitstatus(t_exec_utils exec_utils)
 {
     int j = -1;
@@ -476,6 +394,7 @@ t_exec_utils init_exec_utils(t_cmd *cmd)
     exec_utils.fdin= -1;
     exec_utils.savedout = dup(STDOUT_FILENO);
     exec_utils.fdout= -1;
+    exec_utils.file = NULL;
     return (exec_utils);
 }
 
@@ -490,14 +409,8 @@ void execute(t_exec *exec)
     exec_utils = init_exec_utils(cmd);
     while (cmd && exec_utils.i <= exec_utils.countpipes)
     {
-        exec_utils.fdin = getinputfile(cmd);
-        exec_utils.fdout = getoutputfile(cmd);
-        if (g_exec->herdoc_sig)
-        {
-            printf("before seg");
-            break;
-        }
-            
+        exec_utils.fdin = getinputfile(cmd, &exec_utils);// verfiy exit status  of cont + c;
+        exec_utils.fdout = getoutputfile(cmd, &exec_utils);
         if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
         {
             cmd = cmd->next;
@@ -513,104 +426,3 @@ void execute(t_exec *exec)
     get_exitstatus(exec_utils);
     free_exec(0);
 }
-
-
-
-
-// void execute(t_exec *exec, char **env)
-// {
-//     t_cmd *cmd = exec->cmd;
-//     t_cmd *prev = NULL;
-//     int countpipes = count_pipes(cmd);
-//     int i = 0;
-//     int pid;
-
-//     int fdin= -1;
-//     int savedout = dup(STDOUT_FILENO);
-//     int fdout= -1;
-//     int its_builtin;
-
-//     while (cmd && i <= countpipes)
-//     {
-//         fdin = getinputfile(cmd);
-//         fdout = getoutputfile(cmd);
-
-//         if (fdin == -1 || fdout == -1)
-//         {
-//             cmd = cmd->next;
-//             i++;
-//             g_exec->exit_status = 1;
-//             continue;
-//         }
-//         if (cmd->next)
-//         {
-//             cmd->fd = malloc (2 * sizeof(int));
-//             if (pipe(cmd->fd) == -1)
-//             {
-//                 perror("pipe error\n");
-//                 exit (EXIT_FAILURE);
-//             }
-//         }
-        
-//         its_builtin = itsbuiltin(cmd);
-//         pid = fork();
-//         if (pid == -1)
-//             exit(EXIT_FAILURE);
-//         if (pid == 0)
-//         {
-//             //execute child process;
-//             set_upfdfiles(fdin, fdout, cmd, prev);
-//             if (!its_builtin)
-//             {
-//                 ft_exec(cmd, env);
-//             }
-//             else if (its_builtin && !cmd->cmd[1])
-//                 ft_exec_builtin(cmd);
-//             exit (EXIT_SUCCESS);
-//         }
-//         else
-//         {
-//             // execute parent process;
-//             if (its_builtin && !cmd->next && !prev && cmd->cmd[1])
-//             {
-//                 if (fdout != STDOUT_FILENO)
-//                 {
-//                     dup2(fdout, STDOUT_FILENO);
-//                     close (fdout);
-//                     ft_exec_builtin(cmd);
-//                     dup2(savedout, STDOUT_FILENO);
-//                     close (savedout);
-//                 }
-//                 else
-//                     ft_exec_builtin(cmd);
-//             }
-//             if (fdin != STDIN_FILENO)
-//                 close (fdin);
-//             if (prev)
-//             {
-//                 close (prev->fd[0]);
-//                 close (prev->fd[1]);
-//             }
-//             prev = cmd;
-//             cmd = cmd->next;
-//             i++;
-//         }
-        
-//     }
-
-//         // get exit status;
-//         int j = -1;
-//         int status;
-
-//         while (++j <= countpipes)
-//         {
-//             wait(&status);
-//             if (WIFEXITED(status)) {
-//                 if (!its_builtin)
-//                     g_exec->exit_status = WEXITSTATUS(status);
-//         } else {
-//             printf("Child process did not terminate normally\n");
-//         }
-//     }
-//     free_exec(0);
-// }

@@ -13,14 +13,13 @@ void handle_sig_herdoc(int sig)
 
 int ft_heredoc(char *delimeter, int fd)
 {
-    char *tmp = "\0";
+    char *tmp;
     
+    tmp = NULL;
     while (1)
-    {   
-
+    {
         signal(SIGQUIT, SIG_IGN);
         signal(SIGINT, handle_sig_herdoc);
-
         tmp = readline("");
         if (tmp == NULL)
         {

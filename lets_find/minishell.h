@@ -77,7 +77,7 @@ typedef struct s_cmd
 
 typedef struct s_exec_utils
 {
-
+	t_filedescriptiom *file;
     int countpipes;
     int i;
     int pid;

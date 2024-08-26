@@ -30,8 +30,9 @@ char **envpath_to_arr()
 char	*get_path(char *cmd)
 {
 	char	*path;
-	int		i = 0;
+	int		i;
 
+	i = 0;
 	g_exec->paths = envpath_to_arr();
 	if (!g_exec->paths)
 		return (NULL);
@@ -56,9 +57,26 @@ char	*get_path(char *cmd)
 }
 
 
-char	**init_env_arr()
+
+void	copy_env_in_arr(char **arr, t_env *tmp)
 {
 	int i;
+
+	i = 0;
+	while (tmp)
+	{
+		if (tmp->line)
+		{
+			arr[i] = ft_strdup(tmp->line);
+			i++;
+		}
+		tmp = tmp->next;
+	}
+}
+
+char	**init_env_arr()
+{
+	int 	i;
 	t_env	*tmp;
 	char	**arr;
 
@@ -73,43 +91,8 @@ char	**init_env_arr()
 	if (!arr)
 		return (NULL);
 	tmp = g_exec->env;
-	i = 0;
-	while (tmp)
-	{
-		if (tmp->line)
-		{
-			arr[i] = ft_strdup(tmp->line);
-			i++;
-		}
-		tmp = tmp->next;
-	}
+	copy_env_in_arr(arr, tmp);
 	arr[i] = NULL;
 	return (arr);
 }
 
-
-// void	update_env_arr()
-// {
-// 	int i = 0;
-// 	t_env	*tmp = g_exec->env;
-
-// 	while (tmp)
-// 	{
-// 		i++;
-// 		tmp = tmp->next;
-// 	}
-// 	if (g_exec->env_arr != NULL)
-// 		printf("no it's not null");
-// 	g_exec->env_arr = (char **) malloc (i + 1);
-// 	if (!g_exec->env_arr)
-// 		return;
-// 	tmp = g_exec->env;
-// 	i = 0;
-// 	while (tmp)
-// 	{
-// 		g_exec->env_arr[i] = ft_strdup(tmp->line);
-// 		tmp = tmp->next;
-// 		i++;
-// 	}
-// 	g_exec->env_arr[i] = NULL;
-// }
