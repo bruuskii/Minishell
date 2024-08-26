@@ -209,9 +209,9 @@ void	save_old_pwd(t_env *env)
 
 void	save_current_pwd(t_env *env)
 {
-	char	pwd[1024];
-	char	*new_pwd;
-	t_env	*current;
+	char pwd[1024];
+	char *new_pwd;
+	t_env *current;
 
 	if (!getcwd(pwd, sizeof(pwd)))
 		return ;

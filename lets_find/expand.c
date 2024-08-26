@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "./Libft/libft.h"
+#include "minishell.h"
 
 static char	*handle_exit_status(char *final)
 {
@@ -105,7 +105,8 @@ static char	*append_char(char *final, char c)
 	return (temp);
 }
 
-static char	*handle_dollar_sign(char *final, t_token *token, t_env *env, size_t *i)
+static char	*handle_dollar_sign(char *final, t_token *token, t_env *env,
+		size_t *i)
 {
 	char	dest[100];
 	size_t	j;

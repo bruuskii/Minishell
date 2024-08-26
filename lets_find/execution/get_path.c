@@ -6,14 +6,13 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/21 02:26:04 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 17:01:58 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 18:46:04 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-
-char **envpath_to_arr()
+char	**envpath_to_arr(void)
 {
 	t_env	*temp;
 	char	**env_arr;
@@ -56,11 +55,9 @@ char	*get_path(char *cmd)
 	return (NULL);
 }
 
-
-
 void	copy_env_in_arr(char **arr, t_env *tmp)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (tmp)
@@ -74,9 +71,9 @@ void	copy_env_in_arr(char **arr, t_env *tmp)
 	}
 }
 
-char	**init_env_arr()
+char	**init_env_arr(void)
 {
-	int 	i;
+	int		i;
 	t_env	*tmp;
 	char	**arr;
 
@@ -87,7 +84,7 @@ char	**init_env_arr()
 		i++;
 		tmp = tmp->next;
 	}
-	arr = (char **) malloc ((i + 1) * sizeof(char *));
+	arr = (char **)malloc((i + 1) * sizeof(char *));
 	if (!arr)
 		return (NULL);
 	tmp = g_exec->env;
@@ -95,4 +92,3 @@ char	**init_env_arr()
 	arr[i] = NULL;
 	return (arr);
 }
-

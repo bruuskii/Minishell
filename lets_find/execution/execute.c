@@ -1,55 +1,68 @@
-#include  "../minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execute.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/26 18:45:18 by ainouni           #+#    #+#             */
+/*   Updated: 2024/08/26 19:19:19 by ainouni          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../minishell.h"
 
-t_exec *initexec(char **env)
+t_exec	*initexec(char **env)
 {
-    t_exec *exec;
+	t_exec	*exec;
 
-    exec =  (t_exec *)malloc (sizeof (t_exec ));
-    if (!exec)
-        return (NULL);
-    exec->env = init_env(env);
-    exec->paths = NULL;
-    exec->cmd = NULL;
-    exec->exit_status = 0;
-    exec->herdoc_sig = 0;
-    return (exec);
+	exec = (t_exec *)malloc(sizeof(t_exec));
+	if (!exec)
+		return (NULL);
+	exec->env = init_env(env);
+	exec->paths = NULL;
+	exec->cmd = NULL;
+	exec->exit_status = 0;
+	exec->herdoc_sig = 0;
+	return (exec);
 }
 
-
-
-void execute(t_exec *exec)
+void	advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils)
 {
-    t_cmd *cmd;
-    t_cmd *prev;
-    t_exec_utils    exec_utils;
-
-    cmd = exec->cmd;
-    prev = NULL;
-    exec_utils = init_exec_utils(cmd);
-    while (cmd && exec_utils.i <= exec_utils.countpipes)
-    {
-        exec_utils.fdin = getinputfile(cmd, &exec_utils);
-        exec_utils.fdout = getoutputfile(cmd, &exec_utils);
-        if (exec_utils.sig_rec)
-            break;
-        if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
-        {
-            cmd = cmd->next;
-            exec_utils.i++;
-            g_exec->exit_status = 1;
-            continue;
-        }
-        ft_execute(&exec_utils, cmd, prev);
-        prev = cmd;
-        cmd = cmd->next;
-        exec_utils.i++;
-    }
-    get_exitstatus(exec_utils);
-    free_exec(0);
+	prev = cmd;
+	cmd = cmd->next;
+	exec_utils->i++;
+	g_exec->exit_status = 1;
 }
 
+void	execute(t_exec *exec)
+{
+	t_cmd			*cmd;
+	t_cmd			*prev;
+	t_exec_utils	exec_utils;
 
+	cmd = exec->cmd;
+	prev = NULL;
+	exec_utils = init_exec_utils(cmd);
+	while (cmd && exec_utils.i <= exec_utils.countpipes)
+	{
+		exec_utils.fdin = getinputfile(cmd, &exec_utils);
+		exec_utils.fdout = getoutputfile(cmd, &exec_utils);
+		if (exec_utils.sig_rec)
+			break ;
+		if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
+		{
+			advance_cmd(cmd, prev, &exec_utils);
+			continue ;
+		}
+		ft_execute(&exec_utils, cmd, prev);
+		prev = cmd;
+		cmd = cmd->next;
+		exec_utils.i++;
+	}
+	get_exitstatus(exec_utils);
+	free_exec(0);
+}
 // void free_filedescriptiom(t_filedescriptiom *file)
 // {
 //     t_filedescriptiom *current;
@@ -63,22 +76,26 @@ void execute(t_exec *exec)
 //         next = current->next;
 //         if (current->filename)
 //         {
-//             fprintf(stderr, "Freeing filename: %p\n", (void*)current->filename);
+//             fprintf(stderr, "Freeing filename: %p\n",
+// (void*)current->filename);
 //             free(current->filename);
 //         }
 //         if (current->delimeter)
 //         {
-//             fprintf(stderr, "Freeing delimeter: %p\n", (void*)current->delimeter);
+//             fprintf(stderr, "Freeing delimeter: %p\n",
+// (void*)current->delimeter);
 //             free(current->delimeter);
 //         }
 //         if (!current->isherdoc)  // Only free non-heredoc descriptors
 //         {
-//             fprintf(stderr, "Freeing non-heredoc filedescriptiom: %p\n", (void*)current);
+//             fprintf(stderr, "Freeing non-heredoc filedescriptiom: %p\n",
+// (void*)current);
 //             free(current);
 //         }
 //         else
 //         {
-//             fprintf(stderr, "Skipping heredoc filedescriptiom: %p\n", (void*)current);
+//             fprintf(stderr, "Skipping heredoc filedescriptiom: %p\n",
+// (void*)current);
 //         }
 //         current = next;
 //     }
@@ -89,7 +106,7 @@ void execute(t_exec *exec)
 // {
 //     if (!cmd || !cmd->cleanup_ready)
 //     {
-//         return; // Don't free if not ready for cleanup
+//         return ; // Don't free if not ready for cleanup
 //     }
 //     int i;
 
@@ -97,7 +114,7 @@ void execute(t_exec *exec)
 //     if (!cmd)
 //     {
 //         fprintf(stderr, "cmd is NULL, exiting free_cmd\n");
-//         return;
+//         return ;
 //     }
 
 //     fprintf(stderr, "Freeing cmd->cmd\n");
@@ -105,7 +122,8 @@ void execute(t_exec *exec)
 //     {
 //         for (i = 0; cmd->cmd[i]; i++)
 //         {
-//             fprintf(stderr, "Freeing cmd->cmd[%d]: %p\n", i, (void*)cmd->cmd[i]);
+//             fprintf(stderr, "Freeing cmd->cmd[%d]: %p\n", i,
+// (void*)cmd->cmd[i]);
 //             free(cmd->cmd[i]);
 //         }
 //         fprintf(stderr, "Freeing cmd->cmd array itself\n");

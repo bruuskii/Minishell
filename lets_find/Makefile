@@ -4,6 +4,7 @@ SRCS = parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c \
 	   execution/execute.c  builtins/unset.c builtins/echo.c execution/ft_free.c  \
 	   builtins/ft_exit.c execution/input_output.c execution/execute_utils.c \
 	   execution/execute_utils00.c execution/herdoc_utils.c execution/ft_free_utils.c\
+	   builtins/ft_export.c builtins/ft_export_utils.c \
 
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
@@ -11,7 +12,7 @@ CC = cc
 LIBFT_DIR = Libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
 RM = rm -f
-CFLAGS = -g -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -g -Wall -Wextra -Werror #-fsanitize=address
 LDFLAGS = -lreadline
 
 all: ${NAME}

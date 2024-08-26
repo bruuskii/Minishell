@@ -1,75 +1,86 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_free_utils.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/26 18:45:51 by ainouni           #+#    #+#             */
+/*   Updated: 2024/08/26 18:53:56 by ainouni          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-void    Delete_env()
+void	delete_env(void)
 {
-    t_env   *env;
-    t_env   *tmp;
+	t_env	*env;
+	t_env	*tmp;
 
-    env = g_exec->env; 
-    while (env && env->next)
-    {
-        tmp = env;
-        env = env->next;
-        Delete_env_Node(&g_exec->env, tmp);
-    }
+	env = g_exec->env;
+	while (env && env->next)
+	{
+		tmp = env;
+		env = env->next;
+		delete_env_node(&g_exec->env, tmp);
+	}
 }
-
 
 void	free_db_arr(char **arr)
 {
-	int i;
+	int	i;
 
-    i = 0;
-    if (arr != NULL)
-    {
-	    while (arr[i])
-	    {
-		    if (arr[i])
-			    free(arr[i]);
-		    i++;
-	    }
-    free(arr);
-    }
+	i = 0;
+	if (arr != NULL)
+	{
+		while (arr[i])
+		{
+			if (arr[i])
+				free(arr[i]);
+			i++;
+		}
+		free(arr);
+	}
 }
 
-void    Delete_cmds_node()
+void	delete_cmds_node(void)
 {
-    t_cmd *tmp;
-    t_cmd  *cmd;
+	t_cmd	*tmp;
+	t_cmd	*cmd;
 
-    cmd = g_exec->cmd;
-    while (cmd && cmd->next)
-    {
-        tmp = cmd;
-        cmd = cmd->next;
-        Delete_cmd_Node(&g_exec->cmd, tmp);
-    }
+	cmd = g_exec->cmd;
+	while (cmd && cmd->next)
+	{
+		tmp = cmd;
+		cmd = cmd->next;
+		delete_cmd_node(&g_exec->cmd, tmp);
+	}
 }
 
-void    Delete_tokens()
+void	delete_tokens(void)
 {
-    t_token *token;
-    t_token *tmp;
+	t_token	*token;
+	t_token	*tmp;
 
-    token = g_exec->tokens;
-    while (token && token->next)
-    {
-        tmp = token;
-        token = token->next;
-        Delete_token_Node(&g_exec->tokens, tmp);
-    }
+	token = g_exec->tokens;
+	while (token && token->next)
+	{
+		tmp = token;
+		token = token->next;
+		delete_token_node(&g_exec->tokens, tmp);
+	}
 }
 
-void Delete_fd_Nodes(t_filedescriptiom **src)
+void	delete_fd_nodes(t_filedescriptiom **src)
 {
-    t_filedescriptiom *tmp;
-    t_filedescriptiom *fd;
+	t_filedescriptiom	*tmp;
+	t_filedescriptiom	*fd;
 
-    fd = (*src);
-    while (fd && fd->next)
-    {
-        tmp = fd;
-        fd = fd->next;
-        Delete_fd_Node(src, tmp);
-    }
+	fd = (*src);
+	while (fd && fd->next)
+	{
+		tmp = fd;
+		fd = fd->next;
+		delete_fd_node(src, tmp);
+	}
 }

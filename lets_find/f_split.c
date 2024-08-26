@@ -191,8 +191,7 @@ static void	skip_spaces(const char *str, int *i)
 		(*i)++;
 }
 
-static int	process_space(const char *str, int *i, char **result,
-		int *index)
+static int	process_space(const char *str, int *i, char **result, int *index)
 {
 	if (str[*i] && is_space(str[*i]))
 	{
