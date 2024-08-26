@@ -147,5 +147,6 @@ char				*get_path(char *cmd);
 int					heredoc(char *delimeter, int fd);
 char	            **init_env_arr();
 void 				handle_sigint();
+void 				cleanup_commands(t_cmd *cmd_head);
 
 #endif

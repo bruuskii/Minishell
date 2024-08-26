@@ -105,10 +105,10 @@ static char	*append_char(char *final, char c)
 	return (temp);
 }
 
-static char	*handle_dollar_sign(char *final, t_token *token, t_env *env, int *i)
+static char	*handle_dollar_sign(char *final, t_token *token, t_env *env, size_t *i)
 {
 	char	dest[100];
-	int		j;
+	size_t	j;
 
 	(*i)++;
 	if (token->token[*i] == '?')
@@ -123,7 +123,7 @@ static char	*handle_dollar_sign(char *final, t_token *token, t_env *env, int *i)
 		while (token->token[*i] != '$' && token->token[*i] != '\0'
 			&& token->token[*i] != ' ' && token->token[*i] != '\''
 			&& token->token[*i] != '"' && token->token[*i] != '?'
-			&& j < (int) sizeof(dest) - 1)
+			&& j < sizeof(dest) - 1)
 		{
 			dest[j++] = token->token[(*i)++];
 		}
@@ -141,7 +141,7 @@ static void	update_quote_status(char c, int *in_s_quote, int *in_d_quote)
 		*in_d_quote = !(*in_d_quote);
 }
 
-static char	*process_char(char *final, t_token *token, t_env *env, int *i)
+static char	*process_char(char *final, t_token *token, t_env *env, size_t *i)
 {
 	if (token->token[*i] == '$' && token->token[*i + 1] != '\0')
 		final = handle_dollar_sign(final, token, env, i);
@@ -153,9 +153,10 @@ static char	*process_char(char *final, t_token *token, t_env *env, int *i)
 static char	*process_token(t_token *token, t_env *env)
 {
 	char	*final;
-	int		i;
+	size_t	i;
 	int		in_s_quote;
 	int		in_d_quote;
+	size_t	token_len;
 
 	final = ft_strdup("");
 	if (!final)
@@ -163,7 +164,8 @@ static char	*process_token(t_token *token, t_env *env)
 	i = 0;
 	in_s_quote = 0;
 	in_d_quote = 0;
-	while (token->token[i])
+	token_len = ft_strlen(token->token);
+	while (i < token_len)
 	{
 		update_quote_status(token->token[i], &in_s_quote, &in_d_quote);
 		if (!in_s_quote)

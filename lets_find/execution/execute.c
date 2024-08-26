@@ -614,3 +614,41 @@ void execute(t_exec *exec)
 //     }
 //     free_exec(0);
 // }
+
+
+void	free_cmd(t_cmd *cmd)
+{
+	int	i;
+
+	if (!cmd)
+		return;
+
+	if (cmd->cmd)
+	{
+		for (i = 0; cmd->cmd[i]; i++)
+			free(cmd->cmd[i]);
+		free(cmd->cmd);
+	}
+
+	// Free other members of t_cmd as needed
+	// For example:
+	// free_filedescriptiom(cmd->infile);
+	// free_filedescriptiom(cmd->outfile);
+
+	free(cmd);
+}
+void cleanup_commands(t_cmd *cmd_head)
+{
+    t_cmd *current;
+    t_cmd *next;
+
+    current = cmd_head;
+    while (current)
+    {
+        next = current->next;
+        free_cmd(current);
+        current = next;
+    }
+}
+
+// At the end of your execute function
