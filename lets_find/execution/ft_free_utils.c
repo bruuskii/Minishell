@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:51 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 18:53:56 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/27 18:17:37 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	delete_env(void)
 	t_env	*tmp;
 
 	env = g_exec->env;
-	while (env && env->next)
+	while (env)
 	{
 		tmp = env;
 		env = env->next;
@@ -49,7 +49,7 @@ void	delete_cmds_node(void)
 	t_cmd	*cmd;
 
 	cmd = g_exec->cmd;
-	while (cmd && cmd->next)
+	while (cmd)
 	{
 		tmp = cmd;
 		cmd = cmd->next;
@@ -63,7 +63,7 @@ void	delete_tokens(void)
 	t_token	*tmp;
 
 	token = g_exec->tokens;
-	while (token && token->next)
+	while (token)
 	{
 		tmp = token;
 		token = token->next;
