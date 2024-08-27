@@ -260,16 +260,18 @@ void grep_type(t_token *token, int index, int is_command)
         token->type = "in";
     else if (ft_strcmp(token->token, "<<") == 0 || ft_strcmp(token->token,
             "<") == 0 || ft_strcmp(token->token, ">") == 0
-        || ft_strcmp(token->token, ">>") == 0 || ft_strcmp(token->token,
-            "$") == 0)
+        || ft_strcmp(token->token, ">>") == 0)
         token->type = "operator";
-    else if (index == 0 || is_command || (token->prev && ft_strcmp(token->prev->token, "|") == 0))
+    else if (index == 0 || is_command || (token->prev && ft_strcmp(token->prev->token, "|") == 0)
+             || (token->token[0] == '$' && (token->token[1] == '\'' || token->token[1] == '"')))
+    {
         token->type = "command";
+    }
     else if (ft_strcmp(token->token, "|") == 0)
         token->type = "pipe";
     else
         token->type = "argument";
-    
+
     printf("token , %s .. type %s\n", token->token, token->type);
 }
 

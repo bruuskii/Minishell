@@ -31,7 +31,8 @@ int	is_operator(const char *str)
 	{
 		op_len = ft_strlen(operations[k]);
 		if (ft_strncmp(str, operations[k], op_len) == 0)
-			return (op_len);
+			if (!(str[0] == '$' && (str[1] == '\'' || str[1] == '"')))
+                return (op_len);
 		k++;
 	}
 	return (0);
@@ -113,24 +114,29 @@ static char	*allocate_token(const char *str, int start, int len)
 	return (token);
 }
 
-static int	handle_quote(const char *str, int *i, char **result, int *index)
+static int  handle_quote(const char *str, int *i, char **result, int *index)
 {
-	char	quote;
-	int		start;
-	int		token_len;
+    char    quote;
+    int     start;
+    int     token_len;
 
-	quote = str[*i];
-	start = *i;
-	(*i)++;
-	while (str[*i] && str[*i] != quote)
-		(*i)++;
-	(*i)++;
-	token_len = *i - start;
-	result[*index] = allocate_token(str, start, token_len);
-	if (!result[*index])
-		return (0);
-	(*index)++;
-	return (1);
+    // Check if there's a $ before the quote
+    if (*i > 0 && str[*i - 1] == '$')
+        start = *i - 1;
+    else
+        start = *i;
+
+    quote = str[*i];
+    (*i)++;
+    while (str[*i] && str[*i] != quote)
+        (*i)++;
+    (*i)++;
+    token_len = *i - start;
+    result[*index] = allocate_token(str, start, token_len);
+    if (!result[*index])
+        return (0);
+    (*index)++;
+    return (1);
 }
 
 static int	handle_operator(const char *str, int *i, char **result, int *index)
@@ -149,21 +155,34 @@ static int	handle_operator(const char *str, int *i, char **result, int *index)
 	return (1);
 }
 
-static int	handle_word(const char *str, int *i, char **result, int *index)
+static int  handle_word(const char *str, int *i, char **result, int *index)
 {
-	int	start;
-	int	token_len;
+    int start;
+    int token_len;
 
-	start = *i;
-	while (str[*i] && !is_space(str[*i]) && !is_operator(&str[*i])
-		&& str[*i] != '"' && str[*i] != '\'')
-		(*i)++;
-	token_len = *i - start;
-	result[*index] = allocate_token(str, start, token_len);
-	if (!result[*index])
-		return (0);
-	(*index)++;
-	return (1);
+    start = *i;
+    while (str[*i] && !is_space(str[*i]) && !is_operator(&str[*i]))
+    {
+        if (str[*i] == '$' && (str[*i + 1] == '\'' || str[*i + 1] == '"'))
+        {
+            char quote = str[*i + 1];
+            *i += 2;
+            while (str[*i] && str[*i] != quote)
+                (*i)++;
+            if (str[*i])
+                (*i)++;
+        }
+        else if (str[*i] != '"' && str[*i] != '\'')
+            (*i)++;
+        else
+            break;
+    }
+    token_len = *i - start;
+    result[*index] = allocate_token(str, start, token_len);
+    if (!result[*index])
+        return (0);
+    (*index)++;
+    return (1);
 }
 
 static int	handle_space(char **result, int *index)

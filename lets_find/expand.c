@@ -112,6 +112,24 @@ static char	*handle_dollar_sign(char *final, t_token *token, t_env *env,
 	size_t	j;
 
 	(*i)++;
+	if (token->token[*i] == '\'' || token->token[*i] == '"')
+    {
+        char quote = token->token[*i];
+        final = append_char(final, '$');
+        final = append_char(final, quote);
+        (*i)++;
+        while (token->token[*i] && token->token[*i] != quote)
+        {
+            final = append_char(final, token->token[*i]);
+            (*i)++;
+        }
+        if (token->token[*i] == quote)
+        {
+            final = append_char(final, quote);
+            (*i)++;
+        }
+        return final;
+    }
 	if (token->token[*i] == '?')
 	{
 		final = handle_exit_status(final);
@@ -134,50 +152,58 @@ static char	*handle_dollar_sign(char *final, t_token *token, t_env *env,
 	return (final);
 }
 
-static void	update_quote_status(char c, int *in_s_quote, int *in_d_quote)
+static char *process_token(t_token *token, t_env *env)
 {
-	if (c == '\'' && !(*in_d_quote))
-		*in_s_quote = !(*in_s_quote);
-	else if (c == '"' && !(*in_s_quote))
-		*in_d_quote = !(*in_d_quote);
-}
+    char    *final;
+    size_t  i;
+    int     in_s_quote;
+    int     in_d_quote;
+    size_t  token_len;
 
-static char	*process_char(char *final, t_token *token, t_env *env, size_t *i)
-{
-	if (token->token[*i] == '$' && token->token[*i + 1] != '\0')
-		final = handle_dollar_sign(final, token, env, i);
-	else
-		final = append_char(final, token->token[*i]);
-	return (final);
-}
+    final = ft_strdup("");
+    if (!final)
+        return (NULL);
+    i = 0;
+    in_s_quote = 0;
+    in_d_quote = 0;
+    token_len = ft_strlen(token->token);
 
-static char	*process_token(t_token *token, t_env *env)
-{
-	char	*final;
-	size_t	i;
-	int		in_s_quote;
-	int		in_d_quote;
-	size_t	token_len;
+    // Special handling for $'...' and $"..."
+    if (token_len >= 3 && token->token[0] == '$' && 
+        (token->token[1] == '\'' || token->token[1] == '"') &&
+        ft_strcmp(token->type, "command") == 0)  // Only for command tokens
+    {
+        i = 2;  // Skip the $' or $"
+        while (i < token_len - 1)  // Don't include the closing quote
+        {
+            final = append_char(final, token->token[i]);
+            i++;
+        }
+        return final;
+    }
 
-	final = ft_strdup("");
-	if (!final)
-		return (NULL);
-	i = 0;
-	in_s_quote = 0;
-	in_d_quote = 0;
-	token_len = ft_strlen(token->token);
-	while (i < token_len)
-	{
-		update_quote_status(token->token[i], &in_s_quote, &in_d_quote);
-		if (!in_s_quote)
-			final = process_char(final, token, env, &i);
-		else
-			final = append_char(final, token->token[i]);
-		if (!final)
-			return (NULL);
-		i++;
-	}
-	return (final);
+    while (i < token_len)
+    {
+        if (token->token[i] == '\'' && !in_d_quote)
+        {
+            in_s_quote = !in_s_quote;
+            final = append_char(final, token->token[i]);
+        }
+        else if (token->token[i] == '"' && !in_s_quote)
+        {
+            in_d_quote = !in_d_quote;
+            final = append_char(final, token->token[i]);
+        }
+        else if (!in_s_quote && token->token[i] == '$' && token->token[i + 1] != '\0')
+            final = handle_dollar_sign(final, token, env, &i);
+        else
+            final = append_char(final, token->token[i]);
+
+        if (!final)
+            return (NULL);
+        i++;
+    }
+    return (final);
 }
 
 int	expand(t_token *token, t_env *env, char **str, int index)
