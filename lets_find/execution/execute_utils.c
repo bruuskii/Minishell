@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:38 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 21:43:22 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/27 18:53:01 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ void	ft_execute(t_exec_utils *exec_utils, t_cmd *cmd, t_cmd *prev)
 {
 	if (cmd->next)
 	{
-		cmd->fd = malloc(2 * sizeof(int));
 		if (pipe(cmd->fd) == -1)
 		{
 			perror("pipe error\n");

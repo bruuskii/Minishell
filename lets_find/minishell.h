@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/26 19:22:22 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/27 18:52:48 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ typedef struct s_cmd
 	struct s_filedescriptiom	*infile;
 	struct s_filedescriptiom	*outfile;
 	struct s_cmd				*next;
-	int							*fd;
+	int							fd[2];
 	int							cleanup_ready;
 }								t_cmd;
 

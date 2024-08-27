@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:54 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/27 18:46:40 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/27 18:53:18 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,26 +117,25 @@ void	delete_fd_node(t_filedescriptiom **head,
 		free(nodetodelete);
 }
 
-void	free_fdcmd()
-{
-	t_cmd	*cmd;
+// void	free_fdcmd()
+// {
+// 	t_cmd	*cmd;
 
-	cmd = g_exec->cmd;
-	while (cmd)
-	{
-		if (cmd->fd != NULL)
-		{
-			free(cmd->fd);
-			cmd->fd = NULL;
-		}
+// 	cmd = g_exec->cmd;
+// 	while (cmd)
+// 	{
+// 		if (cmd->fd != NULL)
+// 		{
+// 			free(cmd->fd);
+// 			cmd->fd = NULL;
+// 		}
 			
-		cmd = cmd->next;
-	}
-}
+// 		cmd = cmd->next;
+// 	}
+// }
 
 void	free_exec(int isexit)
 {
-	// free_fdcmd();
 	delete_cmds_node();
 	if (g_exec->paths)
 		free_db_arr(g_exec->paths);

@@ -141,7 +141,7 @@ int	main(int argc, char **argv, char **envp)
 		line = readline(prompt());
 		if (!line)
 		{
-			// free_exec(1);
+			free_exec(1);
 			break ;
 		}
 		if (ft_strlen(line) > 0)
