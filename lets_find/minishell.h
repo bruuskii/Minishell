@@ -182,5 +182,6 @@ int								getequalindex(char *cmd);
 char							*remove_char_(char *str, char c);
 t_env							*is_in_env(t_env *env, char *value_to_check);
 void							insertatend(t_env **head, t_env *node_to_add);
+void cleanup_commands(t_cmd *cmd_head);
 
 #endif
