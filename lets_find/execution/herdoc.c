@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:46:10 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 18:52:04 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/27 17:51:45 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	ft_execute_parent(int status, int exit_status, int *fileinfd, int *fd)
 	else if (exit_status == 3)
 		return (3);
 	*fileinfd = fd[0];
-	return (1);
+	return (0);
 }
 
 int	execute_herdoc(t_exec_utils *exec_utils, int *fileinfd)
@@ -87,6 +87,7 @@ int	execute_herdoc(t_exec_utils *exec_utils, int *fileinfd)
 	{
 		exec_utils->sig_rec = ft_execute_parent(status, exit_status, fileinfd,
 				fd);
+		printf("seg_rec :%d\n", exec_utils->sig_rec);
 		if (exec_utils->sig_rec == 130)
 			exec_utils->exit_state = 130;
 	}
