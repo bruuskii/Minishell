@@ -232,38 +232,45 @@ void	grep_type_space(t_token *token)
 		token->type = "space";
 }
 
-void	grep_type(t_token *token, int index, int is_command)
+void grep_type(t_token *token, int index, int is_command)
 {
-	if (ft_strcmp(token->token, " ") == 0)
-		grep_type_space(token);
-	else if ((token->prev && ft_strcmp(token->prev->token, ">") == 0)
-		|| (token->prev && ft_strcmp(token->prev->token, " ") == 0
-			&& token->prev->prev && ft_strcmp(token->prev->prev->token,
-				">") == 0) || (token->prev && ft_strcmp(token->prev->token,
-				">>") == 0) || (token->prev && ft_strcmp(token->prev->token,
-				" ") == 0 && token->prev->prev
-			&& ft_strcmp(token->prev->prev->token, ">>") == 0))
-		token->type = "out";
-	else if ((token->prev && ft_strcmp(token->prev->token, "<") == 0)
-		|| (token->prev && ft_strcmp(token->prev->token, " ") == 0
-			&& token->prev->prev && ft_strcmp(token->prev->prev->token,
-				"<") == 0) || (token->prev && ft_strcmp(token->prev->token,
-				"<<") == 0) || (token->prev && ft_strcmp(token->prev->token,
-				" ") == 0 && token->prev->prev
-			&& ft_strcmp(token->prev->prev->token, "<<") == 0))
-		token->type = "in";
-	else if (ft_strcmp(token->token, "<<") == 0 || ft_strcmp(token->token,
-			"<") == 0 || ft_strcmp(token->token, ">") == 0
-		|| ft_strcmp(token->token, ">>") == 0 || ft_strcmp(token->token,
-			"$") == 0)
-		token->type = "operator";
-	else if (index == 0 || is_command)
-		token->type = "command";
-	else if (ft_strcmp(token->token, "|") == 0)
-		token->type = "pipe";
-	else
-		token->type = "argument";
-	printf("token , %s .. type %s\n", token->token, token->type);
+    if (ft_strcmp(token->token, " ") == 0)
+    {
+        if (token->prev && (ft_strcmp(token->prev->type, "command") == 0 || 
+            ft_strcmp(token->prev->type, "pipe") == 0))
+            token->type = "space";
+        else
+            grep_type_space(token);
+    }
+    else if ((token->prev && ft_strcmp(token->prev->token, ">") == 0)
+        || (token->prev && ft_strcmp(token->prev->token, " ") == 0
+            && token->prev->prev && ft_strcmp(token->prev->prev->token,
+                ">") == 0) || (token->prev && ft_strcmp(token->prev->token,
+                ">>") == 0) || (token->prev && ft_strcmp(token->prev->token,
+                " ") == 0 && token->prev->prev
+            && ft_strcmp(token->prev->prev->token, ">>") == 0))
+        token->type = "out";
+    else if ((token->prev && ft_strcmp(token->prev->token, "<") == 0)
+        || (token->prev && ft_strcmp(token->prev->token, " ") == 0
+            && token->prev->prev && ft_strcmp(token->prev->prev->token,
+                "<") == 0) || (token->prev && ft_strcmp(token->prev->token,
+                "<<") == 0) || (token->prev && ft_strcmp(token->prev->token,
+                " ") == 0 && token->prev->prev
+            && ft_strcmp(token->prev->prev->token, "<<") == 0))
+        token->type = "in";
+    else if (ft_strcmp(token->token, "<<") == 0 || ft_strcmp(token->token,
+            "<") == 0 || ft_strcmp(token->token, ">") == 0
+        || ft_strcmp(token->token, ">>") == 0 || ft_strcmp(token->token,
+            "$") == 0)
+        token->type = "operator";
+    else if (index == 0 || is_command || (token->prev && ft_strcmp(token->prev->token, "|") == 0))
+        token->type = "command";
+    else if (ft_strcmp(token->token, "|") == 0)
+        token->type = "pipe";
+    else
+        token->type = "argument";
+    
+    printf("token , %s .. type %s\n", token->token, token->type);
 }
 
 static int	is_quote(char c)
