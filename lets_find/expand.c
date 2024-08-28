@@ -139,10 +139,8 @@ static char	*handle_dollar_sign(char *final, t_token *token, t_env *env,
 	{
 		j = 0;
 		ft_memset(dest, 0, sizeof(dest));
-		while (token->token[*i] != '$' && token->token[*i] != '\0'
-			&& token->token[*i] != ' ' && token->token[*i] != '\''
-			&& token->token[*i] != '"' && token->token[*i] != '?'
-			&& j < sizeof(dest) - 1)
+		while ((token->token[*i] >= 65  && token->token[*i] <= 90)
+			|| (token->token[*i] >= 97 && token->token[*i] <= 122))
 		{
 			dest[j++] = token->token[(*i)++];
 		}

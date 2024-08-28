@@ -52,25 +52,25 @@ static int	check_operators(char *line)
 	return (1);
 }
 
-static int	count_quotes(char *line)
-{
-	int	i;
-	int	single_quotes;
-	int	double_quotes;
+// static int	count_quotes(char *line)
+// {
+// 	int	i;
+// 	int	single_quotes;
+// 	int	double_quotes;
 
-	i = 0;
-	single_quotes = 0;
-	double_quotes = 0;
-	while (line[i])
-	{
-		if (line[i] == '\'')
-			single_quotes++;
-		else if (line[i] == '"')
-			double_quotes++;
-		i++;
-	}
-	return ((single_quotes % 2 == 0) && (double_quotes % 2 == 0));
-}
+// 	i = 0;
+// 	single_quotes = 0;
+// 	double_quotes = 0;
+// 	while (line[i])
+// 	{
+// 		if (line[i] == '\'')
+// 			single_quotes++;
+// 		else if (line[i] == '"')
+// 			double_quotes++;
+// 		i++;
+// 	}
+// 	return ((single_quotes % 2 == 0) && (double_quotes % 2 == 0));
+// }
 
 int	first_parse(char *line)
 {
@@ -82,8 +82,6 @@ int	first_parse(char *line)
 	if (!check_start_end(line, len))
 		return (error_return());
 	if (!check_operators(line))
-		return (error_return());
-	if (!count_quotes(line))
 		return (error_return());
 	return (1);
 }
