@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:54 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/27 18:53:18 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/28 11:57:12 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,23 +116,6 @@ void	delete_fd_node(t_filedescriptiom **head,
 	if (nodetodelete)
 		free(nodetodelete);
 }
-
-// void	free_fdcmd()
-// {
-// 	t_cmd	*cmd;
-
-// 	cmd = g_exec->cmd;
-// 	while (cmd)
-// 	{
-// 		if (cmd->fd != NULL)
-// 		{
-// 			free(cmd->fd);
-// 			cmd->fd = NULL;
-// 		}
-			
-// 		cmd = cmd->next;
-// 	}
-// }
 
 void	free_exec(int isexit)
 {

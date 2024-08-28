@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:51 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/27 18:17:37 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/28 11:57:29 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	delete_fd_nodes(t_filedescriptiom **src)
 	t_filedescriptiom	*fd;
 
 	fd = (*src);
-	while (fd && fd->next)
+	while (fd)
 	{
 		tmp = fd;
 		fd = fd->next;

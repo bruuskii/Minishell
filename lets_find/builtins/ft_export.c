@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 19:08:57 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 19:22:22 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/28 12:00:36 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	update_in_env(t_env *temp, char *word_to_app, int isappend, char *cmd)
 	if (isappend)
 	{
 		if (!ft_strchr(temp->line, '='))
-			temp->line = ft_strjoin(temp->line, "=");
-		temp->line = ft_strjoin(temp->line, word_to_app);
+			temp->line = ft_strjoin2(temp->line, "=");
+		temp->line = ft_strjoin2(temp->line, word_to_app);
 	}
 	else
 	{
