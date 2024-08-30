@@ -170,8 +170,7 @@ int								heredoc(char *delimeter, int fd);
 char							**init_env_arr(void);
 void							handle_sigint(int test);
 void							cleanup_commands(t_cmd *cmd_head);
-int								getoutputfile(t_cmd *cmd,
-									t_exec_utils *exec_utils);
+int								getoutputfile(t_cmd *cmd);
 int								getinputfile(t_cmd *cmd,
 									t_exec_utils *exec_utils);
 int								execute_herdoc(t_exec_utils *exec_utils,

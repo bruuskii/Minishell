@@ -33,7 +33,13 @@ int	countfiles(t_filedescriptiom *files)
 {
 	t_filedescriptiom	*filetmp;
 	int					i;
-
+// printf("no fucking fike\n");
+	if (files == NULL)
+	{
+		
+		return (0);
+	}
+		
 	filetmp = files;
 	i = 0;
 	while (filetmp)

@@ -47,6 +47,7 @@ void	cd_path(char *path)
 
 	value = chdir(path);
 	cwd = getcwd(NULL, 0);
+	
 	if (!cwd)
 	{
 		ft_putstr_fd("getcwd: cannot access parent directories\n", 2);
@@ -57,6 +58,7 @@ void	cd_path(char *path)
 	{
 		ft_putstr_fd("chdir connot change directory\n", 2);
 		g_exec->exit_status = 1;
+		free(cwd);
 		return ;
 	}
 	else
@@ -64,6 +66,7 @@ void	cd_path(char *path)
 		g_exec->exit_status = 0;
 		save_old_pwd(g_exec->env);
 		save_current_pwd(g_exec->env);
+		free (cwd);
 	}
 }
 

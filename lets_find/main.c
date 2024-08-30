@@ -148,6 +148,7 @@ int	main(int argc, char **argv, char **envp)
 		{
 			add_history(line);
 			print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
+			free(line);
 			execute(g_exec);
 		}
 		free_exec(0);

@@ -27,12 +27,13 @@ t_exec	*initexec(char **env)
 	return (exec);
 }
 
-void	advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils)
+t_cmd	*advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils)
 {
-	*prev = *cmd;
+	prev = cmd;
 	cmd = cmd->next;
 	exec_utils->i++;
 	g_exec->exit_status = 1;
+	return (prev);
 }
 
 void	execute(t_exec *exec)
@@ -46,13 +47,17 @@ void	execute(t_exec *exec)
 	exec_utils = init_exec_utils(cmd);
 	while (cmd && exec_utils.i <= exec_utils.countpipes)
 	{
+		// exec_utils = init_exec_utils(cmd);
+		exec_utils.fdout = getoutputfile(cmd);
 		exec_utils.fdin = getinputfile(cmd, &exec_utils);
-		exec_utils.fdout = getoutputfile(cmd, &exec_utils);
+		// printf("gog o\n");
+		if (exec_utils.exit_state == 130)
+			break;
 		if (exec_utils.sig_rec)
 			break ;
 		if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
 		{
-			advance_cmd(cmd, prev, &exec_utils);
+			prev = advance_cmd(cmd,prev, &exec_utils);
 			continue ;
 		}
 		ft_execute(&exec_utils, cmd, prev);
