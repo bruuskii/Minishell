@@ -60,4 +60,3 @@ char	*ft_strjoin2(char *s1, char *s2)
 		return (NULL);
 	return (str);
 }
-

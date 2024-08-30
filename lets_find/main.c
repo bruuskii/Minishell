@@ -43,7 +43,7 @@ char	*prompt(void)
 void	clear_screen(char **envp)
 {
 	pid_t	pid;
-		char *clear[] = {"/usr/bin/clear", NULL};
+	char	*clear[] = {"/usr/bin/clear", NULL};
 
 	pid = fork();
 	if (pid == 0)
@@ -66,7 +66,7 @@ void	clear_screen(char **envp)
 void	ls_screen(char **envp)
 {
 	pid_t	pid;
-		char *clear[] = {"/usr/bin/ls", NULL};
+	char	*clear[] = {"/usr/bin/ls", NULL};
 
 	pid = fork();
 	if (pid == 0)
@@ -123,9 +123,9 @@ void	handle_sigint(int test)
 
 int	main(int argc, char **argv, char **envp)
 {
-	// struct sigaction	sa;
-	char				*line;
+	char	*line;
 
+	// struct sigaction	sa;
 	// sa.sa_handler = &handle_sigint;
 	// sa.sa_flags = SA_RESTART; // For Ctr C
 	signal(SIGQUIT, SIG_IGN);
@@ -151,8 +151,8 @@ int	main(int argc, char **argv, char **envp)
 			execute(g_exec);
 		}
 		free_exec(0);
-		//cleanup_commands(g_exec->cmd);
-		//g_exec->cmd = NULL;
+		// cleanup_commands(g_exec->cmd);
+		// g_exec->cmd = NULL;
 		// free(g_exec->cmd->cmd);
 		// free(g_exec->cmd);
 		// free(g_exec);

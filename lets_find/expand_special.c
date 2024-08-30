@@ -1,29 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand.c                                           :+:      :+:    :+:   */
+/*   expand_special.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/16 21:58:11 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:10:29 by izouine          ###   ########.fr       */
+/*   Created: 2024/08/30 16:41:19 by izouine           #+#    #+#             */
+/*   Updated: 2024/08/30 18:14:24 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "./Libft/libft.h"
 #include "minishell.h"
 
-int	expand(t_token *token, t_env *env, char **str, int index)
+char	*handle_special_command(t_token *token)
 {
 	char	*final;
+	size_t	i;
+	size_t	token_len;
 
-	(void)index;
-	(void)str;
-	final = process_tokennn(token, env);
+	final = ft_strdup("");
 	if (!final)
-		return (-1);
-	free(token->token);
-	token->token = ft_strdup(final);
-	free(final);
-	return (1);
+		return (NULL);
+	i = 2;
+	token_len = ft_strlen(token->token);
+	while (i < token_len - 1)
+	{
+		final = append_char(final, token->token[i]);
+		i++;
+	}
+	return (final);
+}
+
+char	*handle_quotes(char *final, char c, int *in_quote)
+{
+	*in_quote = !(*in_quote);
+	return (append_char(final, c));
 }

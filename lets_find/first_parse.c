@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:07:23 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/20 14:56:16 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/30 18:07:25 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,26 +52,6 @@ static int	check_operators(char *line)
 	return (1);
 }
 
-// static int	count_quotes(char *line)
-// {
-// 	int	i;
-// 	int	single_quotes;
-// 	int	double_quotes;
-
-// 	i = 0;
-// 	single_quotes = 0;
-// 	double_quotes = 0;
-// 	while (line[i])
-// 	{
-// 		if (line[i] == '\'')
-// 			single_quotes++;
-// 		else if (line[i] == '"')
-// 			double_quotes++;
-// 		i++;
-// 	}
-// 	return ((single_quotes % 2 == 0) && (double_quotes % 2 == 0));
-// }
-
 int	first_parse(char *line)
 {
 	int	len;
@@ -97,6 +77,5 @@ int	check_outfiles(char *str, int index)
 {
 	if (str[index] == '>' && str[index + 1] == '>' && str[index + 2] == '>')
 		return (1);
-	// g_exec->exit_status = 2;
 	return (0);
 }

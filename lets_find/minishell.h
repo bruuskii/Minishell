@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/27 18:52:48 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/30 17:08:14 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,22 @@ typedef struct s_token
 	struct s_token				*next;
 	struct s_token				*prev;
 }								t_token;
+
+typedef struct s_process_info
+{
+	size_t						i;
+	int							in_s_quote;
+	int							in_d_quote;
+	size_t						token_len;
+}								t_process_info;
+
+typedef struct s_token_info
+{
+	const char					*str;
+	int							*i;
+	char						**result;
+	int							*index;
+}								t_token_info;
 
 typedef struct s_env
 {
@@ -182,6 +198,140 @@ int								getequalindex(char *cmd);
 char							*remove_char_(char *str, char c);
 t_env							*is_in_env(t_env *env, char *value_to_check);
 void							insertatend(t_env **head, t_env *node_to_add);
-void cleanup_commands(t_cmd *cmd_head);
+void							cleanup_commands(t_cmd *cmd_head);
+char							**split_string(const char *str);
 
+// f_split_utils.c
+int								is_space(char c);
+int								is_operator(const char *str);
+char							*allocate_token(const char *str, int start,
+									int len);
+void							skip_spacess(const char *str, int *i);
+
+// f_split_count.c
+int								count_tokens(const char *str);
+
+// f_split_process.c
+int								process_tokenn(t_token_info *info);
+int								process_space(t_token_info *info);
+
+// f_split_handlers.c
+int								handle_quote(t_token_info *info);
+int								handle_operator(t_token_info *info);
+int								handle_word(t_token_info *info);
+int								handle_space(t_token_info *info);
+
+t_cmd							*parse_every_command(t_token *token);
+
+// Utility functions
+t_cmd							*init_new_cmd(void);
+int								count_args(t_token *token);
+void							skip_spaces(t_token **token);
+void							free_cmd(t_cmd *cmd);
+
+// File descriptor functions
+t_filedescriptiom				*create_file_desc(t_token *token);
+void							add_file_to_cmd(t_cmd *cmd,
+									t_filedescriptiom *new_file, int is_infile);
+
+// Token processing functions
+t_filedescriptiom				*process_operator(t_token **token,
+									int is_heredoc, int is_append);
+int								process_command_or_argument(t_cmd *new_cmd,
+									t_token **token, int *i);
+int								process_operator_token(t_cmd *new_cmd,
+									t_token **token);
+int								process_token(t_cmd *new_cmd, t_token **token,
+									int *i);
+
+// Command parsing functions
+t_cmd							*allocate_new_cmd(int nbr_of_args);
+t_cmd							*parse_command_tokens(t_cmd *new_cmd,
+									t_token **token);
+t_cmd							*parse_command(t_token **token);
+
+int								expand(t_token *token, t_env *env, char **str,
+									int index);
+
+// Helper functions
+char							*handle_exit_status(char *final);
+char							*copy_env_value(char *final, const char *path);
+char							*handle_env_variable(char *final, char *dest,
+									t_env *env);
+char							*append_char(char *final, char c);
+
+// Dollar sign handling
+char							*handle_dollar_quote(char *final,
+									t_token *token, size_t *i);
+char							*handle_dollar_var(char *final, t_token *token,
+									t_env *env, size_t *i);
+char							*handle_dollar_sign(char *final, t_token *token,
+									t_env *env, size_t *i);
+
+// Special cases
+char							*handle_special_command(t_token *token);
+char							*handle_quotes(char *final, char c,
+									int *in_quote);
+
+// Processing functions
+char							*process_char(char *final, t_token *token,
+									t_env *env, t_process_info *info);
+char							*process_token_loop(t_token *token, t_env *env,
+									char *final);
+char							*process_tokennn(t_token *token, t_env *env);
+
+// Main functions
+t_env							*init_env(char **str);
+void							print_env(t_env *env, int isexport);
+void							increment_shell_level(t_env *env);
+void							save_old_pwd(t_env *env);
+void							save_current_pwd(t_env *env);
+
+// Helper functions
+t_env							*create_env_node(char *str);
+void							free_env_list(t_env *head);
+t_env							*add_env_node(t_env **head, t_env **prev,
+									char *str);
+void							printf_dq_after(char *cmd, char c);
+void							update_shlvl(t_env *env,
+									const char *shlvl_prefix);
+char							*find_pwd(t_env *env);
+void							update_oldpwd(t_env *env, char *pwd);
+
+int								parse_every_word(char **tokens);
+t_token							*tokenize_input(char **tokens, t_env *env);
+int								print_type(char *str, t_env *env,
+									t_token **token, t_cmd **cmd);
+
+// Token processing functions
+void							grep_type(t_token *token, int index,
+									int is_command);
+char							*double_quotes(char *token);
+
+// Helper functions
+void							free_string_array(char **arr);
+void							free_tokens(t_token *head);
+t_token							*create_new_token(char *token_str,
+									int args_nbr);
+void							update_args_and_command(t_token *current,
+									int index, int *args_nbr, int *is_command);
+void							processs_token(t_token *current, t_env *env,
+									char **tokens, int index);
+void							link_tokens(t_token **head, t_token **current,
+									t_token *new_token);
+int								initialize_print_type(char *str,
+									char ***tokens);
+int								finalize_print_type(t_token *head, t_cmd **cmd);
+void							grep_type_space(t_token *token);
+int								is_quote(char c);
+
+// Additional helper functions (to be implemented in separate files)
+int								is_output_redirection(t_token *token);
+int								is_input_redirection(t_token *token);
+int								is_token_operator(t_token *token);
+int								is_token_command(t_token *token, int index,
+									int is_command);
+
+void							process_quote(char c, char *current_quote);
+int								check_quotes(char *token, char *current_quote);
 #endif

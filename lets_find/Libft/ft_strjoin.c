@@ -46,7 +46,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (s1 && s2)
 	{
 		len = len_str(s1) + len_str(s2);
-		str = (char *) malloc (len + 1);
+		str = (char *)malloc(len + 1);
 		if (!str)
 			return (NULL);
 		str[0] = '\0';
