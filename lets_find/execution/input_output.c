@@ -54,7 +54,7 @@ int	getinputfile(t_cmd *cmd, t_exec_utils *exec_utils)
 	{
 		if (get_last_infile(exec_utils, &fileinfd, &tmpfderror) == -1)
 			g_exec->exit_status = 1;
-		if  (exec_utils->exit_state == 130)
+		if (exec_utils->exit_state == 130)
 			return (130);
 		exec_utils->file = exec_utils->file->next;
 		i++;

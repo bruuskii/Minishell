@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:45 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 18:54:17 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/30 20:41:00 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,11 @@ int	countfiles(t_filedescriptiom *files)
 {
 	t_filedescriptiom	*filetmp;
 	int					i;
-// printf("no fucking fike\n");
+
 	if (files == NULL)
 	{
-		
 		return (0);
 	}
-		
 	filetmp = files;
 	i = 0;
 	while (filetmp)
