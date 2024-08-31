@@ -28,7 +28,6 @@ int	get_last_infile(t_exec_utils *exec_utils, int *fileinfd, int *tmpfderror)
 		*fileinfd = open(exec_utils->file->filename, O_RDONLY, 0777);
 		if (*fileinfd == -1)
 		{
-			ft_putstr_fd("no sush file or directory\n", 2);
 			*tmpfderror = *fileinfd;
 			return (-1);
 		}
@@ -54,8 +53,6 @@ int	getinputfile(t_cmd *cmd, t_exec_utils *exec_utils)
 	{
 		if (get_last_infile(exec_utils, &fileinfd, &tmpfderror) == -1)
 			g_exec->exit_status = 1;
-		if (exec_utils->exit_state == 130)
-			return (130);
 		exec_utils->file = exec_utils->file->next;
 		i++;
 	}
@@ -88,7 +85,7 @@ int	get_lastoutfile(t_filedescriptiom *file, int *fd, int size)
 	return (i);
 }
 
-int	getoutputfile(t_cmd *cmd)
+int	getoutputfile(t_cmd *cmd, t_exec_utils *exec_utils)
 {
 	int	fileoutfd;
 	int	size;
@@ -96,14 +93,14 @@ int	getoutputfile(t_cmd *cmd)
 	int	*fd;
 
 	i = 0;
-	size = 0;
-	if (cmd->outfile == NULL)
-		return (STDOUT_FILENO);
 	size = countfiles(cmd->outfile);
+	exec_utils->file = cmd->outfile;
+	if (!size)
+		return (STDOUT_FILENO);
 	fd = malloc(size * sizeof(int));
 	if (!fd)
 		return (0);
-	i = get_lastoutfile(cmd->outfile, fd, size);
+	i = get_lastoutfile(exec_utils->file, fd, size);
 	if (i == -1)
 	{
 		free(fd);

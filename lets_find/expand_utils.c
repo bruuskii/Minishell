@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand_helpers.c                                   :+:      :+:    :+:   */
+/*   expand_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 16:41:40 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:06:55 by izouine          ###   ########.fr       */
+/*   Created: 2024/08/31 11:39:49 by izouine           #+#    #+#             */
+/*   Updated: 2024/08/31 12:06:50 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,4 +103,25 @@ char	*append_char(char *final, char c)
 	temp[len + 1] = '\0';
 	free(final);
 	return (temp);
+}
+
+char	*handle_quoted_dollar(char *final, t_token *token, size_t *i)
+{
+	char	quote;
+
+	quote = token->token[*i];
+	final = append_char(final, '$');
+	final = append_char(final, quote);
+	(*i)++;
+	while (token->token[*i] && token->token[*i] != quote)
+	{
+		final = append_char(final, token->token[*i]);
+		(*i)++;
+	}
+	if (token->token[*i] == quote)
+	{
+		final = append_char(final, quote);
+		(*i)++;
+	}
+	return (final);
 }

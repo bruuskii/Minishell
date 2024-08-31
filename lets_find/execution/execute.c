@@ -6,7 +6,7 @@
 /*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:18 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/30 20:43:32 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/08/26 19:19:19 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,12 @@ t_exec	*initexec(char **env)
 	return (exec);
 }
 
-t_cmd	*advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils,
-		int iserror)
+void	advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils)
 {
-	prev = cmd;
+	*prev = *cmd;
 	cmd = cmd->next;
 	exec_utils->i++;
-	g_exec->exit_status = iserror;
-	return (prev);
+	g_exec->exit_status = 1;
 }
 
 void	execute(t_exec *exec)
@@ -48,19 +46,19 @@ void	execute(t_exec *exec)
 	exec_utils = init_exec_utils(cmd);
 	while (cmd && exec_utils.i <= exec_utils.countpipes)
 	{
-		exec_utils.fdout = getoutputfile(cmd);
 		exec_utils.fdin = getinputfile(cmd, &exec_utils);
-		if (exec_utils.exit_state == 130)
-			break ;
+		exec_utils.fdout = getoutputfile(cmd, &exec_utils);
 		if (exec_utils.sig_rec)
 			break ;
 		if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
 		{
-			prev = advance_cmd(cmd, prev, &exec_utils, 1);
+			advance_cmd(cmd, prev, &exec_utils);
 			continue ;
 		}
 		ft_execute(&exec_utils, cmd, prev);
-		advance_cmd(cmd, prev, &exec_utils, 0);
+		prev = cmd;
+		cmd = cmd->next;
+		exec_utils.i++;
 	}
 	get_exitstatus(exec_utils);
 	free_exec(0);

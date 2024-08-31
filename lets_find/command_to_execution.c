@@ -6,11 +6,43 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:15:00 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:05:50 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/31 11:56:24 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	cleanup_cmd(t_cmd *cmd)
+{
+	if (cmd)
+	{
+		if (cmd->cmd)
+			free(cmd->cmd);
+		free(cmd);
+	}
+}
+
+t_cmd	*parse_command_cmd(t_token **token)
+{
+	t_cmd	*new_cmd;
+	int		nbr_of_args;
+
+	new_cmd = init_new_cmd();
+	if (!new_cmd)
+		return (NULL);
+	nbr_of_args = count_args_cmd(*token);
+	if (!allocate_cmd_array(new_cmd, nbr_of_args))
+	{
+		cleanup_cmd(new_cmd);
+		return (NULL);
+	}
+	if (!process_cmd_tokens(new_cmd, token))
+	{
+		cleanup_cmd(new_cmd);
+		return (NULL);
+	}
+	return (new_cmd);
+}
 
 t_cmd	*parse_every_command(t_token *token)
 {
@@ -22,7 +54,7 @@ t_cmd	*parse_every_command(t_token *token)
 	cmd_current = NULL;
 	while (token)
 	{
-		new_cmd = parse_command(&token);
+		new_cmd = parse_command_cmd(&token);
 		if (!new_cmd)
 		{
 			free(new_cmd->cmd);

@@ -32,7 +32,6 @@ int	heredoc(char *delimeter, int fd)
 		tmp = readline("");
 		if (ft_heredoc(delimeter, fd, tmp) == 0)
 			break ;
-		free(tmp);
 	}
 	free(tmp);
 	exit(0);

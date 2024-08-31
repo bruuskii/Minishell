@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_utils.c                                    :+:      :+:    :+:   */
+/*   token_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
+/*   By: your_username <your_email@student.42.fr>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 16:59:39 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:15:48 by izouine          ###   ########.fr       */
+/*   Created: 2023/08/18 10:00:00 by your_username    #+#    #+#             */
+/*   Updated: 2023/08/18 10:00:00 by your_username   ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,37 +59,37 @@ t_token	*create_new_token(char *token_str, int args_nbr)
 	return (new_token);
 }
 
-void	update_args_and_command(t_token *current, int index, int *args_nbr,
-		int *is_command)
+void	link_tokens(t_token **head, t_token **current, t_token *new_token)
 {
-	if (ft_strcmp(current->type, "pipe") != 0 && index != 0
-		&& ft_strcmp(current->type, "argument") == 0)
-	{
-		(*args_nbr)++;
-		current->nbr_of_args = *args_nbr;
-	}
-	if (ft_strcmp(current->type, "pipe") == 0)
-	{
-		*is_command = 1;
-		*args_nbr = 0;
-	}
+	if (*current)
+		(*current)->next = new_token;
 	else
-		*is_command = 0;
+		*head = new_token;
+	new_token->prev = *current;
+	*current = new_token;
 }
 
-void	processs_token(t_token *current, t_env *env, char **tokens, int index)
+t_token	*tokenize_input_helper(char **tokens, t_env *env)
 {
-	static int	args_nbr = 0;
-	static int	is_command = 1;
-	char		*processed_token;
+	int		index;
+	t_token	*head;
+	t_token	*current;
+	t_token	*new_token;
 
-	grep_type(current, index, is_command);
-	expand(current, env, tokens, index);
-	processed_token = double_quotes(current->token);
-	if (processed_token)
+	index = 0;
+	head = NULL;
+	current = NULL;
+	while (tokens && tokens[index])
 	{
-		free(current->token);
-		current->token = processed_token;
+		new_token = create_new_token(tokens[index], 0);
+		if (!new_token)
+		{
+			free_tokens(head);
+			return (NULL);
+		}
+		link_tokens(&head, &current, new_token);
+		processs_token(current, env, tokens, index);
+		index++;
 	}
-	update_args_and_command(current, index, &args_nbr, &is_command);
+	return (head);
 }

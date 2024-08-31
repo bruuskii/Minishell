@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:33:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 17:08:14 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/31 13:00:44 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,22 +39,6 @@ typedef struct s_token
 	struct s_token				*next;
 	struct s_token				*prev;
 }								t_token;
-
-typedef struct s_process_info
-{
-	size_t						i;
-	int							in_s_quote;
-	int							in_d_quote;
-	size_t						token_len;
-}								t_process_info;
-
-typedef struct s_token_info
-{
-	const char					*str;
-	int							*i;
-	char						**result;
-	int							*index;
-}								t_token_info;
 
 typedef struct s_env
 {
@@ -115,28 +99,113 @@ typedef struct s_exec
 	int							herdoc_sig;
 }								t_exec;
 
+typedef struct s_token_info
+{
+	char						**result;
+	int							*index;
+	int							start;
+	int							*i;
+}								t_token_info;
+
 extern t_exec					*g_exec;
 
-char							**split_string(const char *str);
-int								is_operator(const char *str);
-int								parse_every_word(char **tokens);
-char							*double_quotes(char *tokens);
+int	handle_operator(t_cmd *new_cmd, t_token **token);
+int	process_token_cmd(t_cmd *new_cmd, t_token **token, int *i);
+int	allocate_cmd_array(t_cmd *new_cmd, int nbr_of_args);
+int	process_cmd_tokens(t_cmd *new_cmd, t_token **token);
+t_cmd	*init_new_cmd(void);
+int	count_args_cmd(t_token *token);
+t_filedescriptiom	*create_file_desc(t_token *token);
+void	add_file_to_cmd(t_cmd *cmd, t_filedescriptiom *new_file, int is_infile);
+int	handle_command_argument(t_cmd *new_cmd, t_token *token, int *i);
+void	cleanup_cmd(t_cmd *cmd);
+t_cmd	*parse_command_cmd(t_token **token);
+t_cmd	*parse_every_command(t_token *token);
+t_env	*create_env_node(char *str);
+void	free_env_list(t_env *head);
+t_env	*add_env_node(t_env **head, t_env **prev, char *str);
+t_env	*init_env(char **str);
+void	printf_dq_after(char *cmd, char c);
+void	print_env(t_env *env, int isexport);
+void	update_shlvl(t_env *env, const char *shlvl_prefix);
+void	increment_shell_level(t_env *env);
+char	*find_pwd(t_env *env);
+void	update_oldpwd(t_env *env, char *pwd);
+void	save_old_pwd(t_env *env);
+void	save_current_pwd(t_env *env);
+char	*handle_env_var(char *final, t_token *token, t_env *env, size_t *i);
+char	*handle_dollar_sign(char *final, t_token *token, t_env *env, size_t *i);
+char	*handle_special_command(t_token *token);
+int	is_special_command(t_token *token);
+char	*handle_regular_char(char *final, t_token *token, size_t *i,
+		int *quotes);
+char	*handle_exit_status(char *final);
+char	*copy_env_value(char *final, const char *path);
+char	*handle_env_variable(char *final, char *dest, t_env *env);
+char	*append_char(char *final, char c);
+char	*handle_quoted_dollar(char *final, t_token *token, size_t *i);
+char	*process_token_loop(t_token *token, t_env *env, char *final);
+char	*process_token_expand(t_token *token, t_env *env);
+int	expand(t_token *token, t_env *env, char **str, int index);
+int	is_space_split(char c);
+int	is_operator_split(const char *str);
+int	count_quote_token(const char *str, int *i, int len);
+int	count_operator_token(const char *str, int *i);
+int	count_word_token(const char *str, int *i, int len);
+int	count_tokens_helper(const char *str, int len);
+int	count_tokens_split(const char *str);
+int	handle_quote_split(const char *str, int *i, char **result, int *index);
+int	handle_operator_split(const char *str, int *i, char **result, int *index);
+int	handle_quoted_substring(const char *str, int *i, char quote);
+int	handle_dollar_quote(const char *str, int *i);
+int	advance_to_end_of_word(const char *str, int *i);
+int	handle_word(const char *str, int *i, char **result, int *index);
+int	handle_space(char **result, int *index);
+void	skip_spaces(const char *str, int *i);
+int	process_token_split(const char *str, int *i, char **result, int *index);
+int	process_space(const char *str, int *i, char **result, int *index);
+char	**init_result(int token_count);
+int	split_string_loop(const char *str, char **result);
+void	free_result(char **result);
+char	**split_string_helper(const char *str, int token_count);
+char	**split_string(const char *str);
+int	check_start_end(char *line, int len);
+int	check_operators(char *line);
+int	first_parse(char *line);
+int	error_return(void);
+int	check_outfiles(char *str, int index);
+void	process_quote(char c, char *current_quote);
+int	check_quotes(char *token, char *current_quote);
+int	parse_every_word(char **tokens);
+int	is_quote(char c);
+void	grep_type_space(t_token *token);
+int	is_redirect_out(t_token *token);
+int	is_redirect_in(t_token *token);
+int	iss_operator(char *token);
+int	is_command_token(t_token *token, int index, int is_command);
+void	processs_token(t_token *current, t_env *env, char **tokens, int index);
+t_token	*tokenize_input(char **tokens, t_env *env);
+void	grep_type(t_token *token, int index, int is_command);
+void	free_string_array(char **arr);
+void	free_tokens(t_token *head);
+t_token	*create_new_token(char *token_str, int args_nbr);
+void	link_tokens(t_token **head, t_token **current, t_token *new_token);
+t_token	*tokenize_input_helper(char **tokens, t_env *env);
+int	tokenize_and_parse(char **tokens, t_env *env, t_token **head, t_cmd **cmd);
+int	process_tokens(char *str, t_env *env, t_token **token, t_cmd **cmd);
+int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd);
+void	handle_quotes_and_args(t_token *current, int *args_nbr, int index);
+void	update_command_status(t_token *current, int *is_command,
+		int *args_nbr);
+char	*double_quotes(char *token);
+char	*allocate_token(const char *str, int start, int len);
+
+
+
+
+
 int								cd(char **cmd);
-void							print_env(t_env *env, int isexport);
-t_env							*init_env(char **str);
-void							increment_shell_level(t_env *env);
 char							*ft_itoa(int n);
-void							save_old_pwd(t_env *env);
-void							save_current_pwd(t_env *env);
-void							grep_type(t_token *token, int index,
-									int command);
-t_cmd							*parse_every_command(t_token *token);
-int								print_type(char *str, t_env *env,
-									t_token **token, t_cmd **cmd);
-int								expand(t_token *token, t_env *env, char **str,
-									int index);
-int								first_parse(char *line);
-int								error_return(void);
 int								check_outfiles(char *str, int index);
 void							insertatend(t_env **head, t_env *node_to_add);
 void							delete_env_node(t_env **head,
@@ -170,7 +239,7 @@ int								heredoc(char *delimeter, int fd);
 char							**init_env_arr(void);
 void							handle_sigint(int test);
 void							cleanup_commands(t_cmd *cmd_head);
-int								getoutputfile(t_cmd *cmd);
+int								getoutputfile(t_cmd *cmd, t_exec_utils *exec_utils);
 int								getinputfile(t_cmd *cmd,
 									t_exec_utils *exec_utils);
 int								execute_herdoc(t_exec_utils *exec_utils,
@@ -198,139 +267,5 @@ char							*remove_char_(char *str, char c);
 t_env							*is_in_env(t_env *env, char *value_to_check);
 void							insertatend(t_env **head, t_env *node_to_add);
 void							cleanup_commands(t_cmd *cmd_head);
-char							**split_string(const char *str);
 
-// f_split_utils.c
-int								is_space(char c);
-int								is_operator(const char *str);
-char							*allocate_token(const char *str, int start,
-									int len);
-void							skip_spacess(const char *str, int *i);
-
-// f_split_count.c
-int								count_tokens(const char *str);
-
-// f_split_process.c
-int								process_tokenn(t_token_info *info);
-int								process_space(t_token_info *info);
-
-// f_split_handlers.c
-int								handle_quote(t_token_info *info);
-int								handle_operator(t_token_info *info);
-int								handle_word(t_token_info *info);
-int								handle_space(t_token_info *info);
-
-t_cmd							*parse_every_command(t_token *token);
-
-// Utility functions
-t_cmd							*init_new_cmd(void);
-int								count_args(t_token *token);
-void							skip_spaces(t_token **token);
-void							free_cmd(t_cmd *cmd);
-
-// File descriptor functions
-t_filedescriptiom				*create_file_desc(t_token *token);
-void							add_file_to_cmd(t_cmd *cmd,
-									t_filedescriptiom *new_file, int is_infile);
-
-// Token processing functions
-t_filedescriptiom				*process_operator(t_token **token,
-									int is_heredoc, int is_append);
-int								process_command_or_argument(t_cmd *new_cmd,
-									t_token **token, int *i);
-int								process_operator_token(t_cmd *new_cmd,
-									t_token **token);
-int								process_token(t_cmd *new_cmd, t_token **token,
-									int *i);
-
-// Command parsing functions
-t_cmd							*allocate_new_cmd(int nbr_of_args);
-t_cmd							*parse_command_tokens(t_cmd *new_cmd,
-									t_token **token);
-t_cmd							*parse_command(t_token **token);
-
-int								expand(t_token *token, t_env *env, char **str,
-									int index);
-
-// Helper functions
-char							*handle_exit_status(char *final);
-char							*copy_env_value(char *final, const char *path);
-char							*handle_env_variable(char *final, char *dest,
-									t_env *env);
-char							*append_char(char *final, char c);
-
-// Dollar sign handling
-char							*handle_dollar_quote(char *final,
-									t_token *token, size_t *i);
-char							*handle_dollar_var(char *final, t_token *token,
-									t_env *env, size_t *i);
-char							*handle_dollar_sign(char *final, t_token *token,
-									t_env *env, size_t *i);
-
-// Special cases
-char							*handle_special_command(t_token *token);
-char							*handle_quotes(char *final, char c,
-									int *in_quote);
-
-// Processing functions
-char							*process_char(char *final, t_token *token,
-									t_env *env, t_process_info *info);
-char							*process_token_loop(t_token *token, t_env *env,
-									char *final);
-char							*process_tokennn(t_token *token, t_env *env);
-
-// Main functions
-t_env							*init_env(char **str);
-void							print_env(t_env *env, int isexport);
-void							increment_shell_level(t_env *env);
-void							save_old_pwd(t_env *env);
-void							save_current_pwd(t_env *env);
-
-// Helper functions
-t_env							*create_env_node(char *str);
-void							free_env_list(t_env *head);
-t_env							*add_env_node(t_env **head, t_env **prev,
-									char *str);
-void							printf_dq_after(char *cmd, char c);
-void							update_shlvl(t_env *env,
-									const char *shlvl_prefix);
-char							*find_pwd(t_env *env);
-void							update_oldpwd(t_env *env, char *pwd);
-
-int								parse_every_word(char **tokens);
-t_token							*tokenize_input(char **tokens, t_env *env);
-int								print_type(char *str, t_env *env,
-									t_token **token, t_cmd **cmd);
-
-// Token processing functions
-void							grep_type(t_token *token, int index,
-									int is_command);
-char							*double_quotes(char *token);
-
-// Helper functions
-void							free_string_array(char **arr);
-void							free_tokens(t_token *head);
-t_token							*create_new_token(char *token_str,
-									int args_nbr);
-void							update_args_and_command(t_token *current,
-									int index, int *args_nbr, int *is_command);
-void							processs_token(t_token *current, t_env *env,
-									char **tokens, int index);
-void							link_tokens(t_token **head, t_token **current,
-									t_token *new_token);
-int								initialize_print_type(char *str,
-									char ***tokens);
-int								finalize_print_type(t_token *head, t_cmd **cmd);
-void							grep_type_space(t_token *token);
-int								is_quote(char c);
-
-// Additional helper functions (to be implemented in separate files)
-int								is_output_redirection(t_token *token);
-int								is_input_redirection(t_token *token);
-int								is_token_operator(t_token *token);
-int								is_token_command(t_token *token, int index,
-									int is_command);
-
-void							process_quote(char c, char *current_quote);
-int								check_quotes(char *token, char *current_quote);
 #endif

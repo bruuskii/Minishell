@@ -12,68 +12,77 @@
 
 #include "minishell.h"
 
-int	parse_every_word(char **tokens)
+int	tokenize_and_parse(char **tokens, t_env *env, t_token **head, t_cmd **cmd)
 {
-	int		index;
-	char	current_quote;
-	int		unclosed;
-
-	current_quote = '\0';
-	index = 0;
-	unclosed = 0;
-	while (tokens && tokens[index] != NULL)
+	*head = tokenize_input(tokens, env);
+	if (!(*head))
+		return (0);
+	*cmd = parse_every_command(*head);
+	if (!(*cmd))
 	{
-		unclosed = check_quotes(tokens[index], &current_quote);
-		index++;
-	}
-	if (unclosed)
-	{
-		ft_putstr_fd("bash: unclosed quotes\n", 2);
+		free(*cmd);
 		return (0);
 	}
 	return (1);
 }
 
-t_token	*tokenize_input(char **tokens, t_env *env)
-{
-	int		index;
-	t_token	*head;
-	t_token	*current;
-	t_token	*new_token;
-
-	index = 0;
-	head = NULL;
-	current = NULL;
-	while (tokens && tokens[index])
-	{
-		new_token = create_new_token(tokens[index], 0);
-		if (!new_token)
-		{
-			free_tokens(head);
-			return (NULL);
-		}
-		link_tokens(&head, &current, new_token);
-		processs_token(current, env, tokens, index);
-		index++;
-	}
-	return (head);
-}
-
-int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
+int	process_tokens(char *str, t_env *env, t_token **token, t_cmd **cmd)
 {
 	char	**tokens;
 	t_token	*head;
 
-	*token = NULL;
-	*cmd = NULL;
-	if (!initialize_print_type(str, &tokens))
+	tokens = split_string(str);
+	if (!tokens || !parse_every_word(tokens))
+	{
+		free_string_array(tokens);
 		return (0);
-	head = tokenize_input(tokens, env);
+	}
+	if (!tokenize_and_parse(tokens, env, &head, cmd))
+	{
+		free_string_array(tokens);
+		return (0);
+	}
 	free_string_array(tokens);
-	if (!head)
-		return (0);
-	if (!finalize_print_type(head, cmd))
-		return (0);
+	free_tokens(head);
 	*token = NULL;
 	return (1);
+}
+
+int	print_type(char *str, t_env *env, t_token **token, t_cmd **cmd)
+{
+	*token = NULL;
+	*cmd = NULL;
+	if (!str || !first_parse(str))
+		return (0);
+	return (process_tokens(str, env, token, cmd));
+}
+
+void	handle_quotes_and_args(t_token *current, int *args_nbr, int index)
+{
+	char	*processed_token;
+
+	processed_token = double_quotes(current->token);
+	if (processed_token)
+	{
+		free(current->token);
+		current->token = processed_token;
+	}
+	if (ft_strcmp(current->type, "pipe") != 0 && index != 0
+		&& ft_strcmp(current->type, "argument") == 0)
+	{
+		(*args_nbr)++;
+		current->nbr_of_args = *args_nbr;
+	}
+}
+
+void	update_command_status(t_token *current, int *is_command,
+		int *args_nbr)
+{
+	if (ft_strcmp(current->type, "pipe") == 0)
+	{
+		*is_command = 1;
+		*args_nbr = 0;
+	}
+	else
+		*is_command = 0;
 }

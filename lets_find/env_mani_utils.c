@@ -5,84 +5,32 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/30 16:51:53 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:13:49 by izouine          ###   ########.fr       */
+/*   Created: 2024/08/31 11:36:43 by izouine           #+#    #+#             */
+/*   Updated: 2024/08/31 12:04:45 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_env	*create_env_node(char *str)
+void	print_env(t_env *env, int isexport)
 {
-	t_env	*node;
-
-	node = (t_env *)malloc(sizeof(t_env));
-	if (!node)
-		return (NULL);
-	node->line = ft_strdup(str);
-	if (!node->line)
+	while (env)
 	{
-		free(node);
-		return (NULL);
-	}
-	node->next = NULL;
-	node->prev = NULL;
-	return (node);
-}
-
-void	free_env_list(t_env *head)
-{
-	t_env	*current;
-
-	while (head)
-	{
-		current = head;
-		head = head->next;
-		free(current->line);
-		free(current);
-	}
-}
-
-t_env	*add_env_node(t_env **head, t_env **prev, char *str)
-{
-	t_env	*current;
-
-	current = create_env_node(str);
-	if (!current)
-	{
-		free_env_list(*head);
-		return (NULL);
-	}
-	if (!*head)
-		*head = current;
-	if (*prev)
-	{
-		(*prev)->next = current;
-		current->prev = *prev;
-	}
-	*prev = current;
-	return (current);
-}
-
-void	printf_dq_after(char *cmd, char c)
-{
-	int	i;
-	int	isfirst;
-
-	i = 0;
-	isfirst = 1;
-	while (cmd[i])
-	{
-		ft_putchar_fd(cmd[i], 1);
-		if (cmd[i] == c && isfirst)
+		if (env->line)
 		{
-			ft_putchar_fd('"', 1);
-			isfirst = 0;
+			if (isexport)
+			{
+				ft_putstr_fd("declare -x ", 1);
+				printf_dq_after(env->line, '=');
+				ft_putchar_fd('\n', 1);
+			}
+			else if (ft_strchr(env->line, '='))
+			{
+				ft_putendl_fd(env->line, 1);
+			}
 		}
-		i++;
+		env = env->next;
 	}
-	if (!isfirst)
-		ft_putchar_fd('"', 1);
 }
 
 void	update_shlvl(t_env *env, const char *shlvl_prefix)
@@ -97,4 +45,64 @@ void	update_shlvl(t_env *env, const char *shlvl_prefix)
 	free(value_str);
 	free(env->line);
 	env->line = new_shlvl;
+}
+
+void	increment_shell_level(t_env *env)
+{
+	t_env		*current;
+	const char	*shlvl_prefix;
+
+	shlvl_prefix = "SHLVL=";
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, shlvl_prefix,
+				ft_strlen(shlvl_prefix)) == 0)
+		{
+			update_shlvl(current, shlvl_prefix);
+			return ;
+		}
+		current = current->next;
+	}
+	current = create_env_node("SHLVL=1");
+	if (current)
+	{
+		current->next = env;
+		if (env)
+			env->prev = current;
+		env = current;
+	}
+}
+
+char	*find_pwd(t_env *env)
+{
+	t_env	*current;
+
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, "PWD=", 4) == 0)
+			return (current->line + 4);
+		current = current->next;
+	}
+	return (NULL);
+}
+
+void	update_oldpwd(t_env *env, char *pwd)
+{
+	t_env	*current;
+	char	*oldpwd;
+
+	current = env;
+	while (current)
+	{
+		if (ft_strncmp(current->line, "OLDPWD=", 7) == 0)
+		{
+			free(current->line);
+			oldpwd = ft_strjoin("OLDPWD=", pwd);
+			current->line = oldpwd;
+			return ;
+		}
+		current = current->next;
+	}
 }

@@ -32,7 +32,7 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 	if (!s)
 		return (NULL);
 	i = 0;
-	arr = (char *)malloc(len_str(s) + 1);
+	arr = (char *) malloc (len_str(s) + 1);
 	if (!arr)
 		return (NULL);
 	while (s[i])

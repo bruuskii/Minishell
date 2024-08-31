@@ -66,7 +66,7 @@ char	*ft_itoa(int n)
 
 	n_len = count_nlen(n);
 	n_pos = n;
-	arr = (char *)malloc(n_len + 1);
+	arr = (char *) malloc(n_len + 1);
 	if (!arr)
 		return (NULL);
 	if (n < 0)

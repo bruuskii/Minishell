@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_free.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:45:54 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/30 18:24:13 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/28 11:57:12 by ainouni          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ void	delete_cmd_node(t_cmd **head, t_cmd *nodetodelete)
 	free_db_arr(nodetodelete->cmd);
 	delete_fd_nodes(&nodetodelete->outfile);
 	delete_fd_nodes(&nodetodelete->infile);
+	
 	if (nodetodelete)
 		free(nodetodelete);
 }

@@ -6,30 +6,30 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 15:07:23 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/30 18:07:25 by izouine          ###   ########.fr       */
+/*   Updated: 2024/08/31 12:36:19 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	check_start_end(char *line, int len)
+int	check_start_end(char *line, int len)
 {
 	int	i;
 
 	i = 0;
 	while (isspace(line[i]))
 		i++;
-	if (is_operator(&line[i]) && ft_strncmp(&line[i], "<", 1) != 0
+	if (is_operator_split(&line[i]) && ft_strncmp(&line[i], "<", 1) != 0
 		&& ft_strncmp(&line[i], "<<", 2) != 0)
 		return (0);
 	while (len > 0 && isspace(line[len]))
 		len--;
-	if (is_operator(&line[len]))
+	if (is_operator_split(&line[len]))
 		return (0);
 	return (1);
 }
 
-static int	check_operators(char *line)
+int	check_operators(char *line)
 {
 	int	i;
 	int	j;
@@ -38,13 +38,13 @@ static int	check_operators(char *line)
 	i = 0;
 	while (line[i])
 	{
-		op_len = is_operator(&line[i]);
+		op_len = is_operator_split(&line[i]);
 		if (op_len)
 		{
 			j = i + op_len;
 			while (line[j] && isspace(line[j]))
 				j++;
-			if (!line[j] || is_operator(&line[j]))
+			if (!line[j] || is_operator_split(&line[j]))
 				return (0);
 		}
 		i++;
