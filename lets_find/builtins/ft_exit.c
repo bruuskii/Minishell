@@ -65,7 +65,6 @@ void	ft_exit(char **cmd)
 {
 	if (!cmd[1])
 	{
-		ft_putstr_fd("exit\n", 1);
 		free_exec(1);
 		exit(0);
 	}

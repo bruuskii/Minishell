@@ -32,6 +32,7 @@ int	heredoc(char *delimeter, int fd)
 		tmp = readline("");
 		if (ft_heredoc(delimeter, fd, tmp) == 0)
 			break ;
+		free(tmp);
 	}
 	free(tmp);
 	exit(0);
@@ -87,7 +88,6 @@ int	execute_herdoc(t_exec_utils *exec_utils, int *fileinfd)
 	{
 		exec_utils->sig_rec = ft_execute_parent(status, exit_status, fileinfd,
 				fd);
-		printf("seg_rec :%d\n", exec_utils->sig_rec);
 		if (exec_utils->sig_rec == 130)
 			exec_utils->exit_state = 130;
 	}

@@ -29,7 +29,8 @@ t_exec	*initexec(char **env)
 
 void	advance_cmd(t_cmd *cmd, t_cmd *prev, t_exec_utils *exec_utils)
 {
-	*prev = *cmd;
+	(void)prev;
+	prev = cmd;
 	cmd = cmd->next;
 	exec_utils->i++;
 	g_exec->exit_status = 1;
@@ -46,10 +47,10 @@ void	execute(t_exec *exec)
 	exec_utils = init_exec_utils(cmd);
 	while (cmd && exec_utils.i <= exec_utils.countpipes)
 	{
-		exec_utils.fdin = getinputfile(cmd, &exec_utils);
 		exec_utils.fdout = getoutputfile(cmd, &exec_utils);
-		if (exec_utils.sig_rec)
-			break ;
+		exec_utils.fdin = getinputfile(cmd, &exec_utils);
+		if (exec_utils.exit_state == 130 || exec_utils.sig_rec)
+			break;
 		if (exec_utils.fdin == -1 || exec_utils.fdout == -1)
 		{
 			advance_cmd(cmd, prev, &exec_utils);

@@ -149,15 +149,9 @@ int	main(int argc, char **argv, char **envp)
 			add_history(line);
 			print_type(line, g_exec->env, &g_exec->tokens, &g_exec->cmd);
 			execute(g_exec);
+			free (line);
 		}
 		free_exec(0);
-		// cleanup_commands(g_exec->cmd);
-		// g_exec->cmd = NULL;
-		// free(g_exec->cmd->cmd);
-		// free(g_exec->cmd);
-		// free(g_exec);
-		// if (strcmp(line, "clear") == 0)
-		//     clear_screen(envp);
 	}
 	return (0);
 }
