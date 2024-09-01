@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_output.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 18:46:13 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 18:56:09 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/09/01 14:33:00 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	getinputfile(t_cmd *cmd, t_exec_utils *exec_utils)
 	{
 		if (get_last_infile(exec_utils, &fileinfd, &tmpfderror) == -1)
 			g_exec->exit_status = 1;
-		if  (exec_utils->exit_state == 130)
+		if (exec_utils->exit_state == 130)
 			return (130);
 		exec_utils->file = exec_utils->file->next;
 		i++;

@@ -8,14 +8,14 @@ SRCS = parsing.c builtins/cd_builtin.c builtins/pwd_builtin.c env_mani.c \
 	   command_to_execution_utils.c env_mani_utils.c expand_last.c \
 	   expand_utils.c f_split_2.c f_split_3.c f_split_4.c f_split_5.c \
 	   ft_itoa.c parsing_handle.c parsing_utils.c parsing_last.c \
-	   parsing_norm.c command_to_execution_last.c env_mani_last.c
+	   parsing_norm.c command_to_execution_last.c env_mani_last.c main_utils.c
 OBJS = ${SRCS:.c=.o}
 NAME = minishell
 CC = cc
 LIBFT_DIR = Libft
 LIBFT_LIB = $(LIBFT_DIR)/libft.a
 RM = rm -f
-CFLAGS = -g -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -g -Wall -Wextra -Werror #-fsanitize=address
 LDFLAGS = -lreadline
 
 all: ${NAME}

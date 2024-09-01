@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ainouni <ainouni@student.42.fr>            +#+  +:+       +#+        */
+/*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/23 18:02:47 by ainouni           #+#    #+#             */
-/*   Updated: 2024/08/26 16:57:02 by ainouni          ###   ########.fr       */
+/*   Updated: 2024/09/01 14:31:02 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,3 @@ char	*ft_strjoin2(char *s1, char *s2)
 		return (NULL);
 	return (str);
 }
-
