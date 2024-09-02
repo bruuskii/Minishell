@@ -6,7 +6,7 @@
 /*   By: izouine <izouine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/31 12:03:07 by izouine           #+#    #+#             */
-/*   Updated: 2024/08/31 12:42:37 by izouine          ###   ########.fr       */
+/*   Updated: 2024/09/02 14:11:14 by izouine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,4 @@ void	grep_type(t_token *token, int index, int is_command)
 		token->type = "command";
 	else
 		token->type = "argument";
-	printf("token , %s .. type %s\n", token->token, token->type);
 }
